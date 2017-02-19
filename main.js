@@ -19,7 +19,6 @@ process.on('uncaughtException',err=>console.log(err));
 var json=s=>JSON.stringify(s);
 var mapkeys=Object.keys;var mapvals=Object.values;
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
-");
 
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
