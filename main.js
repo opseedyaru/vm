@@ -46,10 +46,10 @@ var requestListener=(request, response)=>{
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
       if("/"==uri){
-            response.writeHead(200, {"Content-Type": "text/plain"});
-            response.write("count="+inc(g_obj,'counter'));
-            response.end();
-            return;
+        response.writeHead(200, {"Content-Type": "text/plain"});
+        response.write("count="+inc(g_obj,'counter'));
+        response.end();
+        return;
       }
       if("/eval"==uri){
         var POST=qs.parse(POST_BODY);
