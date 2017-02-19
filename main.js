@@ -59,7 +59,7 @@ var requestListener=(request, response)=>{
         txt(getmap(g_obj,'files')[qp.fn]);
         return;
       }
-      if("/list"==uri){
+      if("/list"==uri||"/ls"==uri){
         var qp=qs.parse(url.parse(request.url).query);
         txt(mapkeys(getmap(g_obj,'files')).join("\n"));
         return;
