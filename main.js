@@ -1,16 +1,3 @@
-if(0)
-{
-  var http = require('http');
-  var fs = require('fs');
-  var index = fs.readFileSync('mashkod.txt');
-  console.log("nodejs server runned");
-  http.createServer(function (req, res) {
-    res.writeHead(200, {'Content-Type': 'text/plain'});
-    res.end(index);
-    console.log("response");
-  }).listen(80);
-}
-
 const util = require('util');
 const vm = require('vm');
 
@@ -21,10 +8,11 @@ var http = require("http"),
     port = process.env.PORT || 80;
 
 var qs = require('querystring');
-
+var g_obj={};
 process.on('uncaughtException',err=>console.log(err));
 
-var http_server=http.createServer(function(request, response) {
+var http_server=http.createServer((a,b)=>{return requestListener(a,b);}).listen(parseInt(port,10));
+var requestListener=(request, response)=>{
   var uri = url.parse(request.url).pathname;
   var filename = path.join(process.cwd(), uri);
 
@@ -88,6 +76,6 @@ var http_server=http.createServer(function(request, response) {
       });
     });
   });
-}).listen(parseInt(port,10));
+}
 
 console.log("Static file server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
