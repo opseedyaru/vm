@@ -23,8 +23,6 @@ var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
 
-var g_devtest=()=>{return 'nothing';}
-
 var http_server=http.createServer((a,b)=>{return requestListener(a,b);}).listen(port,ip);
 var requestListener=(request, response)=>{
   var uri = url.parse(request.url).pathname;
@@ -66,16 +64,9 @@ var requestListener=(request, response)=>{
         txt(mapkeys(getmap(g_obj,'files')).join("\n"));
         return;
       }
-      if("/test"==uri){
-        response.writeHead(200, {"Content-Type": "text/plain"});
-        response.write(g_devtest);
-        response.end();
-        return;
-      }
       if("/"==uri){
         response.writeHead(200, {"Content-Type": "text/plain"});
-        response.write("count="+inc(g_obj,'counter'));
-        response.end();
+        response.end("count="+inc(g_obj,'counter'));
         return;
       }
       if("/eval"==uri){
@@ -85,29 +76,25 @@ var requestListener=(request, response)=>{
           system_tmp=system_tmp();
           if(response){
             response.writeHead(200, {"Content-Type": "text/plain"});
-            response.write(system_tmp);
-            response.end();
+            response.end(system_tmp);
             return;
           }
         }catch(err){
           response.writeHead(500, {"Content-Type": "text/plain"});
-          response.write("Internal Server Error:\n"+err.toString());
-          response.end();
+          response.end("Internal Server Error:\n"+err.toString());
           console.error(err);
           return;
         }
       }
       if(!exists) {
         response.writeHead(404, {"Content-Type": "text/plain"});
-        response.write("404 Not Found\n");
-        response.end();
+        response.end("404 Not Found\n");
         return;
       }
       fs.readFile(filename, "binary", function(err, file) {
         if(err) {
           response.writeHead(500, {"Content-Type": "text/plain"});
-          response.write(err + "\n");
-          response.end();
+          response.end(err + "\n");
           return;
         }
         var headers = {};
