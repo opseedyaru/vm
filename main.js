@@ -4,14 +4,20 @@ const vm = require('vm');
 var http = require("http"),
     url = require("url"),
     path = require("path"),
-    fs = require("fs")
-    port = process.env.PORT || 80;
+    fs = require("fs");
+
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
+    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
+    mongoURLLabel = "";
+
 
 var qs = require('querystring');
 var g_obj={};
 process.on('uncaughtException',err=>console.log(err));
 
-var http_server=http.createServer((a,b)=>{return requestListener(a,b);}).listen(parseInt(port,10));
+var http_server=http.createServer((a,b)=>{return requestListener(a,b);}).listen(port,ip);
 var requestListener=(request, response)=>{
   var uri = url.parse(request.url).pathname;
   var filename = path.join(process.cwd(), uri);
