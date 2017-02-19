@@ -17,6 +17,10 @@ var qs = require('querystring');
 var g_obj={};
 process.on('uncaughtException',err=>console.log(err));
 
+var json=s=>JSON.stringify(s);
+var mapkeys=Object.keys;var mapvals=Object.values;
+var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
+
 var http_server=http.createServer((a,b)=>{return requestListener(a,b);}).listen(port,ip);
 var requestListener=(request, response)=>{
   var uri = url.parse(request.url).pathname;
@@ -41,6 +45,12 @@ var requestListener=(request, response)=>{
     var is_dir=fn=>fs.statSync(filename).isDirectory();
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
+      if("/"==uri){
+            response.writeHead(200, {"Content-Type": "text/plain"});
+            response.write("count="+inc(g_obj,'counter'));
+            response.end();
+            return;
+      }
       if("/eval"==uri){
         var POST=qs.parse(POST_BODY);
         try{
