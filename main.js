@@ -48,19 +48,19 @@ var requestListener=(request, response)=>{
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
       var txt=(s)=>{response.writeHead(200,{"Content-Type":"text/plain"});response.end(s);}
+      var qp=qs.parse(url.parse(request.url).query);
+      var POST=POST_BODY.length?qs.parse(POST_BODY):{};
+      mapkeys(POST).map(k=>qp[k]=POST[k]);
       if("/put"==uri){
-        var qp=qs.parse(url.parse(request.url).query);
         getmap(g_obj,'files')[qp.fn]=qp.data;
         txt(json(qp));
         return;
       }
       if("/get"==uri){
-        var qp=qs.parse(url.parse(request.url).query);
         txt(getmap(g_obj,'files')[qp.fn]);
         return;
       }
       if("/list"==uri||"/ls"==uri){
-        var qp=qs.parse(url.parse(request.url).query);
         txt(mapkeys(getmap(g_obj,'files')).join("\n"));
         return;
       }
@@ -70,7 +70,6 @@ var requestListener=(request, response)=>{
         return;
       }
       if("/eval"==uri){
-        var POST=qs.parse(POST_BODY);
         try{
           var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
           system_tmp=system_tmp();
