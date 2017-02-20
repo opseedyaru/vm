@@ -2,6 +2,7 @@ const util = require('util');
 const vm = require('vm');
 
 var http = require("http"),
+    https = require("https"),
     url = require("url"),
     path = require("path"),
     fs = require("fs");
@@ -22,6 +23,23 @@ var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
+
+var xhr_get=(url,ok,err)=>{
+  (url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
+    var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
+    if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
+    if(error){err(error.message);res.resume();return;}
+    //res.setEncoding('utf8');
+    var rawData='';res.on('data',(chunk)=>rawData+=chunk);
+    res.on('end',()=>{try{ok(rawData);}catch(e){err(e.message);}});
+  }).on('error',(e)=>{err('Got error: '+e.message);});
+}
+
+var hosts={};var hosts_err_msg='';
+xhr_get('http://adler3d.github.io/qap_vm/trash/test2017/hosts.json',s=>hosts=JSON.parse(s),s=>hosts_err_msg=s);
+
+var is_public=host=>hosts[host]=='public';
+var is_shadow=host=>hosts[host]=='shadow';
 
 var http_server=http.createServer((a,b)=>{return requestListener(a,b);}).listen(port,ip);
 var requestListener=(request, response)=>{
