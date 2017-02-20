@@ -17,6 +17,8 @@ var g_interval=false;
 var g_obj={};
 process.on('uncaughtException',err=>qap_log(err));
 
+var qap_log=s=>console.log("["+getDateTime()+"]"+s);
+
 var json=s=>JSON.stringify(s);
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
@@ -194,6 +196,7 @@ var requestListener=(request, response)=>{
       if(need_coop_init){
         need_coop_init=false;
         var pub=is_public(request.headers.host);var none=()=>{};
+        if(pub)if(g_interval){clearInterval(g_interval);g_interval=false;}
         if(pub)g_interval=setInterval(()=>xhr_post('http://'+shadow+'/tick',{},none,none),1000*30);
         var server=pub?shadow:master;
         xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
@@ -203,5 +206,4 @@ var requestListener=(request, response)=>{
     });
   });
 }
-var qap_log=s=>console.log("["+getDateTime()+"]"+s);
 qap_log("Static file server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
