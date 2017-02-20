@@ -25,7 +25,7 @@ var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
 
 var xhr_get=(url,ok,err)=>{
-  (url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
+  var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
     if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
     if(error){err(error.message);res.resume();return;}
@@ -33,6 +33,7 @@ var xhr_get=(url,ok,err)=>{
     var rawData='';res.on('data',(chunk)=>rawData+=chunk);
     res.on('end',()=>{try{ok(rawData);}catch(e){err(e.message);}});
   }).on('error',(e)=>{err('Got error: '+e.message);});
+  return req;
 }
 
 var xhr=(method,URL,data,ok,err)=>{
@@ -41,7 +42,7 @@ var xhr=(method,URL,data,ok,err)=>{
     hostname:up.host,port:secure?443:80,path:up.path,method:method.toUpperCase(),
     headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
-  (secure?https:http).request(options,(res)=>{
+  var req=(secure?https:http).request(options,(res)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
     if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
     if(error){err(error.message);res.resume();return;}
@@ -49,6 +50,8 @@ var xhr=(method,URL,data,ok,err)=>{
     var rawData='';res.on('data',(chunk)=>rawData+=chunk);
     res.on('end',()=>{try{ok(rawData);}catch(e){err(e.message);}});
   }).on('error',(e)=>{err('Got error: '+e.message);});
+  req.end(data);
+  return req;
 }
 
 var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
