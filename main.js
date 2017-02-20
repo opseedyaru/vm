@@ -98,6 +98,7 @@ var requestListener=(request, response)=>{
         xhr_post('http://'+shadow+uri,qp,s=>cb(),s=>txt('coop_fail:\n'+s));
         return;
       };
+      response.off=()=>response={writeHead:()=>{},end:()=>{}};
       var coop=collaboration;
       mapkeys(POST).map(k=>qp[k]=POST[k]);
       if("/hosts.json"==uri){
