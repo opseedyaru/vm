@@ -18,7 +18,7 @@ var g_obj={};
 process.on('uncaughtException',err=>console.log(err));
 
 var json=s=>JSON.stringify(s);
-var mapkeys=Object.keys;var mapvals=Object.values;
+var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
@@ -34,6 +34,24 @@ var xhr_get=(url,ok,err)=>{
     res.on('end',()=>{try{ok(rawData);}catch(e){err(e.message);}});
   }).on('error',(e)=>{err('Got error: '+e.message);});
 }
+
+var xhr=(method,URL,data,ok,err)=>{
+  var up=url.parse(URL);var secure=up.protocol=='https';
+  var options={
+    hostname:up.host,port:secure?443:80,path:up.path,method:method.toUpperCase(),
+    headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
+  };
+  (secure?https:http).request(options,(res)=>{
+    var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
+    if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
+    if(error){err(error.message);res.resume();return;}
+    //res.setEncoding('utf8');
+    var rawData='';res.on('data',(chunk)=>rawData+=chunk);
+    res.on('end',()=>{try{ok(rawData);}catch(e){err(e.message);}});
+  }).on('error',(e)=>{err('Got error: '+e.message);});
+}
+
+var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
 
 var hosts={};var hosts_err_msg='';
 
@@ -74,22 +92,43 @@ var requestListener=(request, response)=>{
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var qp=qs.parse(url.parse(request.url).query);
       var POST=POST_BODY.length?qs.parse(POST_BODY):{};
+      var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
+      var collaboration=cb=>{
+        if(!is_public(request.headers.host)){cb();return;}
+        xhr_post('http://'+shadow+uri,qp,s=>cb(),s=>txt('coop_fail:\n'+s));
+        return;
+      };
+      var coop=collaboration;
       mapkeys(POST).map(k=>qp[k]=POST[k]);
       if("/hosts.json"==uri){
         hosts_sync(s=>txt(s));
         return;
       }
+      if("/del"==uri){
+        coop(()=>{
+          var files=getmap(g_obj,'files');
+          delete files[qp.fn];
+          txt(json(qp));
+        });
+        return;
+      }
       if("/put"==uri){
-        getmap(g_obj,'files')[qp.fn]=qp.data;
-        txt(json(qp));
+        coop(()=>{
+          getmap(g_obj,'files')[qp.fn]=qp.data;
+          txt(json(qp));
+        });
         return;
       }
       if("/get"==uri){
-        txt(getmap(g_obj,'files')[qp.fn]);
+        //coop(()=>{
+          txt(getmap(g_obj,'files')[qp.fn]);
+        //});
         return;
       }
       if("/list"==uri||"/ls"==uri){
-        txt(mapkeys(getmap(g_obj,'files')).join("\n"));
+        //coop(()=>{
+          txt(mapkeys(getmap(g_obj,'files')).join("\n"));
+        //});
         return;
       }
       if("/"==uri){
