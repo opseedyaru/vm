@@ -17,7 +17,7 @@ var g_interval=false;
 var g_obj={};
 process.on('uncaughtException',err=>qap_log(err));
 
-var qap_log=s=>console.log("["+getDateTime()+"]"+s);
+var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 
 var json=s=>JSON.stringify(s);
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
