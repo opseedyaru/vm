@@ -67,7 +67,7 @@ hosts_sync();
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
 
-var http_server=http.createServer((a,b)=>{return requestListener(a,b);}).listen(port,ip);
+var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
 var requestListener=(request, response)=>{
   var uri = url.parse(request.url).pathname;
   var filename = path.join(process.cwd(), uri);
