@@ -55,14 +55,12 @@ var xhr=(method,URL,data,ok,err)=>{
 
 var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
 
-var hosts={};var hosts_err_msg='';
+var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
 var hosts_sync=(cb)=>{
   if(typeof cb=='undefined')cb=()=>{};
   xhr_get('http://adler3d.github.io/qap_vm/trash/test2017/hosts.json',s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
 };
-
-hosts_sync();
 
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
@@ -95,84 +93,96 @@ var requestListener=(request, response)=>{
       var qp=qs.parse(url.parse(request.url).query);
       var POST=POST_BODY.length?qs.parse(POST_BODY):{};
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
-      var collaboration=cb=>{
-        if(!is_public(request.headers.host)){cb();return;}
-        xhr_post('http://'+shadow+uri,qp,s=>cb(),s=>txt('coop_fail:\n'+s));
-        return;
-      };
-      response.off=()=>response={writeHead:()=>{},end:()=>{}};
-      var coop=collaboration;
-      mapkeys(POST).map(k=>qp[k]=POST[k]);
-      if("/hosts.json"==uri){
-        hosts_sync(s=>txt(s));
-        return;
+      var public=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
+      if(need_coop_init){
+        need_coop_init=false;
+        var server=is_public(request.headers.host)?shadow:public;
+        xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);;req_handler();},s=>txt('coop_init_fail:\n'+s));
       }
-      if("/del"==uri){
-        coop(()=>{
-          var files=getmap(g_obj,'files');
-          delete files[qp.fn];
-          txt(json(qp));
-        });
-        return;
-      }
-      if("/put"==uri){
-        coop(()=>{
-          getmap(g_obj,'files')[qp.fn]=qp.data;
-          txt(json(qp));
-        });
-        return;
-      }
-      if("/get"==uri){
-        //coop(()=>{
-          txt(getmap(g_obj,'files')[qp.fn]);
-        //});
-        return;
-      }
-      if("/list"==uri||"/ls"==uri){
-        //coop(()=>{
-          txt(mapkeys(getmap(g_obj,'files')).join("\n"));
-        //});
-        return;
-      }
-      if("/"==uri){
-        response.writeHead(200, {"Content-Type": "text/plain"});
-        response.end("count="+inc(g_obj,'counter'));
-        return;
-      }
-      if("/eval"==uri){
-        try{
-          var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
-          system_tmp=system_tmp();
-          if(response){
-            response.writeHead(200, {"Content-Type": "text/plain"});
-            response.end(system_tmp);
+      var req_handler=()=>{
+        var collaboration=cb=>{
+          if(!is_public(request.headers.host)){cb();return;}
+          xhr_post('http://'+shadow+uri,qp,s=>cb(),s=>txt('coop_fail:\n'+s));
+          return;
+        };
+        response.off=()=>response={writeHead:()=>{},end:()=>{}};
+        var coop=collaboration;
+        mapkeys(POST).map(k=>qp[k]=POST[k]);
+        if("/g_obj.json"==uri){
+          txt(json(g_obj));
+          return;
+        }
+        if("/hosts.json"==uri){
+          hosts_sync(s=>txt(s));
+          return;
+        }
+        if("/del"==uri){
+          coop(()=>{
+            var files=getmap(g_obj,'files');
+            delete files[qp.fn];
+            txt(json(qp));
+          });
+          return;
+        }
+        if("/put"==uri){
+          coop(()=>{
+            getmap(g_obj,'files')[qp.fn]=qp.data;
+            txt(json(qp));
+          });
+          return;
+        }
+        if("/get"==uri){
+          //coop(()=>{
+            txt(getmap(g_obj,'files')[qp.fn]);
+          //});
+          return;
+        }
+        if("/list"==uri||"/ls"==uri){
+          //coop(()=>{
+            txt(mapkeys(getmap(g_obj,'files')).join("\n"));
+          //});
+          return;
+        }
+        if("/"==uri){
+          response.writeHead(200, {"Content-Type": "text/plain"});
+          response.end("count="+inc(g_obj,'counter'));
+          return;
+        }
+        if("/eval"==uri){
+          try{
+            var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
+            system_tmp=system_tmp();
+            if(response){
+              response.writeHead(200, {"Content-Type": "text/plain"});
+              response.end(system_tmp);
+              return;
+            }
+          }catch(err){
+            response.writeHead(500, {"Content-Type": "text/plain"});
+            response.end("Internal Server Error:\n"+err.toString());
+            console.error(err);
             return;
           }
-        }catch(err){
-          response.writeHead(500, {"Content-Type": "text/plain"});
-          response.end("Internal Server Error:\n"+err.toString());
-          console.error(err);
+        }
+        if(!exists) {
+          response.writeHead(404, {"Content-Type": "text/plain"});
+          response.end("404 Not Found\n");
           return;
         }
-      }
-      if(!exists) {
-        response.writeHead(404, {"Content-Type": "text/plain"});
-        response.end("404 Not Found\n");
-        return;
-      }
-      fs.readFile(filename, "binary", function(err, file) {
-        if(err) {
-          response.writeHead(500, {"Content-Type": "text/plain"});
-          response.end(err + "\n");
-          return;
-        }
-        var headers = {};
-        var contentType = contentTypesByExtension[path.extname(filename)];
-        if (contentType) headers["Content-Type"] = contentType;
-        response.writeHead(200, headers);
-        response.write(file, "binary");
-        response.end();
-      });
+        fs.readFile(filename, "binary", function(err, file) {
+          if(err) {
+            response.writeHead(500, {"Content-Type": "text/plain"});
+            response.end(err + "\n");
+            return;
+          }
+          var headers = {};
+          var contentType = contentTypesByExtension[path.extname(filename)];
+          if (contentType) headers["Content-Type"] = contentType;
+          response.writeHead(200, headers);
+          response.write(file, "binary");
+          response.end();
+        });
+      };
     });
   });
 }
