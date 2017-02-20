@@ -93,12 +93,7 @@ var requestListener=(request, response)=>{
       var qp=qs.parse(url.parse(request.url).query);
       var POST=POST_BODY.length?qs.parse(POST_BODY):{};
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
-      var public=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
-      if(need_coop_init){
-        need_coop_init=false;
-        var server=is_public(request.headers.host)?shadow:public;
-        xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);;req_handler();},s=>txt('coop_init_fail:\n'+s));
-      }
+      var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
         var collaboration=cb=>{
           if(!is_public(request.headers.host)){cb();return;}
@@ -183,6 +178,11 @@ var requestListener=(request, response)=>{
           response.end();
         });
       };
+      if(need_coop_init){
+        need_coop_init=false;
+        var server=is_public(request.headers.host)?shadow:master;
+        xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);;req_handler();},s=>txt('coop_init_fail:\n'+s));
+      }
     });
   });
 }
