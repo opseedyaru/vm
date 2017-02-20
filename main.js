@@ -71,7 +71,7 @@ var requestListener=(request, response)=>{
     var is_dir=fn=>fs.statSync(filename).isDirectory();
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
-      var txt=((r)=>{var r=response;return (s)=>{response.writeHead(200,{"Content-Type":"text/plain"});response.end(s);}})(response);
+      var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var qp=qs.parse(url.parse(request.url).query);
       var POST=POST_BODY.length?qs.parse(POST_BODY):{};
       mapkeys(POST).map(k=>qp[k]=POST[k]);
