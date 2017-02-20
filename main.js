@@ -183,8 +183,10 @@ var requestListener=(request, response)=>{
       if(need_coop_init){
         need_coop_init=false;
         var server=is_public(request.headers.host)?shadow:master;
-        xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);;req_handler();},s=>txt('coop_init_fail:\n'+s));
+        xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
+        return;
       }
+      req_handler();
     });
   });
 }
