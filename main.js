@@ -36,7 +36,13 @@ var xhr_get=(url,ok,err)=>{
 }
 
 var hosts={};var hosts_err_msg='';
-xhr_get('http://adler3d.github.io/qap_vm/trash/test2017/hosts.json',s=>hosts=JSON.parse(s),s=>hosts_err_msg=s);
+
+var hosts_sync=(cb)=>{
+  if(typeof cb=='undefined')cb=()=>{};
+  xhr_get('http://adler3d.github.io/qap_vm/trash/test2017/hosts.json',s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
+};
+
+hosts_sync();
 
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
@@ -65,10 +71,14 @@ var requestListener=(request, response)=>{
     var is_dir=fn=>fs.statSync(filename).isDirectory();
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
-      var txt=(s)=>{response.writeHead(200,{"Content-Type":"text/plain"});response.end(s);}
+      var txt=((r)=>{var r=response;return (s)=>{response.writeHead(200,{"Content-Type":"text/plain"});response.end(s);}})(response);
       var qp=qs.parse(url.parse(request.url).query);
       var POST=POST_BODY.length?qs.parse(POST_BODY):{};
       mapkeys(POST).map(k=>qp[k]=POST[k]);
+      if("/hosts.json"==uri){
+        hosts_sync(s=>txt(s));
+        return;
+      }
       if("/put"==uri){
         getmap(g_obj,'files')[qp.fn]=qp.data;
         txt(json(qp));
