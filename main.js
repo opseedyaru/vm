@@ -62,6 +62,8 @@ var hosts_sync=(cb)=>{
   xhr_get('http://adler3d.github.io/qap_vm/trash/test2017/hosts.json',s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
 };
 
+hosts_sync();
+
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
 
