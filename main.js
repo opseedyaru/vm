@@ -13,8 +13,9 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     mongoURLLabel = "";
 
 var qs = require('querystring');
+var g_interval=false;
 var g_obj={};
-process.on('uncaughtException',err=>console.log(err));
+process.on('uncaughtException',err=>qap_log(err));
 
 var json=s=>JSON.stringify(s);
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
@@ -22,6 +23,19 @@ var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
+
+function getDateTime() {
+  var now     = new Date(); 
+  var year    = now.getFullYear();
+  var f=v=>(v.toString().length==1?'0':'')+v;
+  var month   = f(now.getMonth()+1); 
+  var day     = f(now.getDate());
+  var hour    = f(now.getHours());
+  var minute  = f(now.getMinutes());
+  var second  = f(now.getSeconds()); 
+  var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second;   
+  return dateTime;
+}
 
 var xhr_get=(url,ok,err)=>{
   var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
@@ -72,7 +86,7 @@ var requestListener=(request, response)=>{
   var uri = url.parse(request.url).pathname;
   var filename = path.join(process.cwd(), uri);
 
-  console.log("uri = "+uri);
+  qap_log("uri = "+uri);
   var contentTypesByExtension = {
     '.html': "text/html",
     '.css':  "text/css",
@@ -140,11 +154,8 @@ var requestListener=(request, response)=>{
           //});
           return;
         }
-        if("/"==uri){
-          response.writeHead(200, {"Content-Type": "text/plain"});
-          response.end("count="+inc(g_obj,'counter'));
-          return;
-        }
+        if("/"==uri)return coop(()=>txt("count = "+inc(g_obj,'counter')));
+        if("/tick"==uri)return txt("tick = "+inc(g_obj,'tick'));
         if("/eval"==uri){
           try{
             var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
@@ -182,7 +193,9 @@ var requestListener=(request, response)=>{
       };
       if(need_coop_init){
         need_coop_init=false;
-        var server=is_public(request.headers.host)?shadow:master;
+        var pub=is_public(request.headers.host);var none=()=>{};
+        if(pub)g_interval=setInterval(()=>xhr_post('http://'+shadow+'/tick',{},none,none),1000*30);
+        var server=pub?shadow:master;
         xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
         return;
       }
@@ -190,5 +203,5 @@ var requestListener=(request, response)=>{
     });
   });
 }
-
-console.log("Static file server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
+var qap_log=s=>console.log("["+getDateTime()+"]"+s);
+qap_log("Static file server running at\n  => http://localhost:" + port + "/\nCTRL + C to shutdown");
