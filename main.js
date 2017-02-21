@@ -12,8 +12,10 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
     mongoURLLabel = "";
 
+var get_tick_count=()=>new Date().getTime();
+
 var qs = require('querystring');
-var g_interval=false;
+var g_interval=false;var g_ping_base=get_tick_count();
 var g_obj={};
 process.on('uncaughtException',err=>qap_log(err));
 
@@ -157,7 +159,8 @@ var requestListener=(request, response)=>{
           return;
         }
         if("/"==uri)return coop(()=>txt("count = "+inc(g_obj,'counter')));
-        if("/tick"==uri)return txt("tick = "+inc(g_obj,'tick'));
+        if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
+        if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
         if("/eval"==uri){
           try{
             var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
@@ -196,8 +199,17 @@ var requestListener=(request, response)=>{
       if(need_coop_init){
         need_coop_init=false;
         var pub=is_public(request.headers.host);var none=()=>{};
-        if(pub)if(g_interval){clearInterval(g_interval);g_interval=false;}
-        if(pub)g_interval=setInterval(()=>xhr_post('http://'+shadow+'/tick',{},none,none),1000*30);
+        if(g_interval){clearInterval(g_interval);g_interval=false;}
+        var period=1000*30;var net_gap=1000*10;
+        if(!pub){
+          g_interval=setInterval(()=>{
+            var ctc=get_tick_count();
+            if(ctc-g_ping_base<=period+net_gap)return;
+            g_ping_base=ctc;
+            xhr_post('http://'+master+'/ping',{},none,none);
+          },1000);
+        }
+        if(pub)g_interval=setInterval(()=>xhr_post('http://'+shadow+'/tick',{},none,none),period);
         var server=pub?shadow:master;
         xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
         return;
