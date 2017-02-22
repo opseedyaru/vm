@@ -166,7 +166,7 @@ var requestListener=(request, response)=>{
         if("/hostname"==uri){return txt(os.hostname());}
         if("/fetch"==uri){
           (()=>{
-            var repo="https://raw.githubusercontent.com/gitseo/vm/master/;
+            var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
             var fn=('fn' in qp)?qp[fn]:"main.js";
             xhr_get(repo+fn+'?t='+rand(),s=>{fs.writeFileSync(fn,s);return "done!\nlength = "+Buffer.byteLength(s);},txt);
           })();
