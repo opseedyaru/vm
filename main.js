@@ -78,7 +78,7 @@ var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
 var hosts_sync=(cb)=>{
   if(typeof cb=='undefined')cb=()=>{};
-  xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json',s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
+  xhr_post('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json',{},s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
 };
 
 hosts_sync();
@@ -209,12 +209,12 @@ var requestListener=(request, response)=>{
             var ctc=get_tick_count();
             if(ctc-g_ping_base<=period+net_gap)return;
             g_ping_base=ctc;
-            xhr_post('http://'+master+'/ping',{},none,none);
+            xhr_post('http://'+master+'/ping?from='+os.hostname(),{},none,none);
           },1000);
         }
-        if(pub)g_interval=setInterval(()=>xhr_post('http://'+shadow+'/tick',{},none,none),period);
+        if(pub)g_interval=setInterval(()=>xhr_post('http://'+shadow+'/tick?from='+os.hostname(),{},none,none),period);
         var server=pub?shadow:master;
-        xhr_post('http://'+server+'/g_obj.json',{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
+        xhr_post('http://'+server+'/g_obj.json?from='+os.hostname(),{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
         return;
       }
       req_handler();
