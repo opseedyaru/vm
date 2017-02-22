@@ -96,7 +96,8 @@ var requestListener=(request, response)=>{
     '.html': "text/html",
     '.css':  "text/css",
     '.js':   "text/javascript",
-    '.txt':  "text/plain"
+    '.txt':  "text/plain",
+    '.log':  "text/plain"
   };
   
   var on_request_end=(cb)=>{
