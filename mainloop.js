@@ -5,6 +5,7 @@ var safe_spawn_with_cb=(cmd,args,cb)=>{
   var proc=safe_spawn(cmd,args);
   proc.on('close',code=>{qap_log("\nchild process exited with code "+code);cb();});
   proc.on('error',err=>{qap_log("\n"+err+"\n");cb();});
+  return proc;
 }
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 function getDateTime() {
@@ -23,7 +24,6 @@ var file_exist=fn=>{try{require('fs').accessSync(fn);return true;}catch(e){retur
 var fn="fast_unsafe_auto_restart_enabled.txt";
 exec("echo created inside mainloop.js>"+fn);
 var need_restart=true;
-var do_restart=()=>need_restart=true;
 var iter=0;
 var mainloop=setInterval(()=>{
   if(!need_restart)return;
@@ -32,5 +32,5 @@ var mainloop=setInterval(()=>{
   iter++;
   exec('echo "'+iter+'">mainloop_iter.txt');
   qap_log('mainloop::iter = '+iter);
-  safe_spawn_with_cb("node",["main.js"]);
+  safe_spawn_with_cb("node",["main.js"],()=>need_restart=true);
 },500);
