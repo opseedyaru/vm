@@ -5,7 +5,8 @@ var http = require("http"),
     https = require("https"),
     url = require("url"),
     path = require("path"),
-    fs = require("fs");
+    fs = require("fs"),
+    os = require("os");
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -157,6 +158,8 @@ var requestListener=(request, response)=>{
           //});
           return;
         }
+        if("/hostname"==uri){return txt(require('os').hostname());}
+        if("/close"==uri||"/quit"==uri||"/exit"==uri){setTimeout(()=>process.exit(),16);return txt("ok");}
         if("/"==uri)return coop(()=>txt("count = "+inc(g_obj,'counter')));
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
