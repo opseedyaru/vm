@@ -1,6 +1,8 @@
 const util = require('util');
 const vm = require('vm');
 
+var child_process=require('child_process');
+
 var http = require("http"),
     https = require("https"),
     url = require("url"),
@@ -79,7 +81,7 @@ var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
 var hosts_sync=(cb)=>{
   if(typeof cb=='undefined')cb=()=>{};
-  xhe_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
+  xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
 };
 
 hosts_sync();
@@ -114,6 +116,7 @@ var requestListener=(request, response)=>{
     var is_dir=fn=>fs.statSync(filename).isDirectory();
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
+      var quit=()=>{setTimeout(()=>process.exit(),16);return txt("ok");}
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
@@ -161,7 +164,16 @@ var requestListener=(request, response)=>{
           return;
         }
         if("/hostname"==uri){return txt(os.hostname());}
-        if("/close"==uri||"/quit"==uri||"/exit"==uri){setTimeout(()=>process.exit(),16);return txt("ok");}
+        if("/fetch"==uri){
+          (()=>{
+            var repo="https://raw.githubusercontent.com/gitseo/vm/master/;
+            var fn=('fn' in qp)?qp[fn]:"main.js";
+            xhr_get(repo+fn+'?t='+rand(),s=>{fs.writeFileSync(fn,s);return "done!\nlength = "+Buffer.byteLength(s);},txt);
+          })();
+          return;
+        }
+        if("/rollback"==uri){fs.unlinkSync("fast_unsafe_auto_restart_enabled.txt");quit();}
+        if("/close"==uri||"/quit"==uri||"/exit"==uri)quit();
         if("/"==uri)return coop(()=>txt("count = "+inc(g_obj,'counter')));
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
