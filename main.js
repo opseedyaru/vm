@@ -168,7 +168,7 @@ var requestListener=(request, response)=>{
           (()=>{
             var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
             var fn=('fn' in qp)?qp[fn]:"main.js";
-            xhr_get(repo+fn+'?t='+rand(),s=>{fs.writeFileSync(fn,s);return "done!\nlength = "+Buffer.byteLength(s);},txt);
+            xhr_get(repo+fn+'?t='+1,s=>{fs.writeFileSync(fn,s);txt("done!\nlength = "+Buffer.byteLength(s));},txt);
           })();
           return;
         }
