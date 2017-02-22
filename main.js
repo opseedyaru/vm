@@ -81,7 +81,10 @@ var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
 var hosts_sync=(cb)=>{
   if(typeof cb=='undefined')cb=()=>{};
-  xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),s=>{hosts=JSON.parse(s);cb(s);},s=>{hosts_err_msg=s;cb(s);});
+  xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
+    s=>{try{hosts=JSON.parse(s);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);cb(s);},
+    s=>{hosts_err_msg=s;cb(s);}
+  );
 };
 
 hosts_sync();
