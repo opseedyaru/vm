@@ -97,7 +97,7 @@ var requestListener=(request, response)=>{
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
   var filename = path.join(process.cwd(), uri);
 
-  qap_log("uri = "+purl.path);
+  qap_log("url = "+purl.path);
   var contentTypesByExtension = {
     '.html': "text/html",
     '.css':  "text/css",
