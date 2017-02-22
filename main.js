@@ -66,7 +66,7 @@ var xhr=(method,URL,data,ok,err)=>{
     if(error){err(error.message);res.resume();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk);
-    res.on('end',()=>{try{ok(rawData);}catch(e){err(e.message);}});
+    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
   }).on('error',(e)=>{err('Got error: '+e.message);});
   req.end(data);
   return req;
