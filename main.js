@@ -63,11 +63,11 @@ var xhr=(method,URL,data,ok,err)=>{
   var req=(secure?https:http).request(options,(res)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
     if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
-    if(error){err(error.message);res.resume();return;}
+    if(error){err(error.message,res);res.resume();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk);
     res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
-  }).on('error',(e)=>{err('Got error: '+e.message);});
+  }).on('error',e=>{err('Got error: '+e.message,null);});
   req.end(data);
   return req;
 }
