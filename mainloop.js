@@ -3,7 +3,7 @@ var file_exist=fn=>{try{require('fs').accessSync(fn);return true;}catch(e){retur
 var fn="fast_unsafe_auto_restart_enabled.txt";
 exec("echo created inside mainloop.js>"+fn);
 var need_restart=true;
-var do_restart()=>need_restart=true;
+var do_restart=()=>need_restart=true;
 var iter=0;
 var mainloop=setInterval(()=>{
   if(!need_restart)return;
