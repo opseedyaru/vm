@@ -158,7 +158,7 @@ var requestListener=(request, response)=>{
           //});
           return;
         }
-        if("/hostname"==uri){return txt(require('os').hostname());}
+        if("/hostname"==uri){return txt(os.hostname());}
         if("/close"==uri||"/quit"==uri||"/exit"==uri){setTimeout(()=>process.exit(),16);return txt("ok");}
         if("/"==uri)return coop(()=>txt("count = "+inc(g_obj,'counter')));
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
