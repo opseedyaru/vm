@@ -87,10 +87,10 @@ var is_shadow=host=>hosts[host]=='shadow';
 
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
 var requestListener=(request, response)=>{
-  var uri = url.parse(request.url).pathname;
+  var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
   var filename = path.join(process.cwd(), uri);
 
-  qap_log("uri = "+uri);
+  qap_log("uri = "+purl.path);
   var contentTypesByExtension = {
     '.html': "text/html",
     '.css':  "text/css",
@@ -106,12 +106,12 @@ var requestListener=(request, response)=>{
   };
   response.on('error',err=>console.error(err));
   on_request_end((POST_BODY)=>{
+    var POST=POST_BODY.length?qs.parse(POST_BODY):{};
+    mapkeys(POST).map(k=>qp[k]=POST[k]);POST=qp;
     var is_dir=fn=>fs.statSync(filename).isDirectory();
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
-      var qp=qs.parse(url.parse(request.url).query);
-      var POST=POST_BODY.length?qs.parse(POST_BODY):{};
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
@@ -122,7 +122,6 @@ var requestListener=(request, response)=>{
         };
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
         var coop=collaboration;
-        mapkeys(POST).map(k=>qp[k]=POST[k]);
         if("/g_obj.json"==uri){
           txt(json(g_obj));
           return;
