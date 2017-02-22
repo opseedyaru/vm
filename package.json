@@ -4,7 +4,7 @@
   "description": "...",
   "main": "mainloop.js",
   "scripts": {
-    "start": "node mainloop.js",
+    "start": "node mainloop.js|tee mainloop.log",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
