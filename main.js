@@ -119,14 +119,15 @@ var requestListener=(request, response)=>{
     var is_dir=fn=>fs.statSync(filename).isDirectory();
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
-      var quit=()=>{setTimeout(()=>process.exit(),16);return txt("ok");}
+      var raw_quit=()=>{setTimeout(()=>process.exit(),16);}
+      var quit=()=>{raw_quit();return txt("ok");}
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
         var collaboration=cb=>{
-          if(!is_public(request.headers.host)){cb();return;}
-          xhr_post('http://'+shadow+uri,qp,s=>cb(),s=>txt('coop_fail:\n'+s));
+          if(!is_public(request.headers.host)){cb(false);return;}
+          xhr_post('http://'+shadow+uri,qp,s=>cb(true),s=>txt('coop_fail:\n'+s));
           return;
         };
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
@@ -171,7 +172,11 @@ var requestListener=(request, response)=>{
           (()=>{
             var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
             var fn=('fn' in qp)?qp[fn]:"main.js";
-            xhr_get(repo+fn+'?t='+1,s=>{fs.writeFileSync(fn,s);txt("done!\nlength = "+Buffer.byteLength(s));},txt);
+            xhr_get(repo+fn+'?t='+rand(),s=>{
+              fs.writeFileSync(fn,s);
+              txt("done!\nlength = "+Buffer.byteLength(s));
+              if('quit' in qp)raw_quit();
+            },txt);
           })();
           return;
         }
