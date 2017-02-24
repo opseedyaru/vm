@@ -28,6 +28,9 @@ var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 var json=JSON.stringify;
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
+var mapdrop=(e,arr,n)=>{var out=n||{};Object.keys(e).map(k=>arr.indexOf(k)<0?out[k]=e[k]:0);return out;}
+var mapaddfront=(obj,n)=>{for(var k in obj)n[k]=obj[k];return n;}
+var mapclone=obj=>mapaddfront(obj,{});
 
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
@@ -183,7 +186,10 @@ var requestListener=(request, response)=>{
             if(!(qp.fn in files))return json(['not found',qp.fn]);
             var f=files[qp.fn];
             getarr(f,'log').push(log_object);
-            return json(['found at '+os.hostname(),f],null,2);
+            var ignore="host,hostname,method".split(",");
+            f=mapclone(f);f.log=f.log.map(e=>mapdrop(e,ignore));
+            return json(f,null,2);
+            //return json(['found at '+os.hostname(),f],null,2);
           },
           "/ls":(qp,log_object)=>{
             return mapkeys(getmap(g_obj,'files')).join("\n");
