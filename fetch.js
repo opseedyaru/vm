@@ -18,7 +18,7 @@ var xhr_get=(url,ok,err)=>{
 }
 
 var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
-var fn=('fn' in qp)?qp[fn]:"main.js";
+var fn="main.js";
 xhr_get(repo+fn+'?t='+rand(),s=>{
   fs.writeFileSync(fn,s);
   console.log("done!\nlength = "+Buffer.byteLength(s));
