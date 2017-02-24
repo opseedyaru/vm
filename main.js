@@ -189,7 +189,7 @@ var requestListener=(request, response)=>{
             if(!(qp.fn in files))return json(['not found',qp.fn]);
             var f=files[qp.fn];
             getarr(f,'log').push(log_object);
-            return json(['found',f]);
+            return json(['found at '+os.hostname(),f]);
           },
           "/ls":(qp,log_object)=>{
             return mapkeys(getmap(g_obj,'files')).join("\n");
