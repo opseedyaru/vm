@@ -109,6 +109,20 @@ hosts_sync();
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
 
+var request_to_log_object=request=>{
+  var h=request.headers;
+  return {
+    time:getDateTime(),
+    ip:h['x-forwarded-for'],
+    request_uri:request.url,
+    user_agent:h["user-agent"],
+    method:request.method,
+    referer:h.referer,
+    host:request.headers.host,
+    hostname:os.hostname()
+  }
+};
+
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
 var requestListener=(request, response)=>{
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
@@ -144,8 +158,8 @@ var requestListener=(request, response)=>{
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
         var collaboration=cb=>{
-          if(!is_public(request.headers.host)){cb(false);return;}
-          xhr_post('http://'+shadow+uri,qp,s=>cb(true),s=>txt('coop_fail:\n'+s));
+          if(!is_public(request.headers.host)){cb(false,[]);return;}
+          xhr_post('http://'+shadow+uri,qp,s=>cb(true,[s]),s=>txt('coop_fail:\n'+s));
           return;
         };
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
@@ -158,33 +172,30 @@ var requestListener=(request, response)=>{
           hosts_sync(s=>txt(s));
           return;
         }
-        if("/del"==uri){
-          coop(()=>{
+        var cmds={
+          "/del":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
             delete files[qp.fn];
-            txt(json(qp));
-          });
-          return;
-        }
-        if("/put"==uri){
-          coop(()=>{
-            getmap(g_obj,'files')[qp.fn]=qp.data;
-            txt(json(qp));
-          });
-          return;
-        }
-        if("/get"==uri){
-          //coop(()=>{
-            txt(getmap(g_obj,'files')[qp.fn]);
-          //});
-          return;
-        }
-        if("/list"==uri||"/ls"==uri){
-          //coop(()=>{
-            txt(mapkeys(getmap(g_obj,'files')).join("\n"));
-          //});
-          return;
-        }
+            return json(get_tick_count());
+          }
+          "/put":(qp,log_object)=>{
+            var f=getmap(getmap(g_obj,'files'),qp.fn);
+            f.data=qp.data;
+            getarr(f,'log').push(log_object);
+            return json(get_tick_count());
+          }
+          "/get":(qp,log_object)=>{
+            var files=getmap(g_obj,'files');
+            if(!(qp.fn in files))return json(['not found',qp.fn]);
+            var f=files[qp.fn];
+            getarr(f,'log').push(log_object);
+            return json(['found',f]);
+          };
+          "/ls":(qp,log_object)=>{
+            return mapkeys(getmap(g_obj,'files')).join("\n")
+          };
+        };
+        if(uri in cmds){return coop((pub,arr)=>json(arr=[txt(cmds[uri](qp,request_to_log_object(request)))].concat(arr)));}
         if("/hostname"==uri){return txt(os.hostname());}
         if("/fetch"==uri){
           (()=>{
