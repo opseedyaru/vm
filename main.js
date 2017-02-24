@@ -190,10 +190,11 @@ var requestListener=(request, response)=>{
           }
         };
         var collaboration=cb=>{
-          if(!is_public(request.headers.host))return txt("coop error: request denied, because conf = not public");
+          var pub=is_public(request.headers.host);var server=pub?shadow:master;
+          if(!pub)return txt("coop error: request denied, because conf = not public");
           var tmp=request_to_log_object(request);
           var f=qp=>({qp:json(qp),tmp:json(tmp)});
-          xhr_post('http://'+shadow+'/internal?from='+os.hostname()+'&url='+uri,f(qp),s=>cb([s],tmp),s=>txt('coop_fail:\n'+s));
+          xhr_post('http://'+server+'/internal?from='+os.hostname()+'&url='+uri,f(qp),s=>cb([s],tmp),s=>txt('coop_fail:\n'+s));
           return;
         };
         var coop=collaboration;
@@ -201,7 +202,7 @@ var requestListener=(request, response)=>{
           var qp=JSON.parse(params.qp);
           var tmp=JSON.parse(params.tmp);var log_object=tmp;
           var uri=url.parse(tmp.request_uri).pathname;
-          if(uri in cmds){return coop((arr,log_object)=>txt(json([(cmds[uri](qp,log_object))].concat(arr))));}
+          if(uri in cmds){return txt(json([cmds[uri](qp,log_object)]));}
           return txt("error: unknow cmd - '"+uri+"'");
         })(qp);
         if(uri in cmds){return coop((arr,log_object)=>txt(json([(cmds[uri](qp,log_object))].concat(arr))));}
