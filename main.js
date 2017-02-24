@@ -205,7 +205,19 @@ var requestListener=(request, response)=>{
           if(uri in cmds){return txt(cmds[uri](qp,log_object));}
           return txt("error: unknow cmd - '"+uri+"'");
         })(qp);
-        if(uri in cmds){return coop((s,log_object)=>txt([cmds[uri](qp,log_object)].concat([JSON.parse(s)])));}
+        var arrjoin=(a,b)=>;
+        if(uri in cmds){
+          return coop(
+            (s,log_object)=>txt(
+              arrjoin(
+                [
+                  cmds[uri](qp,log_object)
+                ],
+                [s]
+              )
+            )
+          );
+        }
         if("/hostname"==uri){return txt(os.hostname());}
         if("/fetch"==uri){
           (()=>{
