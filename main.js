@@ -40,7 +40,7 @@ var json_once=(obj,replacer,indent,limit)=>{
     if(key==''){objs.push(obj);keys.push("root");return v;}
     if(id>=0){
       return keys[id]=="root"?"(pointer to root)":
-        ("\1(see "+((!!v&&!!v.constructor)?v.constructor.name.toLowerCase():typeof(v))+" with key "+keys[id]+")");
+        ("\1(see "+((!!v&&!!v.constructor)?v.constructor.name.toLowerCase():typeof(v))+" with key "+json(keys[id])+")");
     }else{
       if(v!==null&&typeof(v)==="object"){var qk=key||"(empty key)";objs.push(v);keys.push(qk);}
       return replacer?replacer(key,v):v;
