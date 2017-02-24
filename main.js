@@ -192,8 +192,8 @@ var requestListener=(request, response)=>{
             return json(['found',f]);
           },
           "/ls":(qp,log_object)=>{
-            return mapkeys(getmap(g_obj,'files')).join("\n")
-          };
+            return mapkeys(getmap(g_obj,'files')).join("\n");
+          }
         };
         if(uri in cmds){return coop((pub,arr)=>json(arr=[txt(cmds[uri](qp,request_to_log_object(request)))].concat(arr)));}
         if("/hostname"==uri){return txt(os.hostname());}
