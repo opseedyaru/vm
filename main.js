@@ -138,6 +138,7 @@ var requestListener=(request, response)=>{
     var func=filename=>fs.exists(filename,function(exists) {
       var raw_quit=()=>{setTimeout(()=>process.exit(),16);}
       var quit=()=>{raw_quit();return txt("ok");}
+      var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
