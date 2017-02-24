@@ -157,13 +157,7 @@ var requestListener=(request, response)=>{
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
-        var collaboration=cb=>{
-          if(!is_public(request.headers.host)){cb(false,[]);return;}
-          xhr_post('http://'+shadow+uri,qp,s=>cb(true,[s]),s=>txt('coop_fail:\n'+s));
-          return;
-        };
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
-        var coop=collaboration;
         if("/g_obj.json"==uri){
           txt(json(g_obj));
           return;
@@ -195,7 +189,22 @@ var requestListener=(request, response)=>{
             return mapkeys(getmap(g_obj,'files')).join("\n");
           }
         };
-        if(uri in cmds){return coop((pub,arr)=>json(arr=[txt(cmds[uri](qp,request_to_log_object(request)))].concat(arr)));}
+        var collaboration=cb=>{
+          if(!is_public(request.headers.host))return txt("coop error: request denied, because conf = not public");
+          var tmp=request_to_log_object(request);
+          var f=qp=>({qp:json(qp),tmp:json(tmp)});
+          xhr_post('http://'+shadow+'/internal?from='+os.hostname()+'&url='+uri,f(qp),s=>cb(true,[s]),s=>txt('coop_fail:\n'+s));
+          return;
+        };
+        var coop=collaboration;
+        if("/internal"==uri)((params)=>{
+          var qp=JSON.parse(params.qp);
+          var tmp=JSON.parse(params.tmp);var log_object=tmp;
+          var uri=url.parse(tmp.request_uri).pathname;
+          if(uri in cmds){return coop((pub,arr,log_object)=>json(arr=[txt(cmds[uri](qp,log_object))].concat(arr)));}
+          return txt("error: unknow cmd - '"+uri+"'");
+        })(qp);
+        if(uri in cmds){return coop((pub,arr,log_object)=>json(arr=[txt(cmds[uri](qp,log_object))].concat(arr)));}
         if("/hostname"==uri){return txt(os.hostname());}
         if("/fetch"==uri){
           (()=>{
@@ -211,7 +220,7 @@ var requestListener=(request, response)=>{
         }
         if("/rollback"==uri){fs.unlinkSync("fast_unsafe_auto_restart_enabled.txt");quit();}
         if("/close"==uri||"/quit"==uri||"/exit"==uri)quit();
-        if("/"==uri)return coop(()=>txt("count = "+inc(g_obj,'counter')));
+        if("/"==uri)return txt("count = "+inc(g_obj,'counter'));
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
         if("/eval"==uri){
