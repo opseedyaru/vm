@@ -193,7 +193,7 @@ var requestListener=(request, response)=>{
           if(!is_public(request.headers.host))return txt("coop error: request denied, because conf = not public");
           var tmp=request_to_log_object(request);
           var f=qp=>({qp:json(qp),tmp:json(tmp)});
-          xhr_post('http://'+shadow+'/internal?from='+os.hostname()+'&url='+uri,f(qp),s=>cb(true,[s]),s=>txt('coop_fail:\n'+s));
+          xhr_post('http://'+shadow+'/internal?from='+os.hostname()+'&url='+uri,f(qp),s=>cb(true,[s],tmp),s=>txt('coop_fail:\n'+s));
           return;
         };
         var coop=collaboration;
