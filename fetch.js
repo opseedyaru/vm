@@ -22,5 +22,5 @@ var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
 var fn="main.js";
 xhr_get(repo+fn+'?t='+rand(),s=>{
   fs.writeFileSync(fn,s);
-  console.log("done!\nlength = "+Buffer.byteLength(s));
+  console.log("["+getDateTime()+"] fetch done //length = "+Buffer.byteLength(s));
 },console.error);
