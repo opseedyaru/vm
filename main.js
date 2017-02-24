@@ -177,20 +177,20 @@ var requestListener=(request, response)=>{
             var files=getmap(g_obj,'files');
             delete files[qp.fn];
             return json(get_tick_count());
-          }
+          },
           "/put":(qp,log_object)=>{
             var f=getmap(getmap(g_obj,'files'),qp.fn);
             f.data=qp.data;
             getarr(f,'log').push(log_object);
             return json(get_tick_count());
-          }
+          },
           "/get":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
             if(!(qp.fn in files))return json(['not found',qp.fn]);
             var f=files[qp.fn];
             getarr(f,'log').push(log_object);
             return json(['found',f]);
-          };
+          },
           "/ls":(qp,log_object)=>{
             return mapkeys(getmap(g_obj,'files')).join("\n")
           };
