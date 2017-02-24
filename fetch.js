@@ -16,6 +16,7 @@ var xhr_get=(url,ok,err)=>{
   }).on('error',(e)=>{err('Got error: '+e.message);});
   return req;
 }
+var rand=()=>(Math.random()*1024*64|0);
 
 var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
 var fn="main.js";
