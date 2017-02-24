@@ -205,7 +205,7 @@ var requestListener=(request, response)=>{
           if(uri in cmds){return txt(cmds[uri](qp,log_object));}
           return txt("error: unknow cmd - '"+uri+"'");
         })(qp);
-        var arrjoin=(a,b)=>;
+        var arrjoin=(a,b)=>a[0];
         if(uri in cmds){
           return coop(
             (s,log_object)=>txt(
