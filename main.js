@@ -151,7 +151,7 @@ var requestListener=(request, response)=>{
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
       var raw_quit=()=>{setTimeout(()=>process.exit(),16);}
-      var quit=()=>{raw_quit();return txt("ok");}
+      var quit=()=>{raw_quit();return txt("["+getDateTime()+"] ok");}
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
@@ -203,7 +203,7 @@ var requestListener=(request, response)=>{
             var fn=('fn' in qp)?qp[fn]:"main.js";
             xhr_get(repo+fn+'?t='+rand(),s=>{
               fs.writeFileSync(fn,s);
-              txt("done!\nlength = "+Buffer.byteLength(s));
+              txt("["+getDateTime()+"] fetch done //length = "+Buffer.byteLength(s));
               if('quit' in qp)raw_quit();
             },txt);
           })();
