@@ -5,6 +5,19 @@ var http = require("http"),
     fs = require("fs"),
     os = require("os");
 
+function getDateTime() {
+  var now     = new Date(); 
+  var year    = now.getFullYear();
+  var f=v=>(v.toString().length==1?'0':'')+v;
+  var month   = f(now.getMonth()+1); 
+  var day     = f(now.getDate());
+  var hour    = f(now.getHours());
+  var minute  = f(now.getMinutes());
+  var second  = f(now.getSeconds()); 
+  var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second;   
+  return dateTime;
+}
+
 var xhr_get=(url,ok,err)=>{
   var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
@@ -19,8 +32,8 @@ var xhr_get=(url,ok,err)=>{
 var rand=()=>(Math.random()*1024*64|0);
 
 var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
-var fn="main.js";
+"main.js|fetch.js".split("|").map(fn=>
 xhr_get(repo+fn+'?t='+rand(),s=>{
   fs.writeFileSync(fn,s);
   console.log("["+getDateTime()+"] fetch done //length = "+Buffer.byteLength(s));
-},console.error);
+},console.error));
