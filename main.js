@@ -25,12 +25,30 @@ process.on('uncaughtException',err=>qap_log(err));
 var rand=()=>(Math.random()*1024*64|0);
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 
-var json=s=>JSON.stringify(s);
+var json=JSON.stringify;
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
+
+var json_once=(obj,replacer,indent)=>{
+  var objs=[];var keys=[];
+  return json(obj,(key,v)=>{
+    if(objs.length>2048)return 'object too long';
+    var id=-1;objs.forEach((e,i)=>{if(e===v){id=i;}});
+    if(key==''){objs.push(obj);keys.push("root");return v;}
+    if(id>=0&&typeof(v)=="object"){
+      return keys[id]=="root"?"(pointer to root)":
+        ("\1(see "+((!!v&&!!v.constructor)?v.constructor.name.toLowerCase():typeof(v))+" with key "+keys[id]+")");
+    }else{
+      var qk=key||"(empty key)";
+      objs.push(v);keys.push(qk);
+      return replacer?replacer(key,v):v;
+    }
+  },indent);
+};
+var json_once_v2=(e,v)=>json_once(e,v,2);
 
 function getDateTime() {
   var now     = new Date(); 
