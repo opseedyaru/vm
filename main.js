@@ -32,10 +32,10 @@ var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
 
-var json_once=(obj,replacer,indent)=>{
-  var objs=[];var keys=[];
+var json_once=(obj,replacer,indent,limit)=>{
+  var objs=[];var keys=[];if(typeof(limit)=='undefined')limit=2048;
   return json(obj,(key,v)=>{
-    if(objs.length>2048)return 'object too long';
+    if(objs.length>limit)return 'object too long';
     var id=-1;objs.forEach((e,i)=>{if(e===v){id=i;}});
     if(key==''){objs.push(obj);keys.push("root");return v;}
     if(id>=0){
@@ -47,7 +47,7 @@ var json_once=(obj,replacer,indent)=>{
     }
   },indent);
 };
-var json_once_v2=(e,v)=>json_once(e,v,2);
+var json_once_v2=(e,v,lim)=>json_once(e,v,2,lim);
 
 function getDateTime() {
   var now     = new Date(); 
