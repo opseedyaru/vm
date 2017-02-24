@@ -38,12 +38,11 @@ var json_once=(obj,replacer,indent)=>{
     if(objs.length>2048)return 'object too long';
     var id=-1;objs.forEach((e,i)=>{if(e===v){id=i;}});
     if(key==''){objs.push(obj);keys.push("root");return v;}
-    if(id>=0&&typeof(v)=="object"){
+    if(id>=0){
       return keys[id]=="root"?"(pointer to root)":
         ("\1(see "+((!!v&&!!v.constructor)?v.constructor.name.toLowerCase():typeof(v))+" with key "+keys[id]+")");
     }else{
-      var qk=key||"(empty key)";
-      objs.push(v);keys.push(qk);
+      if(v!==null&&typeof(v)==="object"){var qk=key||"(empty key)";objs.push(v);keys.push(qk);}
       return replacer?replacer(key,v):v;
     }
   },indent);
