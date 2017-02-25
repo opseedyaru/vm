@@ -186,7 +186,7 @@ var requestListener=(request, response)=>{
             if(!(qp.fn in files))return json(['not found',qp.fn]);
             var f=files[qp.fn];
             getarr(f,'log').push(log_object);
-            if(!('raw' in qp))return f.data;
+            if('raw' in qp)return f.data;
             if(!('full' in qp)){
               var ignore="host,hostname,method".split(",");
               f=mapclone(f);f.log=f.log.map(e=>mapdrop(e,ignore));
