@@ -262,7 +262,7 @@ var requestListener=(request, response)=>{
             }
           };
           if('nolog' in qp)return impl();
-          var rec="http://"+master+'/put?fn=eval/rec_'+os.hostname()+'['+getDateTime()+"]"+rand()+".json";
+          var rec="http://"+master+'/put?fn=eval/rec['+getDateTime()+"]"+rand()+"_"+os.hostname()+".json";
           xhr_post(rec,{data:json({code:qp.code,data:qp.data})},impl,err=>txt('rec_error:\n'+err));
           return;
         }
