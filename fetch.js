@@ -5,6 +5,7 @@ var http = require("http"),
     fs = require("fs"),
     os = require("os");
 
+var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 function getDateTime() {
   var now     = new Date(); 
   var year    = now.getFullYear();
@@ -33,7 +34,8 @@ var rand=()=>(Math.random()*1024*64|0);
 
 var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
 "main.js|fetch.js".split("|").map(fn=>
-xhr_get(repo+fn+'?t='+rand(),s=>{
-  fs.writeFileSync(fn,s);
-  console.log("["+getDateTime()+"] fetch done //length = "+Buffer.byteLength(s));
-},console.error));
+  xhr_get(repo+fn+'?t='+rand(),s=>{
+    fs.writeFileSync(fn,s);
+    qap_log("fetch done //length = "+Buffer.byteLength(s));
+  },qap_log)
+);
