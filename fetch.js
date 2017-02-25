@@ -6,6 +6,8 @@ var http = require("http"),
     os = require("os");
 
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
+var qap_err=(context)=>(s=>console.log("["+getDateTime()+"] "+context+": "+s));
+
 function getDateTime() {
   var now     = new Date(); 
   var year    = now.getFullYear();
@@ -37,5 +39,5 @@ var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
   xhr_get(repo+fn+'?t='+rand(),s=>{
     fs.writeFileSync(fn,s);
     qap_log("fetch done //length = "+Buffer.byteLength(s));
-  },qap_log)
+  },qap_err('xhr_get fail'));
 );
