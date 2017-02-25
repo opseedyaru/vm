@@ -262,7 +262,8 @@ var requestListener=(request, response)=>{
             }
           };
           if('nolog' in qp)return impl();
-          xhr_post("http://"+request.headers.host+'/put?fn=eval/rec['+getDateTime()+"]"+rand()+".json",{data:json({code:qp.code,data:qp.data})},impl,err=>txt);
+          var rec="http://"+master+'/put?fn=eval/rec_'+os.hostname()+'['+getDateTime()+"]"+rand()+".json";
+          xhr_post(rec,{data:json({code:qp.code,data:qp.data})},impl,err=>txt('rec_error:\n'+err));
           return;
         }
         if(!exists) {
