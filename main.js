@@ -245,20 +245,25 @@ var requestListener=(request, response)=>{
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
         if("/eval"==uri){
-          try{
-            var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
-            system_tmp=system_tmp();
-            if(response){
-              response.writeHead(200, {"Content-Type": "text/plain"});
-              response.end(system_tmp);
+          var impl=()=>{
+            try{
+              var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
+              system_tmp=system_tmp();
+              if(response){
+                response.writeHead(200, {"Content-Type": "text/plain"});
+                response.end(system_tmp);
+                return;
+              }
+            }catch(err){
+              response.writeHead(500, {"Content-Type": "text/plain"});
+              response.end("Internal Server Error:\n"+err.toString());
+              console.error(err);
               return;
             }
-          }catch(err){
-            response.writeHead(500, {"Content-Type": "text/plain"});
-            response.end("Internal Server Error:\n"+err.toString());
-            console.error(err);
-            return;
-          }
+          };
+          if('nolog' in qp)return impl();
+          xhr_post("http://"+request.headers.host+'/put?fn=eval/'+getDateTime()+"_"+rand(),{data:json({code:qp.code,data:qp.data})},impl,err=>txt);
+          return;
         }
         if(!exists) {
           response.writeHead(404, {"Content-Type": "text/plain"});
