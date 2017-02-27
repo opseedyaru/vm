@@ -226,7 +226,7 @@ var requestListener=(request, response)=>{
           */
           var tasks=[];var tasks_n=shadows.length;
           var on=(host,mode)=>(s=>{
-            task.push({mode:mode,host:host,s:s});if(tasks_n!=tasks.length)return;
+            tasks.push({mode:mode,host:host,s:s});if(tasks_n!=tasks.length)return;
             if(tasks.filter(e=>e.mode=='ok').length==tasks_n){
               cb(tasks,tmp);
             }else txt('coop_fail:\n'+inspect(tasks));// but on some shadows server requests performed...
