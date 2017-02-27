@@ -28,7 +28,16 @@ var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 var json=JSON.stringify;
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
+
+var FToS=n=>(n+0).toFixed(2);
+var qapavg=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.length?arr.reduce((pv,ex)=>pv+cb(ex),0)/arr.length:0;}
+var qapsum=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.reduce((pv,ex)=>pv+cb(ex),0);}
+var qapmin=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;var out;var i=0;for(var k in arr){var v=cb(arr[k]);if(!i){out=v;}i++;out=Math.min(out,v);}return out;}
+var qapmax=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;var out;var i=0;for(var k in arr){var v=cb(arr[k]);if(!i){out=v;}i++;out=Math.max(out,v);}return out;}
+var qapsort=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.sort((a,b)=>cb(b)-cb(a));}
 var mapdrop=(e,arr,n)=>{var out=n||{};Object.keys(e).map(k=>arr.indexOf(k)<0?out[k]=e[k]:0);return out;}
+var mapsort=(arr,cb)=>{if(typeof cb=='undefined')cb=(k,v)=>v;var out={};var tmp=qapsort(mapkeys(arr),k=>cb(k,arr[k]));for(var k in tmp)out[tmp[k]]=arr[tmp[k]];return out;}
+
 var mapaddfront=(obj,n)=>{for(var k in obj)n[k]=obj[k];return n;}
 var mapclone=obj=>mapaddfront(obj,{});
 
@@ -205,7 +214,21 @@ var requestListener=(request, response)=>{
           if(!pub)return txt("coop error: request denied, because conf = not public");
           var tmp=request_to_log_object(request);
           var f=qp=>({qp:json(qp),tmp:json(tmp)});
-          xhr_post('http://'+server+'/internal?from='+os.hostname()+'&url='+uri,f(qp),s=>cb(s,tmp),s=>txt('coop_fail:\n'+s));
+          /*
+            wrong design lead to:
+            request order problem
+            waiting response from all shadows problem
+            any shadow crash lead to OOS
+            then more shadow then more OOS
+          */
+          var tasks=[];var tasks_n=shadows.length;
+          var on=(host,mode)=>(s=>{
+            task.push({mode:mode,host:host,s:s});if(!=tasks.length)return;
+            if(tasks.filter(e=>e.mode=='ok').length==tasks_n){
+              cb(tasks,tmp);
+            }else txt('coop_fail:\n'+inspect(tasks));// but on some shadows server requests performed...
+          });
+          shadows.map(e=>xhr_post('http://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on('ok'),on('fail')));
           return;
         };
         var coop=collaboration;
@@ -219,13 +242,13 @@ var requestListener=(request, response)=>{
         var arrjoin=(a,b)=>a[0];
         if(uri in cmds){
           return coop(
-            (s,log_object)=>txt(
-              arrjoin(
-                [
+            (arr,log_object)=>txt(
+              //arrjoin(
+              //  [
                   cmds[uri](qp,log_object)
-                ],
-                [s]
-              )
+              //  ],
+              //  arr
+              //)
             )
           );
         }
