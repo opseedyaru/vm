@@ -105,7 +105,10 @@ var xhr=(method,URL,data,ok,err)=>{
   return req;
 }
 
+var xhr_add_timeout=(req,ms)=>req.on('socket',sock=>sock.on('timeout',()=>req.abort()).setTimeout(ms));
+
 var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
+var xhr_post_with_to=(url,obj,ok,err,ms)=>xhr_add_timeout(xhr('post',url,qs.stringify(obj),ok,err),ms);
 
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
@@ -228,7 +231,7 @@ var requestListener=(request, response)=>{
               cb(tasks,tmp);
             }else txt('coop_fail:\n'+inspect(tasks));// but on some shadows server requests performed...
           });
-          shadows.map(e=>xhr_post('http://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on('ok'),on('fail')));
+          shadows.map(e=>xhr_post_with_to('http://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on('ok'),on('fail'),1000*5));
           return;
         };
         var coop=collaboration;
