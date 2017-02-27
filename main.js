@@ -20,7 +20,7 @@ var get_tick_count=()=>new Date().getTime();
 var qs = require('querystring');
 var g_interval=false;var g_ping_base=get_tick_count();
 var g_obj={};
-process.on('uncaughtException',err=>qap_log(err));
+process.on('uncaughtException',err=>qap_log(inspect(err)));
 
 var rand=()=>(Math.random()*1024*64|0);
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
