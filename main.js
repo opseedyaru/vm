@@ -231,7 +231,7 @@ var requestListener=(request, response)=>{
               cb(tasks,tmp);
             }else txt('coop_fail:\n'+inspect(tasks));// but on some shadows server requests performed...
           });
-          shadows.map(e=>xhr_post_with_to('http://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on('ok'),on('fail'),1000*5));
+          shadows.map(e=>xhr_post_with_to('http://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on(e,'ok'),on(e,'fail'),1000*5));
           return;
         };
         var coop=collaboration;
