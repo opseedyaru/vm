@@ -285,7 +285,7 @@ var requestListener=(request, response)=>{
               }
             }catch(err){
               response.writeHead(500, {"Content-Type": "text/plain"});
-              response.end("Internal Server Error:\n"+err.toString());
+              response.end("Internal Server Error:\n"+inspect(err));
               console.error(err);
               return;
             }
