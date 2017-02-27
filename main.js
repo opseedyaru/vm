@@ -51,6 +51,7 @@ var json_once=(obj,replacer,indent,limit)=>{
   },indent);
 };
 var json_once_v2=(e,v,lim)=>json_once(e,v,2,lim);
+var inspect=json_once_v2;
 
 function getDateTime() {
   var now     = new Date(); 
@@ -158,6 +159,7 @@ var requestListener=(request, response)=>{
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
+      var shadows=mapkeys(hosts).filter(e=>hosts[e]==('shadow'));
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
@@ -300,7 +302,10 @@ var requestListener=(request, response)=>{
             xhr_post('http://'+master+'/ping?from='+os.hostname(),{},none,none);
           },1000);
         }
-        if(pub)g_interval=setInterval(()=>xhr_post('http://'+shadow+'/tick?from='+os.hostname(),{},none,none),period);
+        var send_tick_to_shadows=()=>{
+          shadows.map(e=>xhr_post('http://'+e+'/tick?from='+os.hostname(),{},none,none));
+        };
+        if(pub)g_interval=setInterval(send_tick_to_shadows,period);
         var server=pub?shadow:master;
         xhr_post('http://'+server+'/g_obj.json?from='+os.hostname(),{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
         return;
