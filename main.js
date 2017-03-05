@@ -8,7 +8,8 @@ var http = require("http"),
     url = require("url"),
     path = require("path"),
     fs = require("fs"),
-    os = require("os");
+    os = require("os"),
+    crypto = require('crypto');
 
 var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
     ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
@@ -180,7 +181,14 @@ var requestListener=(request, response)=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
         if("/g_obj.json"==uri){
           if('raw' in qp)return txt(json(g_obj));
-          var tmp=mapclone(g_obj);getarr(tmp,'g_obj.json').push({time:getDateTime(),hostname:os.hostname(),size:Buffer.byteLength(json(g_obj))});
+          if('data' in qp)return json(mapdrop(mapclone(g_obj),'g_obj.json'));
+          var tmp=mapclone(g_obj);var data=json(mapdrop(mapclone(g_obj),'g_obj.json'));
+          getarr(tmp,'g_obj.json').push({
+            time:getDateTime(),
+            hostname:os.hostname(),
+            size:Buffer.byteLength(data),
+            sha1:crypto.createHash('sha1').update(data).digest('hex')
+          });
           txt(json(tmp));
           return;
         }
