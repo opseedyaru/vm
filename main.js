@@ -179,7 +179,9 @@ var requestListener=(request, response)=>{
       var req_handler=()=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
         if("/g_obj.json"==uri){
-          txt(json(g_obj));
+          if('raw' in qp)return txt(json(g_obj));
+          var tmp=mapclone(g_obj);getarr(tmp,'g_obj.json').push({time:getDateTime(),hostname:os.hostname(),size:Buffer.byteLength(json(g_obj))});
+          txt(json(tmp));
           return;
         }
         if("/hosts.json"==uri){
