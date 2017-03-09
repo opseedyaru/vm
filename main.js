@@ -196,6 +196,16 @@ var requestListener=(request, response)=>{
           hosts_sync(s=>txt(s));
           return;
         }
+        if("/shadows_links"==uri){
+          response.off();
+          return html(shadows.map(e=>"http://"+e+"/fetch?quit").map(e=>'<a href="'+e+'">'+e+'</a>').join("<hr>"));
+        }
+        if("/top"==uri){
+          var files=g_obj.files;
+          return inspect(qapsort(mapkeys(files).map(fn=>(
+            {fn:fn,mass:log_incdec_sumator(files[fn].log)}
+          )),e=>e.mass));
+        }
         var log_incdec_sumator=log=>{
           return ""+log.map(e=>e.request_uri).map(e=>url.parse(e).pathname).
           map(e=>e=="/inc"?+1:(e=="/dec"?-1:0)).reduce((p,v)=>p+v,0);
