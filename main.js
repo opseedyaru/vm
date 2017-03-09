@@ -206,9 +206,9 @@ var requestListener=(request, response)=>{
         }
         if("/top"==uri){
           var files=g_obj.files;
-          return inspect(qapsort(mapkeys(files).map(fn=>(
+          return txt(inspect(qapsort(mapkeys(files).map(fn=>(
             {fn:fn,mass:log_incdec_sumator(files[fn].log)}
-          )),e=>e.mass));
+          )),e=>e.mass)));
         }
         var cmds={
           "/del":(qp,log_object)=>{
