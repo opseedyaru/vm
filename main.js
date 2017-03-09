@@ -182,7 +182,7 @@ var requestListener=(request, response)=>{
         if("/g_obj.json"==uri){
           if('raw' in qp)return txt(json(g_obj));
           if('data' in qp)return json(mapdrop(mapclone(g_obj),'g_obj.json'));
-          var tmp=mapclone(g_obj);var data=json(mapdrop(mapclone(g_obj),'g_obj.json'));
+          var tmp=JSON.parse(json(g_obj));var data=json(mapdrop(mapclone(g_obj),'g_obj.json'));
           getarr(tmp,'g_obj.json').push({
             time:getDateTime(),
             hostname:os.hostname(),
