@@ -196,6 +196,10 @@ var requestListener=(request, response)=>{
           hosts_sync(s=>txt(s));
           return;
         }
+        var log_incdec_sumator=log=>{
+          return ""+log.map(e=>e.request_uri).map(e=>url.parse(e).pathname).
+          map(e=>e=="/inc"?+1:(e=="/dec"?-1:0)).reduce((p,v)=>p+v,0);
+        }
         var cmds={
           "/del":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
@@ -213,14 +217,14 @@ var requestListener=(request, response)=>{
             if(!(qp.fn in files))return json(['not found',qp.fn]);
             var f=files[qp.fn];
             getarr(f,'log').push(log_object);
-            return json(f,null,2);
+            return log_incdec_sumator(f.log);
           },
           "/dec":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
             if(!(qp.fn in files))return json(['not found',qp.fn]);
             var f=files[qp.fn];
             getarr(f,'log').push(log_object);
-            return json(f,null,2);
+            return log_incdec_sumator(f.log);
           },
           "/get":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
