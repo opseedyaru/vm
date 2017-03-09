@@ -197,8 +197,8 @@ var requestListener=(request, response)=>{
           return;
         }
         if("/shadows_links"==uri){
-          response.off();var ls='<a href="/ls">this/ls</a><hr>';
-          return html(ls+shadows.map(e=>"http://"+e+"/fetch?quit").map(e=>'<a href="'+e+'">'+e+'</a>').join("<hr>"));
+          response.off();var ls='<a href="/fetch?quit">this/fetch?quit</a><hr><a href="/ls">this/ls</a>';
+          return html(ls+"<hr>"+shadows.map(e=>"http://"+e+"/fetch?quit").map(e=>'<a href="'+e+'">'+e+'</a>').join("<hr>"));
         }
         if("/top"==uri){
           var files=g_obj.files;
