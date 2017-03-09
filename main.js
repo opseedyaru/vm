@@ -208,6 +208,20 @@ var requestListener=(request, response)=>{
             getarr(f,'log').push(log_object);
             return json(get_tick_count());
           },
+          "/inc":(qp,log_object)=>{
+            var files=getmap(g_obj,'files');
+            if(!(qp.fn in files))return json(['not found',qp.fn]);
+            var f=files[qp.fn];
+            getarr(f,'log').push(log_object);
+            return json(f,null,2);
+          },
+          "/dec":(qp,log_object)=>{
+            var files=getmap(g_obj,'files');
+            if(!(qp.fn in files))return json(['not found',qp.fn]);
+            var f=files[qp.fn];
+            getarr(f,'log').push(log_object);
+            return json(f,null,2);
+          },
           "/get":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
             if(!(qp.fn in files))return json(['not found',qp.fn]);
