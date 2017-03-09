@@ -200,15 +200,15 @@ var requestListener=(request, response)=>{
           response.off();var ls='<a href="/fetch?quit">this/fetch?quit</a><hr><a href="/ls">this/ls</a>';
           return html(ls+"<hr>"+shadows.map(e=>"http://"+e+"/fetch?quit").map(e=>'<a href="'+e+'">'+e+'</a>').join("<hr>"));
         }
+        var log_incdec_sumator=log=>{
+          return ""+log.map(e=>e.request_uri).map(e=>url.parse(e).pathname).
+          map(e=>e=="/inc"?+1:(e=="/dec"?-1:0)).reduce((p,v)=>p+v,0);
+        }
         if("/top"==uri){
           var files=g_obj.files;
           return inspect(qapsort(mapkeys(files).map(fn=>(
             {fn:fn,mass:log_incdec_sumator(files[fn].log)}
           )),e=>e.mass));
-        }
-        var log_incdec_sumator=log=>{
-          return ""+log.map(e=>e.request_uri).map(e=>url.parse(e).pathname).
-          map(e=>e=="/inc"?+1:(e=="/dec"?-1:0)).reduce((p,v)=>p+v,0);
         }
         var cmds={
           "/del":(qp,log_object)=>{
