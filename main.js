@@ -182,7 +182,7 @@ var requestListener=(request, response)=>{
         var jstable=arr=>{
           response.off();
           var cb=data=>html(data.split("</body>").join("<script>draw("+json(arr)+");</script></body>"));
-          fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(data);})
+          fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
         }; 
         if("/g_obj.json"==uri){
