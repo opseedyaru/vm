@@ -222,7 +222,7 @@ var requestListener=(request, response)=>{
         if("/evals"==uri){
           var f=g_obj.files;
           return jstable(
-            mapkeys(f).filter(e=>e.includes("eval/")).map(e=>({fn:e,log_size:f[e].log.length,data:JSON.parse(f[e].data)})).
+            mapkeys(f).filter(e=>e.includes("eval/")).reverse().map(e=>({fn:e,log_size:f[e].log.length,data:JSON.parse(f[e].data)})).
               map(e=>mapaddfront({code:e.data.code,data:e.data.data},e))
           );
         }
