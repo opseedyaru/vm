@@ -57,11 +57,7 @@
     out='<table>'+head+'<tbody>'+out+'</tbody></table>';
     return out;
   }
-  function main()
-  {
-    var data=document.getElementById("data").value;
-    document.getElementById("out").innerHTML=PrintMyTable(JSON.parse(data));
-  }
+  function draw(arr){document.getElementById("out").innerHTML=PrintMyTable(arr);}
 </script>
 </head>
 <body><pre name="out" id="out"></pre></body></html>
