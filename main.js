@@ -239,7 +239,7 @@ var requestListener=(request, response)=>{
           );
           return html(head+qap_unique(
             (fs.readFileSync("main.js")+"").split('"'+'/').map(e=>e.split('"')[0]).slice(1).filter(e=>e.length)
-          ).filter(e=>hide.indexOf(e)<0).map(e=>'<a href="/'+e+'">/'+e+'</a><br>').join("\n"));
+          ).filter(e=>hide.indexOf(e)<0).map(e=>'/'+e).map(e=>'<a href="'+e+'">'+e+'</a><br>').join("\n"));
         }
         var cmds={
           "/del":(qp,log_object)=>{
