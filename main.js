@@ -219,6 +219,13 @@ var requestListener=(request, response)=>{
             {fn:fn,mass:log_incdec_sumator(files[fn].log)}
           )),e=>e.mass));
         }
+        if("/evals"==uri){
+          var f=g_obj.files;
+          return jstable(
+            mapkeys(f).filter(e=>e.includes("eval/")).map(e=>({fn:e,log_size:f[e].log.length,data:JSON.parse(f[e].data)})).
+              map(e=>mapaddfront({code:e.data.code,data:e.data.data},e))
+          );
+        }
         var cmds={
           "/del":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
