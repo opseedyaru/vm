@@ -231,6 +231,16 @@ var requestListener=(request, response)=>{
         if("/hops"==uri){
           return jstable(g_obj['g_obj.json'].map(e=>e).reverse());
         }
+        if("/sitemap"==uri){
+          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
+          var head=("<html><style>div{"+
+            "position:absolute;top:10%;left:50%;margin-top:-50px;margin-left:-50px;width:100px;height:100px;"+
+            "}</style><body><div><h4>"
+          );
+          return html(head+qap_unique(
+            (fs.readFileSync("main.js")+"").split('"/').map(e=>e.split('"')[0]).slice(1).filter(e=>e.length)
+          ).filter(e=>hide.indexOf(e)<0).map(e=>'<a href="/'+e+'">/'+e+'</a><br>').join("\n"));
+        }
         var cmds={
           "/del":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
