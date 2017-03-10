@@ -212,9 +212,12 @@ var requestListener=(request, response)=>{
         }
         if("/top"==uri){
           var files=g_obj.files;
-          return txt(inspect(qapsort(mapkeys(files).map(fn=>(
+          var cb=arr=>js2table(arr);
+          if('raw' in qp)cb=arr=>txt(inspect(arr));
+          if('json' in qp)cb=arr=>txt(json(arr));
+          return cb(qapsort(mapkeys(files).map(fn=>(
             {fn:fn,mass:log_incdec_sumator(files[fn].log)}
-          )),e=>e.mass)));
+          )),e=>e.mass));
         }
         var cmds={
           "/del":(qp,log_object)=>{
@@ -227,20 +230,6 @@ var requestListener=(request, response)=>{
             f.data=qp.data;
             getarr(f,'log').push(log_object);
             return json(get_tick_count());
-          },
-          "/inc":(qp,log_object)=>{
-            var files=getmap(g_obj,'files');
-            if(!(qp.fn in files))return json(['not found',qp.fn]);
-            var f=files[qp.fn];
-            getarr(f,'log').push(log_object);
-            return ""+log_incdec_sumator(f.log);
-          },
-          "/dec":(qp,log_object)=>{
-            var files=getmap(g_obj,'files');
-            if(!(qp.fn in files))return json(['not found',qp.fn]);
-            var f=files[qp.fn];
-            getarr(f,'log').push(log_object);
-            return ""+log_incdec_sumator(f.log);
           },
           "/get":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
@@ -259,6 +248,13 @@ var requestListener=(request, response)=>{
             return mapkeys(getmap(g_obj,'files')).join("\n");
           }
         };
+        ["/inc","/dec"].map(e=>(cmds[e]=(qp,log_object)=>{
+          var files=getmap(g_obj,'files');
+          if(!(qp.fn in files))return json(['not found',qp.fn]);
+          var f=files[qp.fn];
+          getarr(f,'log').push(log_object);
+          return ""+log_incdec_sumator(f.log);
+        }));
         var collaboration=cb=>{
           var pub=is_public(request.headers.host);var server=pub?shadow:master;
           if(!pub)return txt("coop error: request denied, because conf = not public");
