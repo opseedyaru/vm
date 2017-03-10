@@ -42,6 +42,8 @@ var qapsort=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.sort((a,b)=>
 var mapdrop=(e,arr,n)=>{var out=n||{};Object.keys(e).map(k=>arr.indexOf(k)<0?out[k]=e[k]:0);return out;}
 var mapsort=(arr,cb)=>{if(typeof cb=='undefined')cb=(k,v)=>v;var out={};var tmp=qapsort(mapkeys(arr),k=>cb(k,arr[k]));for(var k in tmp)out[tmp[k]]=arr[tmp[k]];return out;}
 
+var qap_unique=arr=>{var tmp={};arr.map((e,i)=>getarr(tmp,e).push(i));return mapkeys(tmp);}
+
 var mapaddfront=(obj,n)=>{for(var k in obj)n[k]=obj[k];return n;}
 var mapclone=obj=>mapaddfront(obj,{});
 
