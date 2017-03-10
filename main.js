@@ -235,7 +235,7 @@ var requestListener=(request, response)=>{
           var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
           var head=("<html><style>div{"+
             "position:absolute;top:10%;left:50%;margin-top:-50px;margin-left:-50px;width:100px;height:100px;"+
-            "}</style><body><div><h4>"
+            "}</style><body><div><h3>"
           );
           return html(head+qap_unique(
             (fs.readFileSync("main.js")+"").split('"'+'/').map(e=>e.split('"')[0]).slice(1).filter(e=>e.length)
