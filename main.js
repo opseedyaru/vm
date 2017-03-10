@@ -174,17 +174,17 @@ var requestListener=(request, response)=>{
       var quit=()=>{raw_quit();return txt("["+getDateTime()+"] ok");}
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
-      var jstable=arr=>{
-        response.off();
-        var cb=data=>html(data.split("</body>").join("<script>draw("+json(arr)+");</script></body>"));
-        fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(data);})
-        return;
-      };
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var shadows=mapkeys(hosts).filter(e=>hosts[e]==('shadow'));
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
+        var jstable=arr=>{
+          response.off();
+          var cb=data=>html(data.split("</body>").join("<script>draw("+json(arr)+");</script></body>"));
+          fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(data);})
+          return;
+        }; 
         if("/g_obj.json"==uri){
           if('raw' in qp)return txt(json(g_obj));
           if('data' in qp)return json(mapdrop(mapclone(g_obj),'g_obj.json'));
