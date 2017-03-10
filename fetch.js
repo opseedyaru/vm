@@ -39,5 +39,5 @@ var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
   xhr_get(repo+fn+'?t='+rand(),s=>{
     fs.writeFileSync(fn,s);
     qap_log("fetch done //length = "+Buffer.byteLength(s));
-  },qap_err('xhr_get fail'));
+  },qap_err('xhr_get fail'))
 );
