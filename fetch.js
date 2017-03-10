@@ -35,7 +35,7 @@ var xhr_get=(url,ok,err)=>{
 var rand=()=>(Math.random()*1024*64|0);
 
 var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
-"main.js|fetch.js".split("|").map(fn=>
+"main.js|fetch.js|json2table_fish.html".split("|").map(fn=>
   xhr_get(repo+fn+'?t='+rand(),s=>{
     fs.writeFileSync(fn,s);
     qap_log("fetch done //length = "+Buffer.byteLength(s));
