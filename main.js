@@ -1,7 +1,7 @@
 const util = require('util');
 const vm = require('vm');
 
-var child_process=require('child_process');
+var child_process=require('child_process');var execSync=child_process.execSync;
 
 var http = require("http"),
     https = require("https"),
@@ -174,6 +174,8 @@ var requestListener=(request, response)=>{
       var quit=()=>{raw_quit();return txt("["+getDateTime()+"] ok");}
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
+        // TODO: fs.readFile("json2table_fish.html",(err,data)=>)
+      var jstable=arr=>html(split("</body>").join("<script>PrintMyTable"+json(arr)+"</script></body>"));
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var shadows=mapkeys(hosts).filter(e=>hosts[e]==('shadow'));
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
@@ -300,7 +302,7 @@ var requestListener=(request, response)=>{
         if("/fetch"==uri){
           (()=>{
             var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
-            var fn=('fn' in qp)?qp[fn]:"main.js";
+            var fn=('fn' in qp)?qp.fn:"main.js";
             xhr_get(repo+fn+'?t='+rand(),s=>{
               fs.writeFileSync(fn,s);
               txt("["+getDateTime()+"] fetch done //length = "+Buffer.byteLength(s));
