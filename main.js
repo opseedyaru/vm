@@ -212,7 +212,7 @@ var requestListener=(request, response)=>{
         }
         if("/top"==uri){
           var files=g_obj.files;
-          var cb=arr=>js2table(arr);
+          var cb=arr=>jstable(arr);
           if('raw' in qp)cb=arr=>txt(inspect(arr));
           if('json' in qp)cb=arr=>txt(json(arr));
           return cb(qapsort(mapkeys(files).map(fn=>(
