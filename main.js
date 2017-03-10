@@ -228,6 +228,9 @@ var requestListener=(request, response)=>{
               map(e=>mapaddfront({code:e.data.code,data:e.data.data},e))
           );
         }
+        if("/hops"==uri){
+          return jstable(g_obj['g_obj.json'].map(e=>e).reverse());
+        }
         var cmds={
           "/del":(qp,log_object)=>{
             var files=getmap(g_obj,'files');
