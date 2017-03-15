@@ -156,7 +156,8 @@ var requestListener=(request, response)=>{
     '.css':  "text/css",
     '.js':   "text/javascript",
     '.txt':  "text/plain",
-    '.log':  "text/plain"
+    '.log':  "text/plain",
+    '.mem':  "application/octet-stream"
   };
   
   var on_request_end=(cb)=>{
