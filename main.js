@@ -184,7 +184,8 @@ var requestListener=(request, response)=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
         var jstable=arr=>{
           response.off();
-          var safe_json=obj=>json(obj).split("/"/*"</script>"*/).join("\/"/*<\/script>*/);
+          //  safe_json=obj=>json(obj).split("</script>").join("<\\/script>");
+          var safe_json=obj=>json(obj).split("/").join("\\/");
           var cb=data=>html(data.split("</body>").join("<script>draw("+safe_json(arr)+");</script></body>"));
           fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
