@@ -193,7 +193,6 @@ var requestListener=(request, response)=>{
         var yt_title=s=>{
           response.off();
           var safe_json=obj=>json(obj).split("/").join("\\/");
-          response.off();
           var cb=data=>html(data.split("</body>").join("<script>draw("+safe_json(s)+");</script></body>"));
           fs.readFile("yt.title.fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
@@ -348,7 +347,11 @@ var requestListener=(request, response)=>{
         if("/close"==uri||"/quit"==uri||"/exit"==uri)quit();
         if("/"==uri)return txt("count = "+inc(g_obj,'counter'));
         if("/yt.title"==uri){
-          return xhr_get("https://youtube.com/get_video_info?video_id="+qp.v,yt_title,s=>txt("yt.title('failed')\n"+s));
+          response.off();response.off=()=>{};
+          xhr("GET","https://www.youtube.com/get_video_info?video_id="+qp.v,"",
+            yt_title,s=>txt("yt.title('failed')\n"+s)
+          );
+          return;
         }
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
