@@ -190,6 +190,14 @@ var requestListener=(request, response)=>{
           fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
         }; 
+        var yt_title=s=>{
+          response.off();
+          var safe_json=obj=>json(obj).split("/").join("\\/");
+          response.off();
+          var cb=data=>html(data.split("</body>").join("<script>draw("+safe_json(s)+");</script></body>"));
+          fs.readFile("yt.title.fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
+          return;
+        }; 
         if("/g_obj.json"==uri){
           if('raw' in qp)return txt(json(g_obj));
           if('data' in qp)return json(mapdrop(mapclone(g_obj),'g_obj.json'));
@@ -339,7 +347,9 @@ var requestListener=(request, response)=>{
         if("/rollback"==uri){fs.unlinkSync("fast_unsafe_auto_restart_enabled.txt");quit();}
         if("/close"==uri||"/quit"==uri||"/exit"==uri)quit();
         if("/"==uri)return txt("count = "+inc(g_obj,'counter'));
-        if("/yt.title"==uri){return xhr_get("https://youtube.com/get_video_info?video_id="+qp.v,s=>txt,s=>txt("yt.title('failed')\n"+s));}
+        if("/yt.title"==uri){
+          return xhr_get("https://youtube.com/get_video_info?video_id="+qp.v,yt_title,s=>txt("yt.title('failed')\n"+s));
+        }
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
         if("/eval"==uri){
