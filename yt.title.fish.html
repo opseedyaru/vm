@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8"><meta charset="utf-8">
+<script>
+  function escapeHtml(text)
+  {
+    if("string"!=(typeof text)){return text;}
+    return text
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+  }
+  function parseQuery(qstr) {
+    var query = {};
+    var a = (qstr[0] === '?' ? qstr.substr(1) : qstr).split('&');
+    for (var i = 0; i < a.length; i++) {
+        var b = a[i].split('=');
+        query[decodeURIComponent(b[0])] = decodeURIComponent(b[1] || '');
+    }
+    return query;
+  }
+  function draw(s){document.getElementById("out").innerHTML=JSON.stringify(parseQuery(s).title,0,2).split("+").join(" ");}
+</script>
+</head>
+<body><pre name="out" id="out"></pre></body></html>
