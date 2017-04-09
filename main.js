@@ -339,7 +339,7 @@ var requestListener=(request, response)=>{
         if("/rollback"==uri){fs.unlinkSync("fast_unsafe_auto_restart_enabled.txt");quit();}
         if("/close"==uri||"/quit"==uri||"/exit"==uri)quit();
         if("/"==uri)return txt("count = "+inc(g_obj,'counter'));
-        if("/yt.title"==uri){return xhr_get("http://youtube.com/get_video_info?video_id="+qp.v,s=>txt,s=>txt("yt.title('failed')"));}
+        if("/yt.title"==uri){return xhr_get("https://youtube.com/get_video_info?video_id="+qp.v,s=>txt,s=>txt("yt.title('failed')"));}
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
         if("/eval"==uri){
