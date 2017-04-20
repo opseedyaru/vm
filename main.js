@@ -176,7 +176,8 @@ var requestListener=(request, response)=>{
     var func=filename=>fs.exists(filename,function(exists) {
       var raw_quit=()=>{setTimeout(()=>process.exit(),16);}
       var quit=()=>{raw_quit();return txt("["+getDateTime()+"] ok");}
-      var png=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"image/png"});r.end(s);}})(response);
+      var png=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"image/png"});r.end(new Buffer(s,"binary"));}})(response);
+      var binary=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"application/octet-stream"});r.end(new Buffer(s,"binary"));}})(response);
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
