@@ -157,7 +157,8 @@ var requestListener=(request, response)=>{
     '.js':   "text/javascript",
     '.txt':  "text/plain",
     '.log':  "text/plain",
-    '.mem':  "application/octet-stream"
+    '.mem':  "application/octet-stream",
+    '.png':  "image/png"
   };
   
   var on_request_end=(cb)=>{
@@ -175,6 +176,7 @@ var requestListener=(request, response)=>{
     var func=filename=>fs.exists(filename,function(exists) {
       var raw_quit=()=>{setTimeout(()=>process.exit(),16);}
       var quit=()=>{raw_quit();return txt("["+getDateTime()+"] ok");}
+      var png=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"image/png"});r.end(s);}})(response);
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
@@ -322,8 +324,9 @@ var requestListener=(request, response)=>{
         })(qp);
         var arrjoin=(a,b)=>a[0];
         if(uri in cmds){
+          var need_png=false;if('fn' in qp)need_png=qp.fn.split('.').slice(-1)[0]=='png';
           return coop(
-            (arr,log_object)=>txt(
+            (arr,log_object)=>(need_png?png:txt)(
               //arrjoin(
               //  [
                   cmds[uri](qp,log_object)
