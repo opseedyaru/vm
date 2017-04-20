@@ -324,7 +324,7 @@ var requestListener=(request, response)=>{
         })(qp);
         var arrjoin=(a,b)=>a[0];
         if(uri in cmds){
-          var need_png=false;if('fn' in qp)need_png=qp.fn.split('.').slice(-1)[0]=='png';
+          var need_png=false;if('fn' in qp)if('raw' in qp)if(!('safe' in qp))need_png=qp.fn.split('.').slice(-1)[0]=='png';
           return coop(
             (arr,log_object)=>(need_png?png:txt)(
               //arrjoin(
