@@ -227,6 +227,7 @@ var requestListener=(request, response)=>{
           var cb=arr=>jstable(arr);
           var filter=fn=>fn.indexOf("eval/rec[")<0;
           if('all' in qp)filter=any=>any;
+          if('evalrecs' in qp)fn=>fn.indexOf("eval/rec[")>=0;
           if('raw' in qp)cb=arr=>txt(inspect(arr));
           if('json' in qp)cb=arr=>txt(json(arr));
           return cb(qapsort(mapkeys(files).filter(filter).map(fn=>(
