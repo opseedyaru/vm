@@ -225,9 +225,11 @@ var requestListener=(request, response)=>{
         if("/top"==uri){
           var files=g_obj.files;
           var cb=arr=>jstable(arr);
+          var filter=fn=>fn.indexOf("eval/rec[")<0;
+          if('all' in qp)filter=any=>any;
           if('raw' in qp)cb=arr=>txt(inspect(arr));
           if('json' in qp)cb=arr=>txt(json(arr));
-          return cb(qapsort(mapkeys(files).map(fn=>(
+          return cb(qapsort(mapkeys(files).filter(filter).map(fn=>(
             {fn:fn,mass:log_incdec_sumator(files[fn].log)}
           )),e=>e.mass));
         }
