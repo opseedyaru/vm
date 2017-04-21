@@ -330,6 +330,7 @@ var requestListener=(request, response)=>{
           var func=need_png?png:txt;
           if('binary' in qp)func=binary;
           if('bin' in qp)func=binary;
+          if('txtbin' in qp)func=txtbin;
           return coop(
             (arr,log_object)=>func(
               //arrjoin(
