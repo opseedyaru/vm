@@ -104,7 +104,7 @@ var xhr=(method,URL,data,ok,err)=>{
     if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
     if(error){err(error.message,res);res.resume();return;}
     //res.setEncoding('utf8');
-    var rawData='';res.on('data',(chunk)=>rawData+=chunk);
+    var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
     res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
   }).on('error',e=>{err('Got error: '+e.message,null);});
   req.end(data);
@@ -178,6 +178,7 @@ var requestListener=(request, response)=>{
       var quit=()=>{raw_quit();return txt("["+getDateTime()+"] ok");}
       var png=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"image/png"});r.end(new Buffer(s,"binary"));}})(response);
       var binary=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"application/octet-stream"});r.end(new Buffer(s,"binary"));}})(response);
+      var txtbin=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(new Buffer(s,"binary"));}})(response);
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
@@ -210,7 +211,7 @@ var requestListener=(request, response)=>{
             size:Buffer.byteLength(data),
             sha1:crypto.createHash('sha1').update(data).digest('hex')
           });
-          txt(json(tmp));
+          txtbin(json(tmp));
           return;
         }
         if("/hosts.json"==uri){
