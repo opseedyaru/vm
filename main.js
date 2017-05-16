@@ -152,7 +152,7 @@ var requestListener=(request, response)=>{
 
   qap_log("url = "+purl.path);
   var contentTypesByExtension = {
-    '.html': "text/html",
+    '.html': "text/html", // "/eval.html"
     '.css':  "text/css",
     '.js':   "text/javascript",
     '.txt':  "text/plain",
