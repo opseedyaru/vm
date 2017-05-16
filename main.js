@@ -156,7 +156,7 @@ var requestListener=(request, response)=>{
     '.css':  "text/css",
     '.js':   "text/javascript",
     '.txt':  "text/plain",
-    '.log':  "text/plain",
+    '.log':  "text/plain", // "/mainloop.log"
     '.mem':  "application/octet-stream",
     '.png':  "image/png"
   };
