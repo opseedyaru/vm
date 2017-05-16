@@ -1,4 +1,5 @@
 var child_process=require('child_process');
+var fs=require('fs');
 var exec=child_process.execSync;
 var safe_spawn=(cmd,args)=>child_process.spawn(cmd,args,{stdio:"inherit"});
 var safe_spawn_with_cb=(cmd,args,cb)=>{
@@ -23,7 +24,7 @@ function getDateTime() {
 var rand=()=>(Math.random()*1024*64|0);
 exec("mkdir ./mainloop_logs");
 fs.writeFileSync("./mainloop_logs/log"+getDateTime()+"_"+rand()+".txt",rand());
-var file_exist=fn=>{try{require('fs').accessSync(fn);return true;}catch(e){return false;}}
+var file_exist=fn=>{try{fs.accessSync(fn);return true;}catch(e){return false;}}
 var fn="fast_unsafe_auto_restart_enabled.txt";
 exec("echo created inside mainloop.js>"+fn);
 var need_restart=true;
