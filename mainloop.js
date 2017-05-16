@@ -20,6 +20,7 @@ function getDateTime() {
   var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second;   
   return dateTime;
 }
+var rand=()=>(Math.random()*1024*64|0);
 exec("mkdir mainloop/logs");
 fs.writeFileSync("mainloop/logs"+getDateTime()+"_"+rand()+".txt",rand());
 var file_exist=fn=>{try{require('fs').accessSync(fn);return true;}catch(e){return false;}}
