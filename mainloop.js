@@ -22,9 +22,10 @@ function getDateTime() {
   return dateTime;
 }
 var rand=()=>(Math.random()*1024*64|0);
-exec("mkdir ./mainloop_logs");
-fs.writeFileSync("./mainloop_logs/log"+getDateTime()+"_"+rand()+".txt",rand());
+var logdir="./mainloop_logs";
+exec("mkdir "+logdir);
 var file_exist=fn=>{try{fs.accessSync(fn);return true;}catch(e){return false;}}
+if(file_exist(logdir))fs.writeFileSync(logdir+"/log"+getDateTime()+"_"+rand()+".txt",rand());
 var fn="fast_unsafe_auto_restart_enabled.txt";
 exec("echo created inside mainloop.js>"+fn);
 var need_restart=true;
