@@ -25,7 +25,7 @@ var file_exist=fn=>{try{fs.accessSync(fn);return true;}catch(e){return false;}}
 var rand=()=>(Math.random()*1024*64|0);
 var logdir="./mainloop_logs";
 if(!file_exist(logdir))exec("mkdir "+logdir);
-fs.writeFileSync(logdir+"/log"+getDateTime()+"_"+rand()+".txt","random = "+rand());
+fs.writeFileSync(logdir+"/log["+getDateTime()+"]_"+rand()+".txt","random = "+rand());
 var fn="fast_unsafe_auto_restart_enabled.txt";
 exec("echo created inside mainloop.js>"+fn);
 var need_restart=true;
