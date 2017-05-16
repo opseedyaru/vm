@@ -1,5 +1,7 @@
 var f=execSync;
 
+var first=f("mkdir -p /etc/rc.d");
+
 var drop_slash_r=s=>s.split("\r").join("");
 
 fs.writeFileSync("/etc/rc.d/vm.sh",drop_slash_r(`#!/bin/bash
@@ -24,12 +26,13 @@ esac
 `));
 
 var out=[
+  first,
   f("chmod +x /etc/rc.d/vm.sh"),
   f("chmod +x /etc/init.d/gitseo_vm"),
   f("sudo update-rc.d gitseo_vm defaults"),
   f("sudo update-rc.d gitseo_vm enable")
 ].join("\n\n");
-return out+"\n---\n"+inspect(""+f("cat /etc/rc.d/vm.sh"));
+return out+"\n---\n"+inspect(/*POST.data);*/""+f("cat /etc/rc.d/vm.sh"));
 
 //response.off();return xhr_get(POST.data,s=>{g_obj=JSON.parse(s);return txt("done");},txt);
 //https://gist.githubusercontent.com/gitseo/1f0fd0fb6d9be1edec0dbdab9d3ce75b/raw/91246e9618778609490bf84fb94906936caab1a1/g_obj.json
