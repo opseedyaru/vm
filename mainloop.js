@@ -20,6 +20,8 @@ function getDateTime() {
   var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second;   
   return dateTime;
 }
+exec("mkdir mainloop/logs");
+fs.writeFileSync("mainloop/logs"+getDateTime()+"_"+rand()+".txt",rand());
 var file_exist=fn=>{try{require('fs').accessSync(fn);return true;}catch(e){return false;}}
 var fn="fast_unsafe_auto_restart_enabled.txt";
 exec("echo created inside mainloop.js>"+fn);
