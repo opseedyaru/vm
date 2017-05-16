@@ -135,7 +135,7 @@ var request_to_log_object=request=>{
   var h=request.headers;
   return {
     time:getDateTime(),
-    ip:h['x-forwarded-for'],
+    ip:h['x-forwarded-for']||request.connection.remoteAddress,
     request_uri:request.url,
     user_agent:h["user-agent"],
     method:request.method,
