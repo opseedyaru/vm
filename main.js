@@ -265,10 +265,11 @@ var requestListener=(request, response)=>{
         }
         if("/logs"==uri){
           var m=getmap(g_obj,'logs');
-          var func=inspect;
+          var func=e=>txt(inspect(e));
           if('json' in qp)func=e=>txt(json(e));
-          if('all' in qp)return func(m);
-          if('jstable' in qp)func=jstable;
+          if('all' in qp)return txt(json(m));
+          var func=jstable;
+          if('json' in qp)func=e=>txt(json(e));
           var arr=m['hostname' in qp?qp.hostname:os.hostname()];
           return func(arr);
         }
