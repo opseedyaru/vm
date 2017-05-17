@@ -266,7 +266,7 @@ var requestListener=(request, response)=>{
         if("/logs"==uri){
           var m=getmap(g_obj,'logs');
           var func=inspect;
-          if('json' in qp)func=json;
+          if('json' in qp)func=e=>txt(json(e));
           if('all' in qp)return func(m);
           if('jstable' in qp)func=jstable;
           var arr=m['hostname' in qp?qp.hostname:os.hostname()];
