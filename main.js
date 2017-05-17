@@ -168,9 +168,24 @@ var requestListener=(request, response)=>{
     request.on('end',()=>cb(Buffer.concat(body).toString()));
   };
   response.on('error',err=>console.error(err));
+  var g_logger_func=request=>{
+    var f=request=>{
+      var h=request.headers;
+      return {
+        time:getDateTime(),
+        ip:h['x-forwarded-for']||request.connection.remoteAddress,
+        request_uri:request.url,
+        user_agent:h["user-agent"],
+        method:request.method,
+        referer:h.referer
+      }
+    };
+    var arr=getarr(getmap(g_obj,'logs'),os.hostname()).push(f(request));
+  };
   on_request_end((POST_BODY)=>{
     var POST=POST_BODY.length?qs.parse(POST_BODY):{};
     mapkeys(POST).map(k=>qp[k]=POST[k]);POST=qp;
+    g_logger_func(request);
     var is_dir=fn=>fs.statSync(filename).isDirectory();
     fs.exists(filename,ok=>{if(ok&&is_dir(filename))filename+='/index.html';func(filename);});
     var func=filename=>fs.exists(filename,function(exists) {
