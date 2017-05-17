@@ -263,6 +263,15 @@ var requestListener=(request, response)=>{
         if("/hops"==uri){
           return jstable(g_obj['g_obj.json'].map(e=>e).reverse());
         }
+        if("/logs"==uri){
+          var m=getmap(g_obj,'logs');
+          var func=inspect;
+          if('json' in qp)func=json;
+          if('all' in qp)return func(m);
+          if('jstable' in qp)func=jstable;
+          var arr=m['hostname' in qp?qp.hostname:os.hostname()];
+          return func(arr);
+        }
         if("/sitemap"==uri){
           var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
           var head=("<html><style>div{"+
