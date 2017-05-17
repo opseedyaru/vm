@@ -267,7 +267,7 @@ var requestListener=(request, response)=>{
           var m=getmap(g_obj,'logs');
           var func=e=>txt(inspect(e));
           if('json' in qp)func=e=>txt(json(e));
-          if('all' in qp)return txt(json(m));
+          if('all' in qp)return func(m);
           var func=jstable;
           if('json' in qp)func=e=>txt(json(e));
           var arr=m['hostname' in qp?qp.hostname:os.hostname()];
