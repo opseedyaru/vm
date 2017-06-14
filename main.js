@@ -1,7 +1,7 @@
 const util = require('util');
 const vm = require('vm');
 
-var child_process=require('child_process');var execSync=child_process.execSync;
+var child_process=require('child_process');var execSync=child_process.execSync;var exec=child_process.exec;
 
 var http = require("http"),
     https = require("https"),
