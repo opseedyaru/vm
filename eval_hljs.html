@@ -21,7 +21,6 @@
   function toHLJS(){var c=document.getElementById('code');toTEXT();hljs.highlightBlock(c);return false;}
   function toSUBMIT(){sync_it();return true;}
   function sync_it(){
-    document.title="bit4!";
     "code.data".split(".").map(e=>document.getElementsByName(e)[0].value=document.getElementById(e).innerText);
   }
   toHLJS();hljs.highlightBlock(document.getElementById("data"));
