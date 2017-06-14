@@ -372,6 +372,21 @@ var requestListener=(request, response)=>{
         if("/fetch"==uri){
           (()=>{
             var repo="https://raw.githubusercontent.com/gitseo/vm/master/";
+            if('git' in qp)
+            {
+              var run=cmd=>execSync(cmd)+"";
+              var f=cmd=>run(cmd).split("\n").map(e=>e.substr("vm/".length)).filter(e=>e.length);
+              var out=[
+                run(`rm -rf vm`),
+                run(`git clone https://github.com/gitseo/vm.git`),
+                f("find vm/* -type d").map(e=>"mkdir "+e).map(run).join("\n"),
+                f("find vm/* -type f").map(e=>"cp vm/"+e+" "+e).map(run).join("\n"),
+                run(`rm -rf vm`),
+                execSync("ls -lh"),
+                ""
+              ];
+              return out.join("\n\n");
+            }
             var fn=('fn' in qp)?qp.fn:"main.js";
             xhr_get(repo+fn+'?t='+rand(),s=>{
               fs.writeFileSync(fn,s);
