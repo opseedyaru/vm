@@ -379,12 +379,13 @@ var requestListener=(request, response)=>{
               var out=[
                 run(`rm -rf vm`),
                 run(`git clone https://github.com/gitseo/vm.git`),
-                f("find vm/* -type d").map(e=>"mkdir "+e).map(run).join("\n"),
+                f("find vm/* -type d").map(e=>"mkdir -p "+e).map(run).join("\n"),
                 f("find vm/* -type f").map(e=>"cp vm/"+e+" "+e).map(run).join("\n"),
                 run(`rm -rf vm`),
                 execSync("ls -lh"),
                 ""
               ];
+              if('quit' in qp)raw_quit();
               return out.join("\n\n");
             }
             var fn=('fn' in qp)?qp.fn:"main.js";
