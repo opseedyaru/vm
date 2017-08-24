@@ -81,6 +81,15 @@ function getDateTime() {
   return dateTime;
 }
 
+var cl_and_exec_cpp=(POST)=>{
+  var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
+  var fn="main["+getDateTime().split(":").join("-").split(" ").join("_")+"]_"+rnd+".cpp";
+  var out="./"+fn+".out";
+  //fn=json(fn);out=json(out);
+  fs.writeFileSync(fn,POST.data);return ""+execSync("g++ -std=c++11 "+fn+" -o "+out+"\nls -l\n"+out);
+}
+//return cl_and_exec_cpp(POST);
+
 var xhr_get=(url,ok,err)=>{
   var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
