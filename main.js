@@ -236,6 +236,7 @@ var requestListener=(request, response)=>{
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
       var req_handler=()=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
+        var resp_off=()=>{response.off();}
         var jstable=arr=>{
           response.off();
           //  safe_json=obj=>json(obj).split("</script>").join("<\\/script>");
