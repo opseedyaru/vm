@@ -88,6 +88,27 @@ var cl_and_exec_cpp=(POST)=>{
   //fn=json(fn);out=json(out);
   fs.writeFileSync(fn,POST.data);return ""+execSync("g++ -std=c++11 "+fn+" -o "+out+"\nls -l\n"+out);
 }
+
+var get_backup=()=>{
+  var tmp=JSON.parse(json(g_obj));var data=json(mapdrop(mapclone(g_obj),'g_obj.json'));
+  getarr(tmp,'g_obj.json').push({
+    time:getDateTime(),
+    hostname:os.hostname(),
+    size:Buffer.byteLength(data),
+    sha1:crypto.createHash('sha1').update(data).digest('hex')
+  });
+  return tmp;
+}
+
+var send_backup=()=>{
+  var nope=()=>{};
+  var fn=crypto.createHash('sha1').update(os.hostname()).digest('hex')+".json";
+  xhr_post("http://qpe.000webhostapp.com/vm/backup/?write&from="+os.hostname(),{fn:fn,data:json(get_backup())},nope,nope);
+}
+
+var start_auto_backup=()=>{
+  setInterval(send_backup,10*60*1000);
+}
 //return cl_and_exec_cpp(POST);
 
 var xhr_get=(url,ok,err)=>{
@@ -228,14 +249,7 @@ var requestListener=(request, response)=>{
         if("/g_obj.json"==uri){
           if('raw' in qp)return txt(json(g_obj));
           if('data' in qp)return json(mapdrop(mapclone(g_obj),'g_obj.json'));
-          var tmp=JSON.parse(json(g_obj));var data=json(mapdrop(mapclone(g_obj),'g_obj.json'));
-          getarr(tmp,'g_obj.json').push({
-            time:getDateTime(),
-            hostname:os.hostname(),
-            size:Buffer.byteLength(data),
-            sha1:crypto.createHash('sha1').update(data).digest('hex')
-          });
-          txtbin(json(tmp));
+          txtbin(json(get_backup()));
           return;
         }
         if("/hosts.json"==uri){
