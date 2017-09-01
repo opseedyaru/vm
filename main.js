@@ -81,12 +81,12 @@ function getDateTime() {
   return dateTime;
 }
 
-var cl_and_exec_cpp=(POST)=>{
+var cl_and_exec_cpp=(code)=>{
   var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
   var fn="main["+getDateTime().split(":").join("-").split(" ").join("_")+"]_"+rnd+".cpp";
   var out="./"+fn+".out";
   //fn=json(fn);out=json(out);
-  fs.writeFileSync(fn,POST.data);return ""+execSync("g++ -std=c++11 "+fn+" -o "+out+"\nls -l\n"+out);
+  fs.writeFileSync(fn,code);return ""+execSync("g++ -std=c++11 "+fn+" -o "+out+"\nls -l\n"+out);
 }
 
 var get_backup=()=>{
@@ -103,11 +103,16 @@ var get_backup=()=>{
 var send_backup=()=>{
   var nope=()=>{};
   var fn=crypto.createHash('sha1').update(os.hostname()).digest('hex')+".json";
-  xhr_post("http://qpe.000webhostapp.com/vm/backup/?write&from="+os.hostname(),{fn:fn,data:json(get_backup())},nope,nope);
+  var backup_servers=mapkeys(hosts).filter(e=>hosts[e]==('backup'));
+  backup_servers.map(e=>
+    xhr_post("http://"+e+"/vm/backup/?write&from="+os.hostname(),{fn:fn,data:json(get_backup())},nope,nope)
+  );
 }
 
+var g_intervals=[];
+
 var start_auto_backup=()=>{
-  setInterval(send_backup,10*60*1000);
+  g_intervals.push(setInterval(send_backup,10*60*1000));
 }
 //return cl_and_exec_cpp(POST);
 
