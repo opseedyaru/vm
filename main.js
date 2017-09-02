@@ -105,7 +105,7 @@ var send_backup=()=>{
   var fn=crypto.createHash('sha1').update(os.hostname()).digest('hex')+".json";
   var backup_servers=mapkeys(hosts).filter(e=>hosts[e]==('backup'));
   backup_servers.map(e=>
-    xhr_post("http://"+e+"/vm/backup/?write&from="+os.hostname(),{fn:fn,data:json(get_backup())},nope,nope)
+    xhr_post('http://'+e+'/vm/backup/?write&from='+os.hostname(),{fn:fn,data:json(get_backup())},nope,nope)
   );
 }
 
@@ -303,7 +303,7 @@ var requestListener=(request, response)=>{
           return func(arr);
         }
         if("/sitemap"==uri){
-          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping,backup,write".split(",");
+          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
           var head=("<html><style>div{"+
             "position:absolute;top:10%;left:50%;margin-top:-50px;margin-left:-50px;width:100px;height:100px;"+
             "}</style><body><div><h3>"
