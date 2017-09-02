@@ -303,7 +303,7 @@ var requestListener=(request, response)=>{
           return func(arr);
         }
         if("/sitemap"==uri){
-          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
+          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping,?write,vm/backup".split(",");
           var head=("<html><style>div{"+
             "position:absolute;top:10%;left:50%;margin-top:-50px;margin-left:-50px;width:100px;height:100px;"+
             "}</style><body><div><h3>"
