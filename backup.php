@@ -8,7 +8,9 @@
   function f($fn,$del){return count(explode($del,$fn));}
   if(array_key_exists('data',$_POST)){
     $fn=array_key_exists('fn',$_POST)?$_POST['fn']:"g_obj.json";
-    if(f($fn,"/")>1||f($fn,"\\")>1||f($fn,".")>2||f($fn,".json")<1){echo "wrong fn, but ok, let's use default(g_obj.json)\n";$fn="g_obj.json";}
+    if(f($fn,"/")>1||f($fn,"\\")>1||f($fn,".")>2||f($fn,".json")<1){
+      echo "wrong fn, but ok, let's use default(g_obj.json)\n";$fn="g_obj.json";
+    }
     file_put_contents(dirname(__FILE__)."/".$fn,$_POST['data']);
     file_put_contents(dirname(__FILE__)."/last_backup_fn.txt",$fn);
     echo "done!\n";
