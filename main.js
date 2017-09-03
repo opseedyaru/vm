@@ -170,6 +170,16 @@ var hosts_sync=(cb)=>{
 
 hosts_sync();
 
+var on_start_sync=()=>{
+  if(typeof cb=='undefined')cb=()=>{};
+  xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/on_restart.js?t='+rand(),
+    s=>{fs.writeFileSync("on_restart.js",s);eval(s);},
+    s=>{fs.writeFileSync("on_restart.js.errmsg",s);}
+  );
+};
+
+on_start_sync();
+
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
 
