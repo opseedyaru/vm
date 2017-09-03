@@ -88,7 +88,7 @@ var cl_and_exec_cpp=(code,async)=>{
   //fn=json(fn);out=json(out);
   fs.writeFileSync(fn,code);
   var cmdline="g++ -std=c++11 "+fn+" -O2 -o "+out+"\nls -l\n"+out;
-  if(async!==undefined)else{exec(cmdline);return "async...";}
+  if(async){exec(cmdline);return "async...";}
   return ""+execSync(cmdline);
 }
 
