@@ -81,12 +81,15 @@ function getDateTime() {
   return dateTime;
 }
 
-var cl_and_exec_cpp=(code)=>{
+var cl_and_exec_cpp=(code,async)=>{
   var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
   var fn="main["+getDateTime().split(":").join("-").split(" ").join("_")+"]_"+rnd+".cpp";
   var out="./"+fn+".out";
   //fn=json(fn);out=json(out);
-  fs.writeFileSync(fn,code);return ""+execSync("g++ -std=c++11 "+fn+" -o "+out+"\nls -l\n"+out);
+  fs.writeFileSync(fn,code);
+  var cmdline="g++ -std=c++11 "+fn+" -O2 -o "+out+"\nls -l\n"+out;
+  if(async!==undefined)else{exec(cmdline);return "async...";}
+  return ""+execSync(cmdline);
 }
 
 var get_backup=()=>{
