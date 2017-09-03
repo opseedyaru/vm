@@ -114,8 +114,12 @@ var send_backup=()=>{
 
 var g_intervals=[];
 
+var set_interval=(func,ms){
+  g_intervals.push({func:func,ref:setInterval(func,ms)});
+}
+
 var start_auto_backup=()=>{
-  g_intervals.push(setInterval(send_backup,10*60*1000));
+  set_interval(send_backup,10*60*1000);
 }
 //return cl_and_exec_cpp(POST);
 
