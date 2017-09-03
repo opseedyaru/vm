@@ -114,7 +114,7 @@ var send_backup=()=>{
 
 var g_intervals=[];
 
-var set_interval=(func,ms){
+var set_interval=(func,ms)=>{
   g_intervals.push({data:getDateTime(),func:func,ref:setInterval(func,ms)});
 }
 
