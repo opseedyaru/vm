@@ -11,5 +11,5 @@ xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/main.js?t='+rand(),
     fs.writeFileSync("main.js",s);
     process.exit();
   },
-  s=>{qap_log("on_restart.js :: fail");fs.writeFileSync("main.js.errmsg","//from on_restart.js\n"+s);}
+  s=>{qap_log("on_restart.js :: fail :: "+s);fs.writeFileSync("main.js.errmsg","//from on_restart.js\n"+s);}
 );
