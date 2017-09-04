@@ -81,14 +81,18 @@ function getDateTime() {
   return dateTime;
 }
 
-var cl_and_exec_cpp=(code,async)=>{
+var cl_and_exec_cpp=(code,async_cb)=>{
   var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
   var fn="main["+getDateTime().split(":").join("-").split(" ").join("_")+"]_"+rnd+".cpp";
   var out="./"+fn+".out";
   //fn=json(fn);out=json(out);
   fs.writeFileSync(fn,code);
-  var cmdline="g++ -std=c++11 "+fn+" -O2 -o "+out+"\nls -l\n"+out;
-  if(async){exec(cmdline);return "async...";}
+  var cmdline="g++ -std=c++11 "+fn+" -O2 -o "+out+"\n"+out;
+  if(async_cb){
+    if((typeof async_cb)!="function")async_cb=()=>{};
+    var proc=exec(cmdline,async_cb);
+    return "async...";
+  }
   return ""+execSync(cmdline);
 }
 
@@ -248,6 +252,7 @@ var requestListener=(request, response)=>{
       var txtbin=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(new Buffer(s,"binary"));}})(response);
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
+      var async_cl_and_exec_cpp=(code)=>cl_and_exec_cpp(code,(error,stdout,stderr)=>txt("so...\n"+(error?"err: "+inspect(error)+"\n"+stderr:"ok: "+(stdout))));
       var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
       var shadows=mapkeys(hosts).filter(e=>hosts[e]==('shadow'));
       var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
