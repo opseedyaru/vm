@@ -1,4 +1,4 @@
-start_auto_backup();
+setTimeout(start_auto_backup(),30*1000);
 set_interval(()=>xhr_get('http://qpe.000webhostapp.com/vm/ping?from='+os.hostname(),()=>{},()=>{}),60*1000);
 var nope=()=>{};
 xhr_get('http://qpe.000webhostapp.com/vm/on_start?from='+os.hostname(),nope,nope);
