@@ -306,9 +306,11 @@ var requestListener=(request, response)=>{
         }
         if("/evals"==uri){
           var f=g_obj.files;
+          var data_filter=e=>(e?e.length>1024*4:e)?"*** over 4k ***":e;
+          if('all' in qp)data_filter=e=>e;
           return jstable(
             mapkeys(f).filter(e=>e.includes("eval/")).reverse().map(e=>({fn:e,log_size:f[e].log.length,code:null,data:JSON.parse(f[e].data)})).
-              map(e=>mapaddfront({code:e.data.code,data:e.data.data},e))
+              map(e=>mapaddfront({code:e.data.code,data:data_filter(e.data.data)},e))
           );
         }
         if("/hops"==uri){
