@@ -1,6 +1,6 @@
 var child_process=require('child_process');
 var fs=require('fs');
-var exec=child_process.execSync;
+var execSync=child_process.execSync;
 var safe_spawn=(cmd,args)=>child_process.spawn(cmd,args,{stdio:"inherit"});
 var safe_spawn_with_cb=(cmd,args,cb)=>{
   var proc=safe_spawn(cmd,args);
@@ -24,10 +24,10 @@ function getDateTime() {
 var file_exist=fn=>{try{fs.accessSync(fn);return true;}catch(e){return false;}}
 var rand=()=>(Math.random()*1024*64|0);
 var logdir="./mainloop_logs";
-if(!file_exist(logdir))exec("mkdir "+logdir);
+if(!file_exist(logdir))execSync("mkdir "+logdir);
 fs.writeFileSync(logdir+"/log["+getDateTime()+"]_"+rand()+".txt","random = "+rand());
 var fn="fast_unsafe_auto_restart_enabled.txt";
-exec("echo created inside mainloop.js>"+fn);
+execSync("echo created inside mainloop.js>"+fn);
 var need_restart=true;
 var iter=0;
 var mainloop=setInterval(()=>{
@@ -35,7 +35,7 @@ var mainloop=setInterval(()=>{
   need_restart=false;
   if(!file_exist(fn)){qap_log('mainloop::end');return clearInterval(mainloop);}
   iter++;
-  exec('echo "'+iter+'">mainloop_iter.txt');
+  execSync('echo "'+iter+'">mainloop_iter.txt');
   qap_log('mainloop::iter = '+iter);
   safe_spawn_with_cb("node",["main.js"],()=>need_restart=true);
 },500);
