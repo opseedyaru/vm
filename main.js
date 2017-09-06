@@ -497,22 +497,23 @@ var requestListener=(request, response)=>{
           xhr_post(rec,{data:json({code:qp.code,data:qp.data})},impl,err=>txt('rec_error:\n'+err));
           return;
         }
-        if(!exists) {
+        if(!exists){
           response.writeHead(404, {"Content-Type": "text/plain"});
           response.end("404 Not Found\n");
           return;
         }
-        fs.readFile(filename, "binary", function(err, file) {
-          if(err) {
-            response.writeHead(500, {"Content-Type": "text/plain"});
-            response.end(err + "\n");
+        fs.readFile(filename,"binary",function(err,file){
+          if(err){
+            response.writeHead(500,{"Content-Type":"text/plain"});
+            response.end(err+"\n");
             return;
           }
-          var headers = {};
-          var contentType = contentTypesByExtension[path.extname(filename)];
-          if (contentType) headers["Content-Type"] = contentType;
-          response.writeHead(200, headers);
-          response.write(file, "binary");
+          var headers={};
+          var contentType=contentTypesByExtension[path.extname(filename)];
+          if(contentType)headers["Content-Type"]=contentType;
+          headers['Content-Length']=Buffer.byteLength(file);
+          response.writeHead(200,headers);
+          response.write(file,"binary");
           response.end();
         });
       };
