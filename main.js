@@ -116,7 +116,7 @@ var send_backup=()=>{
   );
 }
 
-var g_intervals=[];
+var g_intervals=[]; var g_head_content_length=true;
 
 var set_interval=(func,ms)=>{
   g_intervals.push({data:getDateTime(),func:func,ref:setInterval(func,ms)});
@@ -511,7 +511,7 @@ var requestListener=(request, response)=>{
           var headers={};
           var contentType=contentTypesByExtension[path.extname(filename)];
           if(contentType)headers["Content-Type"]=contentType;
-          headers['Content-Length']=Buffer.byteLength(file);
+          if(g_head_content_length)headers['Content-Length']=Buffer.byteLength(file);
           response.writeHead(200,headers);
           response.write(file,"binary");
           response.end();
