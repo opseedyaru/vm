@@ -103,9 +103,13 @@ var s=(()=>{
       16
     );
     var sh=spawn('sh');
-    sh.stdout.pipe(response);
-    sh.stderr.pipe(response);
-    request.pipe(sh.stdin);
+    var to_resp=data=>response.write(data);
+    sh.stdout.on("data",to_resp);
+    sh.stderr.on("data",to_resp);
+    request.on("data",data=>sh.stdin.write(data));
+    //sh.stdout.pipe(response);
+    //sh.stderr.pipe(response);
+    //request.pipe(sh.stdin);
   };
   f(response);
 }).toString().split("\n").slice(1,-1).join("\n");
