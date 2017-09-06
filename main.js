@@ -210,7 +210,7 @@ var requestListener=(request,response)=>{
 
   qap_log("url = "+purl.path);
   
-  if(rt_sh in g_obj)if("/rt_sh"==uri)
+  if("/rt_sh"==uri)if('rt_sh' in g_obj)
   {
     try{
       var system_tmp=eval("()=>{"+g_obj.rt_sh+"\n;return;}");
