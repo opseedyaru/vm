@@ -332,8 +332,22 @@ var requestListener=(request,response)=>{
             {fn:fn,mass:log_incdec_sumator(files[fn].log)}
           )),e=>e.mass));
         }
-        if("/evals"==uri){
+        if("/evals"==uri)
+        {
+          var none=()=>{};
           var f=g_obj.files;
+          if('drop_if_over4k' in qp)
+          {
+            var data_filter=e=>e?e.length>1024*4:e;
+            return txt(
+              mapkeys(f).filter(e=>e.includes("eval/")).reverse().
+                map(e=>({fn:e,log_size:f[e].log.length,code:null,data:JSON.parse(f[e].data)})).
+                filter(e=>data_filter(e.data.data)).
+                map(e=>mapaddfront({code:e.data.code,data:data_filter(e.data.data)},e)).
+                map(e=>({cmd:"http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/del?fn="+e.fn})).
+                map(e=>xhr_get(e.cmd,none,none)+"  "+e.cmd).join("\n")
+            );
+          }
           var data_filter=e=>(e?e.length>1024*4:e)?"*** over 4k ***":e;
           if('all' in qp)data_filter=e=>e;
           return jstable(
