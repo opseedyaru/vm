@@ -214,7 +214,9 @@ var requestListener=(request, response)=>{
     '.txt':  "text/plain",
     '.log':  "text/plain", // "/mainloop.log"
     '.mem':  "application/octet-stream",
-    '.png':  "image/png"
+    '.bin':  "application/octet-stream",
+    '.png':  "image/png",
+    '.ico':  "image/x-icon"
   };
   
   var on_request_end=(cb)=>{
