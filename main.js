@@ -300,6 +300,9 @@ var requestListener=(request, response)=>{
           return log.map(e=>e.request_uri).map(e=>url.parse(e).pathname).
           map(e=>e=="/inc"?+1:(e=="/dec"?-1:0)).reduce((p,v)=>p+v,0);
         }
+        if("/ll"==uri){return txt(execSync("ls -l"));}
+        if("/ps_aux"==uri){return txt(execSync("ps -aux"));}
+        if("/ps_aux_ll"==uri){return txt(execSync("ps -aux\nls -l"));}
         if("/top"==uri){
           var files=g_obj.files;
           var cb=arr=>jstable(arr);
