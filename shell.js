@@ -50,7 +50,7 @@ var hosts=[
   "http://agile-eyrie-44522.herokuapp.com/eval"
 ];
 
-var xhr_shell=(method,URL,data,ok,err)=>{
+var xhr_shell=(method,URL)=>{
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
@@ -62,66 +62,93 @@ var xhr_shell=(method,URL,data,ok,err)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
     if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
     if(error){err(error.message,res);res.resume();return;}
-    //res.setEncoding('utf8');
     if(!linked)
     {
-      res.pipe(process.stdout);
+      var rawData='';
+      res.on('data',data=>{
+
+        rawData+=data.toString("binary");
+        var e=rawData.indexOf("\0");
+        if(e<0)return;
+        var t=rawData.split("\0");
+        if(t.length<3)return;
+        var len=t[0]|0;
+        var out=t.slice(2).join("\0");
+        if(out.length<len)return;
+        var z=t[1];
+        var msg=out.substr(0,len);
+        rawData=out.substr(len);
+        if(z==="out"||z==="err")process.stdout.write(msg);
+        
+        //process.stdout.write(data);
+      });
       res.on('error',e=>{qap_log('Got error: '+e.message,null);});
       linked=true;
     }
-    //var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
-    //res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
   }).on('error',e=>{qap_log('Got error: '+e.message,null);});
-  process.stdin.on("data",data=>{
-    req.write((data+"").split("\r").join(""));
-    //process.stdin.resume();
+
+  var to_req=z=>data=>{
+    req.write(data.length+"\0"+z+"\0"+data)
+  };
+  var inp=to_req("inp");
+  var ping=to_req("ping");
+  
+  process.stdin.setRawMode(true);
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data',data=>{
+    if(data==='\u0003')process.exit();
+    inp(data);
   });
-  //process.stdin.resume();
-  //process.stdin.pipe(req);
-  //var i=0;
-  //setInterval(()=>{if(i<96)req.write("echo hehehehe\n");i++;},16);
-  //req.end(data);
-  //qap_log(req.end.toString());
+  process.stdin.resume();
+  inp("echo welcome!\n");
+  setInterval(()=>ping("ping"),500);
   return req;
 }
 
-xhr_shell("post","http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/rt_sh");
-
-/*
 var json=JSON.stringify;
 
 var s=(()=>{
-  var f=(response)=>{
+  var f=(request,response)=>{
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
-    var i=0;
-    response.write("begin\n"+getDateTime()+"\n");
-    if(0)set_interval(
-      ()=>{
-        if(i<96)response.write("hi form rt_sh "+i+"\n");
-        i++;
-      },
-      16
-    );
-    var sh=spawn('sh');
-    var to_resp=data=>response.write(data);
-    sh.stdout.on("data",to_resp);
-    sh.stderr.on("data",to_resp);
-    request.on("data",data=>sh.stdin.write(data));
-    //sh.stdout.pipe(response);
-    //sh.stderr.pipe(response);
-    //request.pipe(sh.stdin);
+    var sh=spawn('sh',['-i']);
+    var to_resp=z=>data=>{
+      response.write(data.length+"\0"+z+"\0"+data);
+    };
+    var ping=to_resp("ping");
+    set_interval(()=>ping("ping"),500);
+    sh.stderr.on("data",to_resp("err"));
+    sh.stdout.on("data",to_resp("out"));
+    to_resp("out")("\n["+getDateTime()+"] :: begin\n");
+    var rawData='';
+    request.on("data",data=>{
+      rawData+=data.toString("binary");
+      var e=rawData.indexOf("\0");
+      if(e<0)return;
+      var t=rawData.split("\0");
+      if(t.length<3)return;
+      var len=t[0]|0;
+      var out=t.slice(2).join("\0");
+      if(out.length<len)return;
+      var z=t[1];
+      var msg=out.substr(0,len);
+      rawData=out.substr(len);
+      if(z==="inp")sh.stdin.write(msg);
+    });
   };
-  f(response);
+  f(request,response);
 }).toString().split("\n").slice(1,-1).join("\n");
 
-var code="g_obj.rt_sh="+json(s)+";return inspect(g_obj.rt_sh);";
+var code="g_obj.rt_sh="+json(s)+";return '['+getDateTime()+'] :: g_obj.rt_sh = ...\\n'+g_obj.rt_sh;";
 
 xhr(
   "post",
   hosts[0],
   qs.stringify({code:code}),
-  qap_log,qap_log
-);/**/
+  s=>{
+    qap_log(s);
+    xhr_shell("post","http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/rt_sh");
+  },qap_log
+);
 
 
 
