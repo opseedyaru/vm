@@ -204,12 +204,26 @@ var request_to_log_object=request=>{
 };
 
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
-var requestListener=(request, response)=>{
+var requestListener=(request,response)=>{
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
   var filename = path.join(process.cwd(), uri);
 
   qap_log("url = "+purl.path);
-  var contentTypesByExtension = {
+  
+  if(rt_sh in g_obj)if("/rt_sh"==uri)
+  {
+    try{
+      var system_tmp=eval("()=>{"+g_obj.rt_sh+"\n;return;}");
+      system_tmp();
+      return;
+    }catch(err){
+      response.writeHead(500,{"Content-Type":"text/plain"});
+      response.end("Internal Server Error:\nstack:\n"+qaperr_to_str(err)+"\n\ninpsect(err):\n"+inspect(err));
+      console.error(err);
+      return;
+    }
+  }
+  var contentTypesByExtension={
     '.html': "text/html", // "/eval.html" "/eval_hljs.html"
     '.css':  "text/css",
     '.js':   "text/javascript",
@@ -220,7 +234,6 @@ var requestListener=(request, response)=>{
     '.png':  "image/png",
     '.ico':  "image/x-icon"
   };
-  
   var on_request_end=(cb)=>{
     var body=[];
     request.on('error',err=>console.error(err));
