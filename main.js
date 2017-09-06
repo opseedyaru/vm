@@ -513,7 +513,7 @@ var requestListener=(request, response)=>{
           var headers={};
           var contentType=contentTypesByExtension[path.extname(filename)];
           if(contentType)headers["Content-Type"]=contentType;
-          if(g_head_content_length)headers['Content-Length']=Buffer.byteLength(file);
+          if(g_head_content_length)headers['Content-Length']=file.length;
           response.writeHead(200,headers);
           response.write(file,"binary");
           response.end();
