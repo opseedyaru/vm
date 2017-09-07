@@ -46,8 +46,9 @@ var xhr=(method,URL,data,ok,err)=>{
 }
 
 var hosts=[
-  "http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/eval",
-  "http://agile-eyrie-44522.herokuapp.com/eval"
+  "http://vm-vm.1d35.starter-us-east-1.openshiftapps.com",
+  "http://agile-eyrie-44522.herokuapp.com",
+  "http://vm-vm.193b.starter-ca-central-1.openshiftapps.com"
 ];
 
 var xhr_shell=(method,URL)=>{
@@ -148,11 +149,11 @@ var code="g_obj.rt_sh="+json(s)+";return '['+getDateTime()+'] :: ok';//g_obj.rt_
 
 xhr(
   "post",
-  hosts[0],
+  hosts[2]+"/eval",
   qs.stringify({code:code}),
   s=>{
     qap_log(s);
-    xhr_shell("post","http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/rt_sh");
+    xhr_shell("post",hosts[2]+"/rt_sh");
   },qap_log
 );
 
