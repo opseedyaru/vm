@@ -129,7 +129,9 @@ var start_auto_backup=()=>{
 }
 //return cl_and_exec_cpp(POST);
 
-var xhr_get=(url,ok,err)=>{
+var xhr_get=(url,ok,err)=>
+  if((typeof ok)!="function")ok=()=>{};
+  if((typeof oerrk)!="function")err=()=>{};
   var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
     if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
@@ -142,6 +144,8 @@ var xhr_get=(url,ok,err)=>{
 }
 
 var xhr=(method,URL,data,ok,err)=>{
+  if((typeof ok)!="function")ok=()=>{};
+  if((typeof oerrk)!="function")err=()=>{};
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
@@ -167,7 +171,7 @@ var xhr_post_with_to=(url,obj,ok,err,ms)=>xhr_add_timeout(xhr('post',url,qs.stri
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
 var hosts_sync=(cb)=>{
-  if(typeof cb=='undefined')cb=()=>{};
+  if((typeof cb)!="function")cb=()=>{};
   xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
     s=>{try{hosts=JSON.parse(s);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);}cb(s);},
     s=>{hosts_err_msg=s;cb(s);}
@@ -177,7 +181,7 @@ var hosts_sync=(cb)=>{
 hosts_sync();
 
 var on_start_sync=()=>{
-  if(typeof cb=='undefined')cb=()=>{};
+  if((typeof cb)!="function")cb=()=>{};
   xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/on_restart.js?t='+rand(),
     s=>{fs.writeFileSync("on_restart.js",s);eval(s);},
     s=>{fs.writeFileSync("on_restart.js.errmsg",s);}
