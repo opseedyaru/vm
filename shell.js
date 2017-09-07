@@ -101,6 +101,12 @@ var xhr_shell=(method,URL)=>{
   });
   process.stdin.resume();
   inp("echo welcome!\n");
+  var ps1=(()=>{
+    //STARTCOLOR='\e[0;32m';
+    //ENDCOLOR="\e[0m"
+    //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
+  }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
+  inp(ps1+"\n");
   var iter=0;setInterval(()=>ping(""+(iter++)),500);
   return req;
 }

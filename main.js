@@ -228,6 +228,7 @@ var requestListener=(request,response)=>{
     '.css':  "text/css",
     '.js':   "text/javascript",
     '.txt':  "text/plain",
+    '.php':  "text/plain",
     '.log':  "text/plain", // "/mainloop.log"
     '.mem':  "application/octet-stream",
     '.bin':  "application/octet-stream",
