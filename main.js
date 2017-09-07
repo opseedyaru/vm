@@ -129,7 +129,7 @@ var start_auto_backup=()=>{
 }
 //return cl_and_exec_cpp(POST);
 
-var xhr_get=(url,ok,err)=>
+var xhr_get=(url,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof oerrk)!="function")err=()=>{};
   var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
