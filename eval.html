@@ -2,9 +2,9 @@
 <html>
  <head>
   <meta charset="utf-8">
-  <title>eval on node.js</title><style type="text/css">textarea{width:99%}</style>
+  <style type="text/css">textarea{width:99%}</style>
  </head>
- <body onload="document.getElementById('code').focus();">
+ <body onload="document.getElementById('code').focus();document.title='eval on '+location.hostname">
   <form id="postform" action="eval" method="post">
     <p><b>code:</b></p>
     <p><textarea spellcheck=false rows="15" name="code" id="code" onkeypress="if(event.keyCode==10||(event.ctrlKey&&event.keyCode==13))document.getElementById('postform').submit();"></textarea></p>
