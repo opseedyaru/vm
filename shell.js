@@ -101,7 +101,7 @@ var xhr_shell=(method,URL)=>{
   });
   process.stdin.resume();
   inp("echo welcome!\n");
-  setInterval(()=>ping("ping"),500);
+  var iter=0;setInterval(()=>ping(""+(iter++)),500);
   return req;
 }
 
@@ -115,7 +115,7 @@ var s=(()=>{
       response.write(data.length+"\0"+z+"\0"+data);
     };
     var ping=to_resp("ping");
-    set_interval(()=>ping("ping"),500);
+    var iter=0;set_interval(()=>ping(""+(iter++)),500);
     sh.stderr.on("data",to_resp("err"));
     sh.stdout.on("data",to_resp("out"));
     to_resp("out")("\n["+getDateTime()+"] :: begin\n");
@@ -138,7 +138,7 @@ var s=(()=>{
   f(request,response);
 }).toString().split("\n").slice(1,-1).join("\n");
 
-var code="g_obj.rt_sh="+json(s)+";return '['+getDateTime()+'] :: g_obj.rt_sh = ...\\n'+g_obj.rt_sh;";
+var code="g_obj.rt_sh="+json(s)+";return '['+getDateTime()+'] :: ok';//g_obj.rt_sh = ...\\n'+g_obj.rt_sh;";
 
 xhr(
   "post",
