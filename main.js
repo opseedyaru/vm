@@ -239,7 +239,7 @@ var requestListener=(request,response)=>{
   if("/rt_sh"==uri)
   {
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
-    var toR=z=>data=>response.write(data.length+"\0"+z+"\0"+data);
+    var toR=z=>data=>data?response.write(data.length+"\0"+z+"\0"+data):qap_log("unk data, but z = "+z);
     var pipe_from_to_func=(stream,func)=>stream.on("data",func).on("end",func);
     var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);

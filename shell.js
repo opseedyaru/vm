@@ -80,7 +80,7 @@ var xhr_shell=(method,URL)=>{
         rawData=out.substr(len);
         if(z==="out")process.stdout.write(msg);
         if(z==="err")process.stderr.write(msg);
-        if(z==="qap_log")qap_log(msg);
+        if(z==="qap_log")qap_log("formR :: "+msg);
       });
       var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
       'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
@@ -97,35 +97,28 @@ var xhr_shell=(method,URL)=>{
   toR("eval")(
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
-      q("before spawn");
       var sh=spawn('bash',['-i']);
-      q("after spawn");
       pipe_from_to(sh.stderr,"err");
       pipe_from_to(sh.stdout,"out");
-      q("after pipes");
       sh.on('close',code=>toR("qap_log")("bash exited with code "+code));
       sh.on('error',code=>toR("qap_log")("bash error "+code));
-      q("after events linking");
       z2func['inp']=msg=>sh.stdin.write(msg);
       q("begin");
     }).toString().split("\n").slice(1,-1).join("\n")
   );
-  var inp=toR("inp");inp("echo welcome!\n");
+  var inp=toR("inp");
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   process.stdin.setRawMode(true);
   process.stdin.setEncoding('utf8');
-  process.stdin.on('data',data=>{
-    //if(data==='\u0003')process.exit();
-    inp(data);
-  });
-  process.stdin.resume();
+  process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
   var ps1=(()=>{
     //STARTCOLOR='\e[0;32m';
     //ENDCOLOR="\e[0m"
     //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
   }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
   inp(ps1+"\n");
-  
+  inp("echo welcome!\n");
+  process.stdin.resume();
   return req;
 }
 
