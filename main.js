@@ -212,9 +212,13 @@ var request_to_log_object=request=>{
 };
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
 var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket)=>{
-  getarr(g_err_socks,json(err)).push(inspect(socket));
   if(inspect(socket.address())=="{}")return;
-  var code=[
+  var info={};(
+    "bufferSize,bytesRead,bytesWritten,connecting,"+
+    "destroyed,localAddress,localPort,remoteAddress,remotePort"
+  ).split(",").map(e=>info[e]=socket[e]);
+  getarr(g_err_socks,json(err)).push(info);
+  /*var code=[
   "socket.bufferSize",
   "socket.bytesRead",
   "socket.bytesWritten",
@@ -224,8 +228,7 @@ var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket
   "socket.localPort",
   "socket.remoteAddress",
   "socket.remotePort"].map(e=>json(e)+":"+e).join(",");
-  var info=eval("({"+code+"})");
-
+  var info=eval("({"+code+"})");*/
   qap_log("http_server::on_clientError : "+inspect(err)+'\nsocket.address() = '+inspect(info));
 };
 http_server.on('clientError',(err,socket)=>{
