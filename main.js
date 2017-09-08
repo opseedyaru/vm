@@ -236,17 +236,49 @@ var requestListener=(request,response)=>{
 
   qap_log("url = "+purl.path);
   
-  if("/rt_sh"==uri)if('rt_sh' in g_obj)
+  if("/rt_sh"==uri)
   {
-    try{
-      var system_tmp=eval("()=>{"+g_obj.rt_sh+"\n;return;}");
-      system_tmp();
-      return;
-    }catch(err){
-      response.writeHead(500,{"Content-Type":"text/plain"});
-      response.end(qap_err("rt_sh.eval",err));
-      return;
-    }
+    response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
+    var to_resp=z=>data=>response.write(data.length+"\0"+z+"\0"+data);
+    var pipe_from_to=(stream,func)=>stream.on("data",func).on("end",func);
+    var ping=to_resp("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
+    to_resp("log")("["+getDateTime()+"] :: hi");
+    var z2func={
+      eval:msg=>{
+        try{
+          var system_tmp=eval("()=>{"+msg+"\n;return;}");
+          system_tmp();
+          return;
+        }catch(err){
+          response.writeHead(500,{"Content-Type":"text/plain"});
+          response.end(qap_err("rt_sh.eval",err));
+          clear_interval(ping_interval);
+          return;
+        }
+      }
+    };
+    var rawData='';
+    request.on("data",data=>{
+      rawData+=data.toString("binary");
+      var e=rawData.indexOf("\0");
+      if(e<0)return;
+      var t=rawData.split("\0");
+      if(t.length<3)return;
+      var len=t[0]|0;
+      var out=t.slice(2).join("\0");
+      if(out.length<len)return;
+      var z=t[1];
+      var msg=out.substr(0,len);
+      rawData=out.substr(len);
+      if(z in z2func)z2func[z](msg);
+      //if(z in z2func)z2func[z](msg);
+      //if(z in z2func)z2func[z](msg,z);
+    });
+    var u=event=>request.on(event,e=>qap_log('rt_sh :: Got '+event));
+    'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
+    request.on('error',e=>qap_log('Got error: '+e.message));
+    request.on('aborted',e=>clear_interval(ping_interval));
+    return;
   }
   var contentTypesByExtension={
     '.html': "text/html", // "/eval.html" "/eval_hljs.html"
