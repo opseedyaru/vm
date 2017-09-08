@@ -217,19 +217,9 @@ var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket
     "bufferSize,bytesRead,bytesWritten,connecting,"+
     "destroyed,localAddress,localPort,remoteAddress,remotePort"
   ).split(",").map(e=>info[e]=socket[e]);
-  getarr(g_err_socks,json(err)).push(info);
-  /*var code=[
-  "socket.bufferSize",
-  "socket.bytesRead",
-  "socket.bytesWritten",
-  "socket.connecting",
-  "socket.destroyed",
-  "socket.localAddress",
-  "socket.localPort",
-  "socket.remoteAddress",
-  "socket.remotePort"].map(e=>json(e)+":"+e).join(",");
-  var info=eval("({"+code+"})");*/
-  qap_log("http_server::on_clientError : "+inspect(err)+'\nsocket.address() = '+inspect(info));
+  var all={err:err,address:socket.address(),socket:info,headers:socket.parser.headers};
+  getarr(g_err_socks,json(err)).push(all);
+  qap_log("http_server::on_clientError : "+inspect(all));
 };
 http_server.on('clientError',(err,socket)=>{
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
