@@ -105,7 +105,7 @@ var xhr_shell=(method,URL)=>{
         if(z==="out")process.stdout.write(msg);
         if(z==="err")process.stderr.write(msg);
         if(z==="qap_log")qap_log("formR :: "+msg);
-        if(z==="exit"){qap_log("formR_exit_msg :: "+msg);process.exit();}
+        if(z==="exit")process.exit();
       });
       var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
       'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
