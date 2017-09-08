@@ -100,10 +100,12 @@ var xhr_shell=(method,URL)=>{
       var sh=spawn('bash',['-i']);
       sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
       sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stderr"));
-      //pipe_from_to(sh.stderr,"err");
-      //pipe_from_to(sh.stdout,"out");
-      sh.on('close',code=>toR("qap_log")("bash exited with code "+code));
-      sh.on('error',code=>toR("qap_log")("bash error "+code));
+      var finish=msg=>{
+        toR("qap_log")(msg);
+        delete z2func['inp'];
+      }
+      sh.on('close',code=>finish("bash exited with code "+code));
+      sh.on('error',code=>finish("bash error "+code));
       z2func['inp']=msg=>sh.stdin.write(msg);
       q("begin");
     }).toString().split("\n").slice(1,-1).join("\n")
