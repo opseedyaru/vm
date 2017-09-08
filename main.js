@@ -413,6 +413,18 @@ var requestListener=(request,response)=>{
             );
           }
           var data_filter=e=>(e?e.length>1024*4:e)?"*** over 4k ***":e;
+          if('drop_if_trash' in qp)
+          {
+            var algo=e=>e?e.indexOf('trash')==0:0;
+            return jstable(
+              mapkeys(f).filter(e=>e.includes("eval/")).reverse().
+                map(e=>({fn:e,log_size:f[e].log.length,code:null,data:JSON.parse(f[e].data)})).
+                filter(e=>algo(e.data.code)).
+                map(e=>mapaddfront({code:e.data.code,data:data_filter(e.data.data)},e)).
+                map(e=>({cmd:"http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/del?fn="+e.fn})).
+                map(e=>xhr_get(e.cmd,none,none)+"  "+e.cmd).join("\n") //*/
+            );
+          }
           if('all' in qp)data_filter=e=>e;
           return jstable(
             mapkeys(f).filter(e=>e.includes("eval/")).reverse().map(e=>({fn:e,log_size:f[e].log.length,code:null,data:JSON.parse(f[e].data)})).
