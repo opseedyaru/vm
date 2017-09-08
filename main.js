@@ -222,11 +222,11 @@ var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket
   "socket.localPort",
   "socket.remoteAddress",
   "socket.remotePort"].map(e=>json(e)+":"+e).join(",");
-  var info=eval("{"+code+"}");
+  var info=eval("({"+code+"})");
 
   qap_log("http_server::on_clientError : "+inspect(err)+'\nsocket.address() = '+inspect(info));
 };
-http_server.on('clientError', (err, socket) => {
+http_server.on('clientError',(err,socket)=>{
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
   if(!g_http_server_debug)return;
   g_err_socks_func(err,socket);

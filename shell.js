@@ -136,7 +136,7 @@ var xhr_shell=(method,URL)=>{
 
 var json=JSON.stringify;
 
-var s=(()=>{
+var g_obj_rt_sh=(()=>{
   var f=(request,response)=>{
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
     var sh=spawn('bash',['-i']);
@@ -147,6 +147,8 @@ var s=(()=>{
     var iter=0;set_interval(()=>ping(""+(iter++)),500);
     sh.stderr.on("data",to_resp("err"));
     sh.stdout.on("data",to_resp("out"));
+    sh.on('close',code=>qap_log(`rt_sh :: child process exited with code ${code}`));
+    sh.on('error',text=>qap_log(`rt_sh :: child process error: ${text}`));
     to_resp("out")("\n["+getDateTime()+"] :: begin\n");
     var rawData='';
     request.on("data",data=>{
@@ -176,7 +178,7 @@ var s=(()=>{
   f(request,response);
 }).toString().split("\n").slice(1,-1).join("\n");
 
-var code="g_obj.rt_sh="+json(s)+";return '['+getDateTime()+'] :: ok';//g_obj.rt_sh = ...\\n'+g_obj.rt_sh;";
+var code="g_obj.rt_sh="+json(g_obj_rt_sh)+";return '['+getDateTime()+'] :: ok';";
 var id=0;
 xhr(
   "post",
