@@ -125,7 +125,7 @@ var g_intervals=[];
 
 var set_interval=(func,ms)=>{
   g_intervals.push({data:getDateTime(),func:func,ref:setInterval(func,ms)});
-  return g_interval.slice(-1)[0];
+  return g_intervals.slice(-1)[0];
 }
 
 var clear_interval=(ref)=>{
