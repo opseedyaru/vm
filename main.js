@@ -208,13 +208,28 @@ var request_to_log_object=request=>{
     hostname:os.hostname()
   }
 };
-var g_http_server_debug=true;var g_err_socks_arr=[];
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
+var g_http_server_debug=true;var g_err_socks={};var g_err_socks_code=()=>{
+  getarr(g_err_socks,json(err)).push(inspect(socket));
+  if(inspect(socket.address())=="{}")return;
+  var code=[
+  "socket.bufferSize",
+  "socket.bytesRead",
+  "socket.bytesWritten",
+  "socket.connecting",
+  "socket.destroyed",
+  "socket.localAddress",
+  "socket.localPort",
+  "socket.remoteAddress",
+  "socket.remotePort"].map(e=>json(e)+":"+e).join(",");
+  var info=eval("{"+code+"}");
+
+  qap_log("http_server::on_clientError : "+inspect(err)+'\nsocket.address() = '+inspect(info));
+};
 http_server.on('clientError', (err, socket) => {
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
   if(!g_http_server_debug)return;
-  g_err_socks_arr.push({err:err,socket:socket});
-  qap_log("http_server::on_clientError : "+inspect(err)+"\nsocket.address() = "+inspect(socket.address()));
+  g_err_socks_func(err,socket);
 });
 var requestListener=(request,response)=>{
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
