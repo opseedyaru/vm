@@ -208,8 +208,12 @@ var request_to_log_object=request=>{
     hostname:os.hostname()
   }
 };
-
+var g_http_server_debug=true;
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
+http_server.on('clientError', (err, socket) => {
+  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+  if(g_http_server_debug)qap_log("http_server::clientError :\n"+inspect(socket));
+});
 var requestListener=(request,response)=>{
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
   var filename = path.join(process.cwd(), uri);
