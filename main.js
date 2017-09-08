@@ -27,7 +27,7 @@ var g_obj={};
 var qaperr_to_str=err=>err.stack.toString();
 
 process.on('uncaughtException',err=>{
-  qap_log("uncaughtException :: \n"+inspect(err)+" //"+qaperr_to_str(err));
+  qap_log("uncaughtException :: "+inspect(err)+" //"+qaperr_to_str(err));
 });
 
 var rand=()=>(Math.random()*1024*64|0);
@@ -217,8 +217,7 @@ var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket
     "bufferSize,bytesRead,bytesWritten,connecting,"+
     "destroyed,localAddress,localPort,remoteAddress,remotePort"
   ).split(",").map(e=>info[e]=socket[e]);
-  all['incoming_headers']=socket.parser.incoming.headers;
-  var all={err:err,socket:info};
+  var all={err:err,socket:info,incoming_headers:socket.parser.incoming.headers};
   getarr(g_err_socks,json(err)).push(all);
   qap_log("http_server::on_clientError : "+inspect(all));
 };
