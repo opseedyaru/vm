@@ -217,8 +217,9 @@ var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket
     "bufferSize,bytesRead,bytesWritten,connecting,"+
     "destroyed,localAddress,localPort,remoteAddress,remotePort"
   ).split(",").map(e=>info[e]=socket[e]);
+  all['incoming_headers']=socket.parser.incoming.headers;
   var all={err:err,socket:info};
-  getarr(g_err_socks,json(err)).push(all);all['socket']=socket;
+  getarr(g_err_socks,json(err)).push(all);
   qap_log("http_server::on_clientError : "+inspect(all));
 };
 http_server.on('clientError',(err,socket)=>{
