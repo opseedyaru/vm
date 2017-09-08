@@ -84,30 +84,16 @@ var xhr_shell=(method,URL)=>{
         
         //process.stdout.write(data);
       });
-      res.on('error',e=>{qap_log('Got error: '+e.message,null);});
+      res.on('error',e=>qap_log('Got error: '+e.message));
       var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
-      //u('error');
-      u('end');
-      u('abort');
-      u('aborted');
-      u('connect');
-      u('continue');
-      u('response');
-      u('upgrade');
+      'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
       once=true;
     }
   });
 
   var u=event=>req.on(event,e=>qap_log('xhr_shell::req :: Got '+event));
-  //u('error');
-  u('end');
-  u('abort');
-  u('aborted');
-  u('connect');
-  u('continue');
-  u('response');
-  u('upgrade');
-  req.on('error',e=>qap_log('Got error: '+e.message));//.on('end',e=>qap_log('Got end: '+e.message));
+  'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
+  req.on('error',e=>qap_log('Got error: '+e.message));
   req.setNoDelay();
   var to_req=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   var inp=to_req("inp");
@@ -134,12 +120,12 @@ var xhr_shell=(method,URL)=>{
 var json=JSON.stringify;
 
 var g_obj_rt_sh=(()=>{
-  var f=(request,response)=>{
+  ((request,response)=>{
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
     var sh=spawn('bash',['-i']);
     var to_resp=z=>data=>response.write(data.length+"\0"+z+"\0"+data);
     var ping=to_resp("ping");
-    var iter=0;set_interval(()=>ping(""+(iter++)),500);
+    var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
     sh.stderr.on("data",to_resp("err"));
     sh.stdout.on("data",to_resp("out"));
     sh.on('close',code=>qap_log(`rt_sh :: child process exited with code ${code}`));
@@ -161,16 +147,8 @@ var g_obj_rt_sh=(()=>{
       if(z==="inp")sh.stdin.write(msg);
     });
     var u=event=>request.on(event,e=>qap_log('rt_sh :: Got '+event));
-    u('error');
-    u('end');
-    u('abort');
-    u('aborted');
-    u('connect');
-    u('continue');
-    u('response');
-    u('upgrade');
-  };
-  f(request,response);
+    'error,end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
+  })(request,response);
 }).toString().split("\n").slice(1,-1).join("\n");
 
 var code="g_obj.rt_sh="+json(g_obj_rt_sh)+";return '['+getDateTime()+'] :: ok';";

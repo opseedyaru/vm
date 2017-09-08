@@ -24,11 +24,10 @@ var qs = require('querystring');
 var g_interval=false;var g_ping_base=get_tick_count();
 var g_obj={};
 
-var qaperr_to_str=err=>err.stack.toString();
+var qap_err=(context,err)=>context+" :: err = "+inspect(err)+" //"+err.stack.toString();
+var log_err=(context,err)=>qap_log(qap_err(context,err));
 
-process.on('uncaughtException',err=>{
-  qap_log("uncaughtException :: "+inspect(err)+" //"+qaperr_to_str(err));
-});
+process.on('uncaughtException',err=>log_err('uncaughtException',err));
 
 var rand=()=>(Math.random()*1024*64|0);
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
@@ -126,6 +125,11 @@ var g_intervals=[];
 
 var set_interval=(func,ms)=>{
   g_intervals.push({data:getDateTime(),func:func,ref:setInterval(func,ms)});
+  return g_interval.slice(-1)[0];
+}
+
+var clear_interval=(ref)=>{
+  clearInterval(ref.ref);g_intervals.splice(g_intervals.indexOf(ref),1);
 }
 
 var start_auto_backup=()=>{
@@ -240,8 +244,7 @@ var requestListener=(request,response)=>{
       return;
     }catch(err){
       response.writeHead(500,{"Content-Type":"text/plain"});
-      response.end("Internal Server Error:\nstack:\n"+qaperr_to_str(err)+"\n\ninpsect(err):\n"+inspect(err));
-      console.error(err);
+      response.end(qap_err("rt_sh.eval",err));
       return;
     }
   }
@@ -540,9 +543,8 @@ var requestListener=(request,response)=>{
                 return;
               }
             }catch(err){
-              response.writeHead(500, {"Content-Type": "text/plain"});
-              response.end("Internal Server Error:\n"+qaperr_to_str(err));
-              console.error(err);
+              response.writeHead(500,{"Content-Type":"text/plain"});
+              response.end(qap_err("/eval",err));
               return;
             }
           };
