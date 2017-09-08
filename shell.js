@@ -98,8 +98,10 @@ var xhr_shell=(method,URL)=>{
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
       var sh=spawn('bash',['-i']);
-      pipe_from_to(sh.stderr,"err");
-      pipe_from_to(sh.stdout,"out");
+      sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
+      sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stderr"));
+      //pipe_from_to(sh.stderr,"err");
+      //pipe_from_to(sh.stdout,"out");
       sh.on('close',code=>toR("qap_log")("bash exited with code "+code));
       sh.on('error',code=>toR("qap_log")("bash error "+code));
       z2func['inp']=msg=>sh.stdin.write(msg);
