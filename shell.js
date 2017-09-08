@@ -103,8 +103,8 @@ var xhr_shell=(method,URL)=>{
       pipe_from_to(sh.stderr,"err");
       pipe_from_to(sh.stdout,"out");
       q("after pipes");
-      sh.on('close',code=>to_resp("qap_log")("bash exited with code "+code));
-      sh.on('error',code=>to_resp("qap_log")("bash error "+code));
+      sh.on('close',code=>toR("qap_log")("bash exited with code "+code));
+      sh.on('error',code=>toR("qap_log")("bash error "+code));
       q("after events linking");
       z2func['inp']=msg=>sh.stdin.write(msg);
       q("begin");

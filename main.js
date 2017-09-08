@@ -223,7 +223,7 @@ var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket
   ).split(",").map(e=>info[e]=socket[e]);
   var all={err:err,socket:info,incoming_headers:socket.parser.incoming.headers};
   getarr(g_err_socks,json(err)).push(all);
-  qap_log("http_server::on_clientError : "+inspect(all));
+  qap_log("http_server::on_clientError : "+json(all.incoming_headers["x-forwarded-for"));
 };
 http_server.on('clientError',(err,socket)=>{
   socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
