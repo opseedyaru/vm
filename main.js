@@ -209,7 +209,7 @@ var request_to_log_object=request=>{
   }
 };
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
-var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=()=>{
+var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket)=>{
   getarr(g_err_socks,json(err)).push(inspect(socket));
   if(inspect(socket.address())=="{}")return;
   var code=[
