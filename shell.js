@@ -11,6 +11,12 @@ var http = require("http"),
 crypto = require('crypto');
 
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
+
+var qap_err=(context,err)=>context+" :: err = "+inspect(err)+" //"+err.stack.toString();
+var log_err=(context,err)=>qap_log(qap_err(context,err));
+
+process.on('uncaughtException',err=>log_err('uncaughtException',err));
+
 function getDateTime() {
   var now     = new Date(); 
   var year    = now.getFullYear();
@@ -23,6 +29,24 @@ function getDateTime() {
   var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second;   
   return dateTime;
 }
+
+var json_once=(obj,replacer,indent,limit)=>{
+  var objs=[];var keys=[];if(typeof(limit)=='undefined')limit=2048;
+  return json(obj,(key,v)=>{
+    if(objs.length>limit)return 'object too long';
+    var id=-1;objs.forEach((e,i)=>{if(e===v){id=i;}});
+    if(key==''){objs.push(obj);keys.push("root");return v;}
+    if(id>=0){
+      return keys[id]=="root"?"(pointer to root)":
+        ("\1(see "+((!!v&&!!v.constructor)?v.constructor.name.toLowerCase():typeof(v))+" with key "+json(keys[id])+")");
+    }else{
+      if(v!==null&&typeof(v)==="object"){var qk=key||"(empty key)";objs.push(v);keys.push(qk);}
+      return replacer?replacer(key,v):v;
+    }
+  },indent);
+};
+var json_once_v2=(e,v,lim)=>json_once(e,v,2,lim);
+var inspect=json_once_v2;
 
 var file_exist=fn=>{try{fs.accessSync(fn);return true;}catch(e){return false;}}
 var rand=()=>(Math.random()*1024*64|0);
@@ -81,6 +105,7 @@ var xhr_shell=(method,URL)=>{
         if(z==="out")process.stdout.write(msg);
         if(z==="err")process.stderr.write(msg);
         if(z==="qap_log")qap_log("formR :: "+msg);
+        if(z==="exit"){qap_log("formR_exit_msg :: "+msg);process.exit();}
       });
       var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
       'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
@@ -99,9 +124,10 @@ var xhr_shell=(method,URL)=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
       var sh=spawn('bash',['-i']);
       sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
-      sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stderr"));
+      sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stdout"));
       var finish=msg=>{
-        toR("qap_log")(msg);
+        q(msg);
+        toR("exit")();
         response.destroy();
         request.destroy();
         delete z2func['inp'];
