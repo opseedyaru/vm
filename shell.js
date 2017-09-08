@@ -67,7 +67,6 @@ var xhr_shell=(method,URL)=>{
     {
       var rawData='';
       res.on('data',data=>{
-
         rawData+=data.toString("binary");
         var e=rawData.indexOf("\0");
         if(e<0)return;
@@ -79,14 +78,13 @@ var xhr_shell=(method,URL)=>{
         var z=t[1];
         var msg=out.substr(0,len);
         rawData=out.substr(len);
-        //qap_log(z+" :: "+msg);
-        if(z==="out"||z==="err")process.stdout.write(msg);
-        
-        //process.stdout.write(data);
+        if(z==="out")process.stdout.write(msg);
+        if(z==="err")process.stderr.write(msg);
+        if(z==="qap_log")qap_log(msg);
       });
-      res.on('error',e=>qap_log('Got error: '+e.message));
       var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
       'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
+      res.on('error',e=>qap_log('Got error: '+e.message));
       once=true;
     }
   });
@@ -96,9 +94,19 @@ var xhr_shell=(method,URL)=>{
   req.on('error',e=>qap_log('Got error: '+e.message));
   req.setNoDelay();
   var to_req=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
-  var inp=to_req("inp");
-  var ping=to_req("ping");
-  
+  to_req("eval")(
+    (()=>{
+      var sh=spawn('bash',['-i']);
+      pipe_from_to(sh.stderr,"err");
+      pipe_from_to(sh.stdout,"out");
+      sh.on('close',code=>to_resp("qap_log")("bash exited with code "+code));
+      sh.on('error',code=>to_resp("qap_log")("bash error "+code));
+      to_resp("out")("["+getDateTime()+"] :: begin\n");
+      z2func['inp']=msg=>sh.stdin.write(msg);
+    }).toString().split("\n").slice(1,-1).join("\n");
+  );
+  var inp=to_req("inp");inp("echo welcome!\n");
+  var ping=to_req("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   process.stdin.setRawMode(true);
   process.stdin.setEncoding('utf8');
   process.stdin.on('data',data=>{
@@ -106,64 +114,19 @@ var xhr_shell=(method,URL)=>{
     inp(data);
   });
   process.stdin.resume();
-  inp("echo welcome!\n");
   var ps1=(()=>{
     //STARTCOLOR='\e[0;32m';
     //ENDCOLOR="\e[0m"
     //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
   }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
   inp(ps1+"\n");
-  var iter=0;setInterval(()=>ping("home::"+(iter++)),500);
+  
   return req;
 }
 
 var json=JSON.stringify;
 
-var g_obj_rt_sh=(()=>{
-  ((request,response)=>{
-    response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
-    var sh=spawn('bash',['-i']);
-    var to_resp=z=>data=>response.write(data.length+"\0"+z+"\0"+data);
-    var ping=to_resp("ping");
-    var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
-    sh.stderr.on("data",to_resp("err"));
-    sh.stdout.on("data",to_resp("out"));
-    sh.on('close',code=>qap_log(`rt_sh :: child process exited with code ${code}`));
-    sh.on('error',text=>qap_log(`rt_sh :: child process error: ${text}`));
-    to_resp("out")("\n["+getDateTime()+"] :: begin\n");
-    var rawData='';
-    request.on("data",data=>{
-      rawData+=data.toString("binary");
-      var e=rawData.indexOf("\0");
-      if(e<0)return;
-      var t=rawData.split("\0");
-      if(t.length<3)return;
-      var len=t[0]|0;
-      var out=t.slice(2).join("\0");
-      if(out.length<len)return;
-      var z=t[1];
-      var msg=out.substr(0,len);
-      rawData=out.substr(len);
-      if(z==="inp")sh.stdin.write(msg);
-    });
-    var u=event=>request.on(event,e=>qap_log('rt_sh :: Got '+event));
-    'error,end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
-  })(request,response);
-}).toString().split("\n").slice(1,-1).join("\n");
-
-var code="g_obj.rt_sh="+json(g_obj_rt_sh)+";return '['+getDateTime()+'] :: ok';";
-var id=0;
-xhr(
-  "post",
-  hosts[id]+"/eval",
-  qs.stringify({code:code}),
-  s=>{
-    qap_log(s);
-    xhr_shell("post",hosts[id]+"/rt_sh");
-  },qap_log
-);
-
-
+xhr_shell("post",hosts[id]+"/rt_sh");
 
 
 
