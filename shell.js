@@ -102,6 +102,8 @@ var xhr_shell=(method,URL)=>{
       sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stderr"));
       var finish=msg=>{
         toR("qap_log")(msg);
+        response.destroy();
+        request.destroy();
         delete z2func['inp'];
       }
       sh.on('close',code=>finish("bash exited with code "+code));
