@@ -58,12 +58,12 @@ var xhr_shell=(method,URL)=>{
     headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
     //headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
-  var linked=false;
+  var once=false;
   var req=(secure?https:http).request(options,(res)=>{
     var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
     if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
     if(error){err(error.message,res);res.resume();return;}
-    if(!linked)
+    if(!once)
     {
       var rawData='';
       res.on('data',data=>{
@@ -79,17 +79,39 @@ var xhr_shell=(method,URL)=>{
         var z=t[1];
         var msg=out.substr(0,len);
         rawData=out.substr(len);
+        qap_log(z+" :: "+msg);
         if(z==="out"||z==="err")process.stdout.write(msg);
         
         //process.stdout.write(data);
       });
       res.on('error',e=>{qap_log('Got error: '+e.message,null);});
-      linked=true;
+      var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
+      //u('error');
+      u('end');
+      u('abort');
+      u('aborted');
+      u('connect');
+      u('continue');
+      u('response');
+      u('upgrade');
+      once=true;
     }
-  }).on('error',e=>{qap_log('Got error: '+e.message,null);});
+  });
 
+  var u=event=>req.on(event,e=>qap_log('xhr_shell::req :: Got '+event));
+  //u('error');
+  u('end');
+  u('abort');
+  u('aborted');
+  u('connect');
+  u('continue');
+  u('response');
+  u('upgrade');
+  req.on('error',e=>qap_log('Got error: '+e.message));//.on('end',e=>qap_log('Got end: '+e.message));
+  req.setNoDelay();
   var to_req=z=>data=>{
-    req.write(data.length+"\0"+z+"\0"+data)
+    qap_log(data);
+    req.write(data.length+"\0"+z+"\0"+data);
   };
   var inp=to_req("inp");
   var ping=to_req("ping");
@@ -108,7 +130,7 @@ var xhr_shell=(method,URL)=>{
     //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
   }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
   inp(ps1+"\n");
-  var iter=0;setInterval(()=>ping(""+(iter++)),500);
+  var iter=0;setInterval(()=>ping("home::"+(iter++)),500);
   return req;
 }
 
@@ -141,6 +163,15 @@ var s=(()=>{
       rawData=out.substr(len);
       if(z==="inp")sh.stdin.write(msg);
     });
+    var u=event=>request.on(event,e=>qap_log('rt_sh :: Got '+event));
+    u('error');
+    u('end');
+    u('abort');
+    u('aborted');
+    u('connect');
+    u('continue');
+    u('response');
+    u('upgrade');
   };
   f(request,response);
 }).toString().split("\n").slice(1,-1).join("\n");
