@@ -239,11 +239,11 @@ var requestListener=(request,response)=>{
   if("/rt_sh"==uri)
   {
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
-    var to_resp=z=>data=>response.write(data.length+"\0"+z+"\0"+data);
+    var toR=z=>data=>response.write(data.length+"\0"+z+"\0"+data);
     var pipe_from_to_func=(stream,func)=>stream.on("data",func).on("end",func);
-    var pipe_from_to=(stream,z)=>{var f=to_resp(z);pipe_from_to_func(stream,f);}
-    var ping=to_resp("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
-    to_resp("log")("["+getDateTime()+"] :: hi");
+    var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
+    var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
+    toR("log")("["+getDateTime()+"] :: hi");
     var z2func={
       eval:msg=>{
         try{
