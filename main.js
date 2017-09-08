@@ -109,10 +109,12 @@ var get_backup=()=>{
   return tmp;
 }
 
+var get_hosts_by_type=type=>mapkeys(hosts).filter(e=>hosts[e]==type);
+
 var send_backup=()=>{
   var nope=()=>{};
   var fn=crypto.createHash('sha1').update(os.hostname()).digest('hex')+".json";
-  var backup_servers=mapkeys(hosts).filter(e=>hosts[e]==('backup'));
+  var backup_servers=get_hosts_by_type('backup');
   backup_servers.map(e=>
     xhr_post('http://'+e+'/vm/backup/?write&from='+os.hostname(),{fn:fn,data:json(get_backup())},nope,nope)
   );
@@ -284,9 +286,9 @@ var requestListener=(request,response)=>{
           flags
         );
       }
-      var shadow=mapkeys(hosts)[mapvals(hosts).indexOf('shadow')];
-      var shadows=mapkeys(hosts).filter(e=>hosts[e]==('shadow'));
-      var master=mapkeys(hosts)[mapvals(hosts).indexOf('public')];
+      var shadows=get_hosts_by_type('shadow');
+      var shadow=shadows[0];
+      var master=get_hosts_by_type('public')[0];
       var req_handler=()=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{}};
         var resp_off=()=>{response.off();}
@@ -548,7 +550,8 @@ var requestListener=(request,response)=>{
           fs.createReadStream(filename).pipe(response);
         });
       };
-      if(need_coop_init){
+      if(need_coop_init)
+      {
         need_coop_init=false;
         var pub=is_public(request.headers.host);var none=()=>{};
         if(g_interval){clearInterval(g_interval);g_interval=false;}
@@ -562,7 +565,7 @@ var requestListener=(request,response)=>{
           },1000);
         }
         var send_tick_to_shadows=()=>{
-          shadows.map(e=>xhr_post('http://'+e+'/tick?from='+os.hostname(),{},none,none));
+          get_hosts_by_type('shadow').map(e=>xhr_post('http://'+e+'/tick?from='+os.hostname(),{},none,none));
         };
         if(pub)g_interval=setInterval(send_tick_to_shadows,period);
         var server=pub?shadow:master;
