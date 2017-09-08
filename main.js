@@ -29,7 +29,7 @@ var qaperr_to_str=err=>err.stack.toString();
 process.on('uncaughtException',err=>{
   qap_log(qaperr_to_str(err)+"\n\ninpsect(err):\n"+inspect(err)+"\n\nconsole.error(err):\n");
   console.error(err);
-);
+});
 
 var rand=()=>(Math.random()*1024*64|0);
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
