@@ -146,14 +146,14 @@ var s=(()=>{
 }).toString().split("\n").slice(1,-1).join("\n");
 
 var code="g_obj.rt_sh="+json(s)+";return '['+getDateTime()+'] :: ok';//g_obj.rt_sh = ...\\n'+g_obj.rt_sh;";
-
+var id=0;
 xhr(
   "post",
-  hosts[2]+"/eval",
+  hosts[id]+"/eval",
   qs.stringify({code:code}),
   s=>{
     qap_log(s);
-    xhr_shell("post",hosts[2]+"/rt_sh");
+    xhr_shell("post",hosts[id]+"/rt_sh");
   },qap_log
 );
 
