@@ -169,7 +169,6 @@ var xhr=(method,URL,data,ok,err)=>{
   };
   var req=(secure?https:http).request(options,(res)=>{
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
-    if(error){err(error.message,res);res.resume();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
     res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
