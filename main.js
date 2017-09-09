@@ -93,6 +93,24 @@ function getDateTime() {
   return dateTime;
 }
 
+var emitter_on_data_decoder=(emitter,cb)=>{
+  var rawData='';
+  emitter.on('data',data=>{
+    rawData+=data.toString("binary");
+    var e=rawData.indexOf("\0");
+    if(e<0)return;
+    var t=rawData.split("\0");
+    if(t.length<3)return;
+    var len=t[0]|0;
+    var out=t.slice(2).join("\0");
+    if(out.length<len)return;
+    var z=t[1];
+    var msg=out.substr(0,len);
+    rawData=out.substr(len);
+    cb(z,msg);
+  });
+}
+
 var cl_and_exec_cpp=(code,async_cb,flags)=>{
   var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
   var fn="main["+getDateTime().split(":").join("-").split(" ").join("_")+"]_"+rnd+".cpp";
@@ -245,6 +263,7 @@ http_server.on('clientError',(err,socket)=>{
   if(!g_http_server_debug)return;
   g_err_socks_func(err,socket);
 });
+
 var requestListener=(request,response)=>{
   var purl=url.parse(request.url);var uri=purl.pathname;var qp=qs.parse(purl.query);
   var filename = path.join(process.cwd(), uri);
@@ -283,23 +302,7 @@ var requestListener=(request,response)=>{
         }
       }
     };
-    var rawData='';
-    request.on("data",data=>{
-      rawData+=data.toString("binary");
-      var e=rawData.indexOf("\0");
-      if(e<0)return;
-      var t=rawData.split("\0");
-      if(t.length<3)return;
-      var len=t[0]|0;
-      var out=t.slice(2).join("\0");
-      if(out.length<len)return;
-      var z=t[1];
-      var msg=out.substr(0,len);
-      rawData=out.substr(len);
-      fromR(z,msg);
-      //if(z in z2func)z2func[z](msg);
-      //if(z in z2func)z2func[z](msg,z);
-    });
+    emitter_on_data_decoder(request,fromR);
     ee_logger(request,'rt_sh.request','end,abort,aborted,connect,continue,response,upgrade');
     ee_logger(response,'rt_sh.response','end,abort,aborted,connect,continue,response,upgrade');
     call_cb_on_err(request,qap_log,'rt_sh.request');
