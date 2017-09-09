@@ -257,6 +257,7 @@ var requestListener=(request,response)=>{
     toR("log")("["+getDateTime()+"] :: hi");
     var on_exit=()=>{
       clear_interval(ping_interval);
+      request.destroy();
       response.destroy();
     }
     var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
