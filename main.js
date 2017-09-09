@@ -5,6 +5,7 @@ var child_process=require('child_process');
 var execSync=child_process.execSync;var exec=child_process.exec;
 var spawnSync=child_process.spawnSync;var spawn=child_process.spawn;
 
+var qs = require('querystring');
 var http = require("http"),
     https = require("https"),
     url = require("url"),
@@ -20,7 +21,6 @@ var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
 
 var get_tick_count=()=>new Date().getTime();
 
-var qs = require('querystring');
 var g_interval=false;var g_ping_base=get_tick_count();
 var g_obj={};
 
@@ -161,7 +161,7 @@ var xhr_get=(url,ok,err)=>{
 
 var xhr=(method,URL,data,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
-  if((typeof oerrk)!="function")err=()=>{};
+  if((typeof err)!="function")err=()=>{};
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
