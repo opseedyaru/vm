@@ -146,6 +146,10 @@ var start_auto_backup=()=>{
 }
 //return cl_and_exec_cpp(POST);
 
+var ee_logger=(emitter,name,events)=>{
+  events.split(',').map(event=>emitter.on(event,e=>qap_log(name+' :: Got '+event)));
+}
+
 var xhr_get=(url,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
@@ -255,8 +259,11 @@ var requestListener=(request,response)=>{
     var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
     toR("log")("["+getDateTime()+"] :: hi");
+    var on_exit_funcs=[];
     var on_exit=()=>{
-      clear_interval(ping_interval);
+      if(!ping_interval)return;
+      clear_interval(ping_interval);ping_interval=false;
+      on_exit_funcs.map(f=>f());
       request.destroy();
       response.destroy();
     }
@@ -271,7 +278,7 @@ var requestListener=(request,response)=>{
           QapNoWay();
           response.writeHead(500,{"Content-Type":"text/plain"});
           response.end(qap_err("rt_sh.eval.msg",err));
-          clear_interval(ping_interval);
+          on_exit();
           return;
         }
       }
@@ -293,10 +300,12 @@ var requestListener=(request,response)=>{
       //if(z in z2func)z2func[z](msg);
       //if(z in z2func)z2func[z](msg,z);
     });
-    var u=event=>request.on(event,e=>qap_log('rt_sh :: Got '+event));
-    'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
+    ee_logger(request,'rt_sh.request','end,abort,aborted,connect,continue,response,upgrade');
+    ee_logger(response,'rt_sh.response','end,abort,aborted,connect,continue,response,upgrade');
     call_cb_on_err(request,qap_log,'rt_sh.request');
+    call_cb_on_err(response,qap_log,'rt_sh.request');
     request.on('aborted',on_exit);
+    response.on('aborted',on_exit);
     return;
   }
   var contentTypesByExtension={

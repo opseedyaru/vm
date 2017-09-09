@@ -87,7 +87,7 @@ var ee_logger=(emitter,name,events)=>{
   events.split(',').map(event=>emitter.on(event,e=>qap_log(name+' :: Got '+event)));
 }
 ee_logger(sh,'sh','close,disconnect,error,exit,message');
-sh.on('close',()=>xhr_get(hosts[2]+"/fetch?quit",qap_log,qap_log));
+sh.on('close',()=>xhr_get(hosts[2]+"/fetch?quit&from=commit_push_and_do_restart.js",qap_log,qap_log));
 
 
 

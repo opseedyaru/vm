@@ -57,22 +57,8 @@ var inspect=json_once_v2;
 var file_exist=fn=>{try{fs.accessSync(fn);return true;}catch(e){return false;}}
 var rand=()=>(Math.random()*1024*64|0);
 
-var xhr=(method,URL,data,ok,err)=>{
-  var up=url.parse(URL);var secure=up.protocol=='https';
-  var options={
-    hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
-    headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
-  };
-  var req=(secure?https:http).request(options,(res)=>{
-    var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
-    if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
-    if(error){err(error.message,res);res.resume();return;}
-    //res.setEncoding('utf8');
-    var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
-    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
-  }).on('error',err=>console.error(err));
-  req.end(data);
-  return req;
+var ee_logger=(emitter,name,events)=>{
+  events.split(',').map(event=>emitter.on(event,e=>qap_log(name+' :: Got '+event)));
 }
 
 var hosts=[
@@ -89,36 +75,34 @@ var xhr_shell=(method,URL,ok,err)=>{
     //headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
   var once=false;
-  var req=(secure?https:http).request(options,(res)=>{
+  var req=(secure?https:http).request(options,(res)=>
+  {
     var statusCode=res.statusCode;
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
-    if(!once)
-    {
-      var rawData='';
-      res.on('data',data=>{
-        rawData+=data.toString("binary");
-        var e=rawData.indexOf("\0");
-        if(e<0)return;
-        var t=rawData.split("\0");
-        if(t.length<3)return;
-        var len=t[0]|0;
-        var out=t.slice(2).join("\0");
-        if(out.length<len)return;
-        var z=t[1];
-        var msg=out.substr(0,len);
-        rawData=out.substr(len);
-        if(z==="out")process.stdout.write(msg);
-        if(z==="err")process.stderr.write(msg);
-        if(z==="qap_log")qap_log("formR :: "+msg);
-        if(z==="exit")process.exit();
-      });
-      var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
-      'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
-      res.on('error',err=>console.error(err));
-      once=true;
-    }
+    var rawData='';
+    res.on('data',data=>{
+      rawData+=data.toString("binary");
+      var e=rawData.indexOf("\0");
+      if(e<0)return;
+      var t=rawData.split("\0");
+      if(t.length<3)return;
+      var len=t[0]|0;
+      var out=t.slice(2).join("\0");
+      if(out.length<len)return;
+      var z=t[1];
+      var msg=out.substr(0,len);
+      rawData=out.substr(len);
+      if(z==="out")process.stdout.write(msg);
+      if(z==="err")process.stderr.write(msg);
+      if(z==="qap_log")qap_log("formR :: "+msg);
+      if(z==="exit")process.exit();
+    });
+    ee_logger(res,'xhr_shell.res','end,abort,aborted,connect,continue,response,upgrade');
+    call_cb_on_err(res,qap_log,'xhr_shell.res');
   });
-
+  ee_logger(req,'xhr_shell.req','end,abort,aborted,connect,continue,response,upgrade');
+  call_cb_on_err(req,qap_log,'xhr_shell.req');
+  
   var u=event=>req.on(event,e=>qap_log('xhr_shell::req :: Got '+event));
   'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
   req.on('error',e=>qap_log('Got error: '+e.message));
@@ -127,19 +111,18 @@ var xhr_shell=(method,URL,ok,err)=>{
   toR("eval")(
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
-      var sh=spawn('bash',['-i']);
-      sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
-      sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stdout"));
+      var sh=spawn('bash',['-i']);on_exit_funcs.push(()=>sh.kill());
       var finish=msg=>{
         q(msg);
         toR("exit")();
-        response.destroy();
-        request.destroy();
-        delete z2func['inp'];
+        on_exit();
       }
+      sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
+      sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stdout"));
       sh.on('close',code=>finish("bash exited with code "+code));
       sh.on('error',code=>finish("bash error "+code));
       z2func['inp']=msg=>sh.stdin.write(msg);
+      on_exit_funcs.push(()=>{delete z2func['inp'];});
       q("begin");
     }).toString().split("\n").slice(1,-1).join("\n")
   );
