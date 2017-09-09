@@ -108,7 +108,6 @@ var xhr_shell=(method,URL,ok,err)=>{
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   toR("eval")(
     (()=>{
-      //on_exit_funcs.push(()=>qap_log("on_exit_funcs::first"));
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
       var sh=spawn('bash',['-i'],{detached:true});on_exit_funcs.push(()=>sh.kill('SIGHUP'));
       var finish=msg=>{
@@ -123,7 +122,6 @@ var xhr_shell=(method,URL,ok,err)=>{
       z2func['inp']=msg=>sh.stdin.write(msg);
       on_exit_funcs.push(()=>{delete z2func['inp'];});
       q("begin");
-      //on_exit_funcs.push(()=>qap_log("on_exit_funcs::last"));
     }).toString().split("\n").slice(1,-1).join("\n")
   );
   var inp=toR("inp");
