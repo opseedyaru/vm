@@ -303,7 +303,7 @@ var requestListener=(request,response)=>{
     ee_logger(request,'rt_sh.request','end,abort,aborted,connect,continue,response,upgrade');
     ee_logger(response,'rt_sh.response','end,abort,aborted,connect,continue,response,upgrade');
     call_cb_on_err(request,qap_log,'rt_sh.request');
-    call_cb_on_err(response,qap_log,'rt_sh.request');
+    call_cb_on_err(response,qap_log,'rt_sh.response');
     request.on('aborted',on_exit);
     response.on('aborted',on_exit);
     return;
