@@ -153,7 +153,7 @@ var xhr_get=(url,ok,err)=>{
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk);
-    res.on('end',()=>ok(rawData);}catch(e){err(e.message);}});
+    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
   });
   call_cb_on_err(req,qap_log,'xhr_get');
   return req;
