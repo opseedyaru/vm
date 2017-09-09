@@ -92,7 +92,6 @@ var xhr_shell=(method,URL,ok,err)=>{
     headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
     //headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
-  var once=false;
   var req=(secure?https:http).request(options,(res)=>
   {
     var statusCode=res.statusCode;
