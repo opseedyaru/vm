@@ -147,6 +147,13 @@ var xhr_shell=(method,URL)=>{
     //STARTCOLOR='\e[0;32m';
     //ENDCOLOR="\e[0m"
     //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
+    //export TERM='xterm'
+    //alias rollback=pkill -f npm
+    //alias cls='clear'
+    //alias ll='ls -all'
+    //alias grep='grep --color=always'
+    //LS_COLORS=$LS_COLORS:'di=0;35:' ; export LS_COLORS
+    //ps -aux
   }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
   inp(ps1+"\n");
   inp("echo welcome!\n");
