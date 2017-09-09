@@ -83,8 +83,10 @@ var hosts=[
 ];
 
 var sh=spawn('sh.exe',['-c',"git commit -am 'upd'\ngit push"],{stdio:[0,1,2]});
-var ee_logger=(emitter,s)=>s.split(',').map(event=>emitter.on(event,e=>qap_log('sh :: Got '+event)));
-ee_logger(sh,'close,disconnect,error,exit,message');
+var ee_logger=(emitter,name,events)=>{
+  events.split(',').map(event=>emitter.on(event,e=>qap_log(name+' :: Got '+event)));
+}
+ee_logger(sh,'sh','close,disconnect,error,exit,message');
 sh.on('close',()=>xhr_get(hosts[2]+"/fetch?quit",qap_log,qap_log));
 
 
