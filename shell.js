@@ -79,6 +79,8 @@ var xhr_shell=(method,URL,ok,err)=>{
   {
     var statusCode=res.statusCode;
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+    ee_logger(res,'xhr_shell.res','end,abort,aborted,connect,continue,response,upgrade');
+    call_cb_on_err(res,qap_log,'xhr_shell.res');
     var rawData='';
     res.on('data',data=>{
       rawData+=data.toString("binary");
@@ -97,15 +99,10 @@ var xhr_shell=(method,URL,ok,err)=>{
       if(z==="qap_log")qap_log("formR :: "+msg);
       if(z==="exit")process.exit();
     });
-    ee_logger(res,'xhr_shell.res','end,abort,aborted,connect,continue,response,upgrade');
-    call_cb_on_err(res,qap_log,'xhr_shell.res');
   });
   ee_logger(req,'xhr_shell.req','end,abort,aborted,connect,continue,response,upgrade');
   call_cb_on_err(req,qap_log,'xhr_shell.req');
-  
-  var u=event=>req.on(event,e=>qap_log('xhr_shell::req :: Got '+event));
-  'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
-  req.on('error',e=>qap_log('Got error: '+e.message));
+
   req.setNoDelay();
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   toR("eval")(
@@ -120,7 +117,7 @@ var xhr_shell=(method,URL,ok,err)=>{
       sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
       sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stdout"));
       sh.on('close',code=>finish("bash exited with code "+code));
-      sh.on('error',code=>finish("bash error "+code));
+      call_cb_on_err(sh,qap_log,'sh');
       z2func['inp']=msg=>sh.stdin.write(msg);
       on_exit_funcs.push(()=>{delete z2func['inp'];});
       q("begin");
