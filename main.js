@@ -248,6 +248,7 @@ var requestListener=(request,response)=>{
     var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
     toR("log")("["+getDateTime()+"] :: hi");
+    var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
     var z2func={
       eval:msg=>{
         try{
@@ -275,7 +276,7 @@ var requestListener=(request,response)=>{
       var z=t[1];
       var msg=out.substr(0,len);
       rawData=out.substr(len);
-      if(z in z2func)z2func[z](msg);
+      fromR(z,msg);
       //if(z in z2func)z2func[z](msg);
       //if(z in z2func)z2func[z](msg,z);
     });
