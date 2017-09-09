@@ -174,7 +174,7 @@ var xhr=(method,URL,data,ok,err)=>{
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
     res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
   });
-  use_logger_on_error(req);
+  call_cb_on_err(req,qap_log,'xhr');
   req.end(data);
   return req;
 }
