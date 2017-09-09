@@ -64,7 +64,7 @@ var xhr=(method,URL,data,ok,err)=>{
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
     res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
-  }).on('error',e=>{err('Got error: '+e.message,null);});
+  }).on('error',err=>console.error(err));
   req.end(data);
   return req;
 }
@@ -109,7 +109,7 @@ var xhr_shell=(method,URL)=>{
       });
       var u=event=>res.on(event,e=>qap_log('xhr_shell::res :: Got '+event));
       'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
-      res.on('error',e=>qap_log('Got error: '+e.message));
+      res.on('error',err=>console.error(err));
       once=true;
     }
   });
@@ -141,8 +141,8 @@ var xhr_shell=(method,URL)=>{
   var inp=toR("inp");
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   process.stdin.setRawMode(true);
-  process.stdin.setEncoding('utf8');
-  process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
+  //process.stdin.setEncoding('utf8');
+  process.stdin.on('data',data=>{/*if(data==='\u0003')process.exit();*/inp(data);});
   var ps1=(()=>{
     //STARTCOLOR='\e[0;32m';
     //ENDCOLOR="\e[0m"

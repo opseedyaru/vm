@@ -24,13 +24,22 @@ var qs = require('querystring');
 var g_interval=false;var g_ping_base=get_tick_count();
 var g_obj={};
 
+var QapNoWay=()=>{qap_log("QapNoWay :: no impl");qap_log("no way");}
+
+var call_cb_on_err=(emitter,cb,...args)=>{
+  emitter.on('error',err=>{
+    cb("'inspect({args,err}) // stack': "+inspect({args:args,err:err})+" // "+err.stack.toString());
+  });
+}
+
 var qap_err=(context,err)=>context+" :: err = "+inspect(err)+" //"+err.stack.toString();
 var log_err=(context,err)=>qap_log(qap_err(context,err));
 
 process.on('uncaughtException',err=>log_err('uncaughtException',err));
 
 var rand=()=>(Math.random()*1024*64|0);
-var qap_log=s=>console.log("["+getDateTime()+"] "+s);
+var qap_add_time=s=>"["+getDateTime()+"] "+s;
+var qap_log=s=>console.log(qap_add_time(s));
 
 var json=JSON.stringify;
 var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
@@ -139,15 +148,14 @@ var start_auto_backup=()=>{
 
 var xhr_get=(url,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
-  if((typeof oerrk)!="function")err=()=>{};
+  if((typeof err)!="function")err=()=>{};
   var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
-    var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
-    if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
-    if(error){err(error.message);res.resume();return;}
+    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.abort();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk);
-    res.on('end',()=>{try{ok(rawData);}catch(e){err(e.message);}});
-  }).on('error',(e)=>{err('Got error: '+e.message);});
+    res.on('end',()=>ok(rawData);}catch(e){err(e.message);}});
+  });
+  call_cb_on_err(req,qap_log,'xhr_get');
   return req;
 }
 
@@ -160,13 +168,13 @@ var xhr=(method,URL,data,ok,err)=>{
     headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
   var req=(secure?https:http).request(options,(res)=>{
-    var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
-    if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
+    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.abort();return;}
     if(error){err(error.message,res);res.resume();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
     res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
-  }).on('error',e=>{err('Got error: '+e.message,null);});
+  });
+  use_logger_on_error(req);
   req.end(data);
   return req;
 }
@@ -248,6 +256,10 @@ var requestListener=(request,response)=>{
     var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
     toR("log")("["+getDateTime()+"] :: hi");
+    var on_exit=()=>{
+      clear_interval(ping_interval);
+      response.destroy();
+    }
     var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
     var z2func={
       eval:msg=>{
@@ -256,8 +268,9 @@ var requestListener=(request,response)=>{
           system_tmp();
           return;
         }catch(err){
+          QapNoWay();
           response.writeHead(500,{"Content-Type":"text/plain"});
-          response.end(qap_err("rt_sh.eval",err));
+          response.end(qap_err("rt_sh.eval.msg",err));
           clear_interval(ping_interval);
           return;
         }
@@ -282,8 +295,8 @@ var requestListener=(request,response)=>{
     });
     var u=event=>request.on(event,e=>qap_log('rt_sh :: Got '+event));
     'end,abort,aborted,connect,continue,response,upgrade'.split(',').map(u);
-    request.on('error',e=>qap_log('Got error: '+e.message));
-    request.on('aborted',e=>clear_interval(ping_interval));
+    call_cb_on_err(request,qap_log,'rt_sh.request');
+    request.on('aborted',on_exit);
     return;
   }
   var contentTypesByExtension={
@@ -301,11 +314,11 @@ var requestListener=(request,response)=>{
   };
   var on_request_end=(cb)=>{
     var body=[];
-    request.on('error',err=>console.error(err));
+    call_cb_on_err(request,qap_log,'http_server.requestListener.on_request_end');
     request.on('data',chunk=>body.push(chunk));
     request.on('end',()=>cb(Buffer.concat(body).toString()));
   };
-  response.on('error',err=>console.error(err));
+  call_cb_on_err(response,qap_log,'http_server.requestListener');
   var g_logger_func=request=>{
     var f=request=>{
       var h=request.headers;
@@ -594,7 +607,7 @@ var requestListener=(request,response)=>{
               }
             }catch(err){
               response.writeHead(500,{"Content-Type":"text/plain"});
-              response.end(qap_err("/eval",err));
+              response.end(qap_err("/eval.POST.code",err));
               return;
             }
           };
