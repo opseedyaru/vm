@@ -108,9 +108,9 @@ var xhr_shell=(method,URL,ok,err)=>{
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   toR("eval")(
     (()=>{
-      on_exit_funcs.push(()=>qap_log("on_exit_funcs::first"));
+      //on_exit_funcs.push(()=>qap_log("on_exit_funcs::first"));
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
-      var sh=spawn('bash',['-i'],{detached:true});on_exit_funcs.push(()=>{sh.kill('SIGKILL');qap_log("after sh.kill();")});
+      var sh=spawn('bash',['-i'],{detached:true});on_exit_funcs.push(()=>sh.kill('SIGHUP'));
       var finish=msg=>{
         q(msg);
         toR("exit")();
@@ -123,7 +123,7 @@ var xhr_shell=(method,URL,ok,err)=>{
       z2func['inp']=msg=>sh.stdin.write(msg);
       on_exit_funcs.push(()=>{delete z2func['inp'];});
       q("begin");
-      on_exit_funcs.push(()=>qap_log("on_exit_funcs::last"));
+      //on_exit_funcs.push(()=>qap_log("on_exit_funcs::last"));
     }).toString().split("\n").slice(1,-1).join("\n")
   );
   var inp=toR("inp");
@@ -138,11 +138,13 @@ var xhr_shell=(method,URL,ok,err)=>{
     //export TERM='xterm'
     //alias rollback='pkill -f npm'
     //alias cls='clear'
-    //alias ll='ls -all'
+    //alias ll='ls -all --color=always'
     //alias grep='grep --color=always'
     //LS_COLORS=$LS_COLORS:'di=0;35:' ; export LS_COLORS
     //ps -aux
   }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
+  var press_insert_key=String.fromCharCode(27,91,50,126);
+  inp(press_insert_key);
   inp(ps1+"\n");
   inp("echo welcome!\n");
   process.stdin.resume();
