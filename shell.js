@@ -140,7 +140,7 @@ var xhr_shell=(method,URL,ok,err)=>{
     //alias cls='clear'
     //alias ll='ls -all --color=always'
     //alias grep='grep --color=always'
-    //LS_COLORS=$LS_COLORS:'di=0;35:' ; export LS_COLORS
+    //LS_COLORS=$LS_COLORS:'di=0;33:' ; export LS_COLORS
     //ps -aux
   }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
   var press_insert_key=String.fromCharCode(27,91,50,126);
