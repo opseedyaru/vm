@@ -99,6 +99,7 @@ var xhr_shell=(method,URL,ok,err)=>{
       if(z==="qap_log")qap_log("formR :: "+msg);
       if(z==="exit")process.exit();
     });
+    res.on('end',()=>process.exit());
   });
   ee_logger(req,'xhr_shell.req','end,abort,aborted,connect,continue,response,upgrade');
   call_cb_on_err(req,qap_log,'xhr_shell.req');
