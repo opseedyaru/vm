@@ -10,6 +10,12 @@ var http = require("http"),
     os = require("os"),
 crypto = require('crypto');
 
+var call_cb_on_err=(emitter,cb,...args)=>{
+  emitter.on('error',err=>{
+    cb("'inspect({args,err}) // stack': "+inspect({args:args,err:err})+" // "+err.stack.toString());
+  });
+}
+
 var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 
 var qap_err=(context,err)=>context+" :: err = "+inspect(err)+" //"+err.stack.toString();
@@ -75,7 +81,7 @@ var hosts=[
   "http://vm-vm.193b.starter-ca-central-1.openshiftapps.com"
 ];
 
-var xhr_shell=(method,URL)=>{
+var xhr_shell=(method,URL,ok,err)=>{
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
@@ -84,9 +90,8 @@ var xhr_shell=(method,URL)=>{
   };
   var once=false;
   var req=(secure?https:http).request(options,(res)=>{
-    var statusCode=res.statusCode;var contentType=res.headers['content-type'];var error;
-    if(statusCode!==200){error=new Error('Request Failed.\nStatus Code: '+statusCode);}
-    if(error){err(error.message,res);res.resume();return;}
+    var statusCode=res.statusCode;
+    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
     if(!once)
     {
       var rawData='';
@@ -141,14 +146,14 @@ var xhr_shell=(method,URL)=>{
   var inp=toR("inp");
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   process.stdin.setRawMode(true);
-  //process.stdin.setEncoding('utf8');
-  process.stdin.on('data',data=>{/*if(data==='\u0003')process.exit();*/inp(data);});
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
   var ps1=(()=>{
     //STARTCOLOR='\e[0;32m';
     //ENDCOLOR="\e[0m"
     //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
     //export TERM='xterm'
-    //alias rollback=pkill -f npm
+    //alias rollback='pkill -f npm'
     //alias cls='clear'
     //alias ll='ls -all'
     //alias grep='grep --color=always'
@@ -163,7 +168,7 @@ var xhr_shell=(method,URL)=>{
 
 var json=JSON.stringify;
 
-xhr_shell("post",hosts[2]+"/rt_sh");
+xhr_shell("post",hosts[2]+"/rt_sh",qap_log,qap_log);
 
 
 
