@@ -61,6 +61,24 @@ var ee_logger=(emitter,name,events)=>{
   events.split(',').map(event=>emitter.on(event,e=>qap_log(name+' :: Got '+event)));
 }
 
+var emitter_on_data_decoder=(emitter,cb)=>{
+  var rawData='';
+  emitter.on('data',data=>{
+    rawData+=data.toString("binary");
+    var e=rawData.indexOf("\0");
+    if(e<0)return;
+    var t=rawData.split("\0");
+    if(t.length<3)return;
+    var len=t[0]|0;
+    var out=t.slice(2).join("\0");
+    if(out.length<len)return;
+    var z=t[1];
+    var msg=out.substr(0,len);
+    rawData=out.substr(len);
+    cb(z,msg);
+  });
+}
+
 var hosts=[
   "http://vm-vm.1d35.starter-us-east-1.openshiftapps.com",
   "http://agile-eyrie-44522.herokuapp.com",
@@ -81,24 +99,14 @@ var xhr_shell=(method,URL,ok,err)=>{
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
     ee_logger(res,'xhr_shell.res','end,abort,aborted,connect,continue,response,upgrade');
     call_cb_on_err(res,qap_log,'xhr_shell.res');
-    var rawData='';
-    res.on('data',data=>{
-      rawData+=data.toString("binary");
-      var e=rawData.indexOf("\0");
-      if(e<0)return;
-      var t=rawData.split("\0");
-      if(t.length<3)return;
-      var len=t[0]|0;
-      var out=t.slice(2).join("\0");
-      if(out.length<len)return;
-      var z=t[1];
-      var msg=out.substr(0,len);
-      rawData=out.substr(len);
-      if(z==="out")process.stdout.write(msg);
-      if(z==="err")process.stderr.write(msg);
-      if(z==="qap_log")qap_log("formR :: "+msg);
-      if(z==="exit")process.exit();
-    });
+    var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
+    var z2func={
+      out:msg=>process.stdout.write(msg),
+      err:msg=>process.stderr.write(msg),
+      qap_log:msg=>qap_log("formR :: "+msg),
+      exit:msg=>process.exit()
+    };
+    emitter_on_data_decoder(res,fromR);
     res.on('end',()=>process.exit());
   });
   ee_logger(req,'xhr_shell.req','end,abort,aborted,connect,continue,response,upgrade');
