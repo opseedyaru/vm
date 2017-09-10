@@ -619,7 +619,7 @@ var requestListener=(request,response)=>{
               }
             }catch(err){
               response.writeHead(500,{"Content-Type":"text/plain"});
-              response.end(qap_err("/eval.POST.code",err));
+              response.end(qap_err('/eval.POST.code',err));
               return;
             }
           };
