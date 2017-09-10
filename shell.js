@@ -213,11 +213,9 @@ var f=(key,val)=>{
 };
 process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 
-if(val=="inspect")qap_log(inspect(process.argv));
-
-if(val=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
-
-if(val=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log);
+if(api=="inspect")qap_log(inspect(process.argv));
+if(api=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
+if(api=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log);
 
 
 
