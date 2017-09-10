@@ -118,7 +118,7 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
       var stream=false;var off=s=>{if(!s)return;s.destroy();}
       Object.assign(z2func,{
         fn:msg=>{off(stream);stream=fs.createWriteStream(msg);q("fn = "+msg);},
-        data:{msg=>stream.write(msg);q(msg.length);}
+        data:msg=>{stream.write(msg);q(msg.length);}
       });
       q("begin");
       on_exit_funcs.push(()=>off(stream));
