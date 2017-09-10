@@ -85,6 +85,52 @@ var hosts=[
   "http://vm-vm.193b.starter-ca-central-1.openshiftapps.com"
 ];
 
+var xhr_blob_upload=(method,URL,ok,err)=>{
+  var up=url.parse(URL);var secure=up.protocol=='https';
+  var options={
+    hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
+    headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
+  };
+  var req=(secure?https:http).request(options,(res)=>
+  {
+    var statusCode=res.statusCode;
+    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+    ee_logger(res,'xhr_shell.res','end,abort,aborted,connect,continue,response,upgrade');
+    call_cb_on_err(res,qap_log,'xhr_shell.res');
+    var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
+    var z2func={
+      out:msg=>process.stdout.write(msg),
+      err:msg=>process.stderr.write(msg),
+      qap_log:msg=>qap_log("formR :: "+msg),
+      exit:msg=>process.exit()
+    };
+    emitter_on_data_decoder(res,fromR);
+    res.on('end',()=>process.exit());
+  });
+  ee_logger(req,'xhr_shell.req','end,abort,aborted,connect,continue,response,upgrade');
+  call_cb_on_err(req,qap_log,'xhr_shell.req');
+
+  req.setNoDelay();
+  var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
+  toR("eval")(
+    (()=>{
+      var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
+      var stream=false;var off=s=>{if(!s)return;s.destroy();}
+      Object.assign(z2func,{
+        fn:msg=>{off(stream);stream=fs.createWriteStream(msg);q("fn = "+msg);},
+        data:{msg=>stream.write(msg);q(msg.length);}
+      });
+      q("begin");
+      on_exit_funcs.push(()=>off(stream));
+    }).toString().split("\n").slice(1,-1).join("\n")
+  );
+  var fn="rayenv_L8_scene_v22.bin";
+  toR("fn")(fn);
+  fs.createReadStream("../../Release/"+fn).on('data',toR("data"));
+  var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
+  return req;
+}
+
 var xhr_shell=(method,URL,ok,err)=>{
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
@@ -158,7 +204,9 @@ var xhr_shell=(method,URL,ok,err)=>{
 
 var json=JSON.stringify;
 
-xhr_shell("post",hosts[2]+"/rt_sh",qap_log,qap_log);
+//xhr_shell("post",hosts[2]+"/rt_sh",qap_log,qap_log);
+
+xhr_blob_upload("post",hosts[2]+"/rt_sh",qap_log,qap_log);
 
 
 
