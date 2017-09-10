@@ -206,7 +206,7 @@ var xhr_shell=(method,URL,ok,err)=>{
 
 var json=JSON.stringify;
 
-var name2hostid={ca:2,us:0,ae:1};
+var name2hostid={ca:2,us:0,ae:1}; //IRL do not work on ae, because of proxy.
 var id=2;var api="shell";
 var f=(key,val)=>{
   if(key==="api"){api=val;}
