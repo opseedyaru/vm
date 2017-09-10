@@ -57,8 +57,9 @@ var inspect=json_once_v2;
 var file_exist=fn=>{try{fs.accessSync(fn);return true;}catch(e){return false;}}
 var rand=()=>(Math.random()*1024*64|0);
 
-var ee_logger=(emitter,name,events)=>{
-  events.split(',').map(event=>emitter.on(event,e=>qap_log(name+' :: Got '+event)));
+var ee_logger_v2=(emitter,name,cb,events)=>{
+  events.split(',').map(event=>emitter.on(event,e=>cb(name+' :: Got '+event)));
+  call_cb_on_err(emitter,cb,name);
 }
 
 var emitter_on_data_decoder=(emitter,cb)=>{
@@ -95,8 +96,7 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   {
     var statusCode=res.statusCode;
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
-    ee_logger(res,'xhr_shell.res','end,abort,aborted,connect,continue,response,upgrade');
-    call_cb_on_err(res,qap_log,'xhr_shell.res');
+    ee_logger_v2(res,'xhr_shell.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
     var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
     var z2func={
       out:msg=>process.stdout.write(msg),
@@ -107,8 +107,7 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
     emitter_on_data_decoder(res,fromR);
     res.on('end',()=>process.exit());
   });
-  ee_logger(req,'xhr_shell.req','end,abort,aborted,connect,continue,response,upgrade');
-  call_cb_on_err(req,qap_log,'xhr_shell.req');
+  ee_logger_v2(req,'xhr_shell.req',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
 
   req.setNoDelay();
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
@@ -131,33 +130,34 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   return req;
 }
 
-var xhr_shell=(method,URL,ok,err)=>{
+var qap_http_request_decoder=(method,URL,fromR,on_end)=>{
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
     headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
-    //headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
   var req=(secure?https:http).request(options,(res)=>
   {
     var statusCode=res.statusCode;
-    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
-    ee_logger(res,'xhr_shell.res','end,abort,aborted,connect,continue,response,upgrade');
-    call_cb_on_err(res,qap_log,'xhr_shell.res');
-    var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
-    var z2func={
-      out:msg=>process.stdout.write(msg),
-      err:msg=>process.stderr.write(msg),
-      qap_log:msg=>qap_log("formR :: "+msg),
-      exit:msg=>process.exit()
-    };
+    if(res.statusCode!==200){qap_log('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+    ee_logger_v2(res,'qhrd.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
     emitter_on_data_decoder(res,fromR);
-    res.on('end',()=>process.exit());
+    res.on('end',on_end);
   });
-  ee_logger(req,'xhr_shell.req','end,abort,aborted,connect,continue,response,upgrade');
-  call_cb_on_err(req,qap_log,'xhr_shell.req');
-
+  ee_logger_v2(req,'qhrd.req',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
   req.setNoDelay();
+  return req;
+};
+
+var xhr_shell=(method,URL,ok,err,use_two_requests)=>{
+  var fromR=(z,msg)=>{/*qap_log("\n"+json({z:z,msg:msg}));*/if(z in z2func)z2func[z](msg);};
+  var z2func={
+    out:msg=>process.stdout.write(msg),
+    err:msg=>process.stderr.write(msg),
+    qap_log:msg=>qap_log("formR :: "+msg),
+    exit:msg=>process.exit()
+  };
+  var req=qap_http_request_decoder(method,URL,fromR,()=>process.exit());
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   toR("eval")(
     (()=>{
@@ -179,11 +179,12 @@ var xhr_shell=(method,URL,ok,err)=>{
   );
   var inp=toR("inp");
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
-  var set_rm=s=>{if('setRawMode' in s)s.setRawMode(true);}
-  set_rm(process.stdin);
+  var set_raw_mode=s=>{if('setRawMode' in s)s.setRawMode(true);}
+  set_raw_mode(process.stdin);
   process.stdin.setEncoding('utf8');
   process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
   var ps1=(()=>{
+    //COLUMNS=180;
     //STARTCOLOR='\e[0;32m';
     //ENDCOLOR="\e[0m"
     //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
@@ -198,7 +199,7 @@ var xhr_shell=(method,URL,ok,err)=>{
   var press_insert_key=String.fromCharCode(27,91,50,126);
   inp(press_insert_key);
   inp(ps1+"\n");
-  inp("echo xhr_shell URL = "+json(URL)+"\n");
+  inp("echo xhr_shell URL is "+URL+"\n");
   inp("echo welcome\n");
   process.stdin.resume();
   return req;
@@ -217,58 +218,6 @@ process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 if(api=="inspect")qap_log(inspect(process.argv));
 if(api=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
 if(api=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
