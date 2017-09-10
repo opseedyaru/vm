@@ -197,18 +197,27 @@ var xhr_shell=(method,URL,ok,err)=>{
   var press_insert_key=String.fromCharCode(27,91,50,126);
   inp(press_insert_key);
   inp(ps1+"\n");
-  inp("echo welcome!\n");
+  inp("echo xhr_shell URL = "+json(URL)+"\n");
+  inp("echo welcome\n");
   process.stdin.resume();
   return req;
 }
 
 var json=JSON.stringify;
 
-//xhr_shell("post",hosts[2]+"/rt_sh",qap_log,qap_log);
+var name2hostid={ca:2,us:0,ae:1};
+var id=2;var api="shell";
+var f=(key,val)=>{
+  if(key==="api"){api=val;}
+  if(key==="host")if(val in name2hostid)id=name2hostid[val];
+};
+process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 
-xhr_blob_upload("post",hosts[2]+"/rt_sh",qap_log,qap_log);
+if(val=="inspect")qap_log(inspect(process.argv));
 
+if(val=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
 
+if(val=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log);
 
 
 
