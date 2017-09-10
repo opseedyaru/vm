@@ -199,7 +199,7 @@ var xhr_shell=(method,URL,ok,err,use_two_requests)=>{
   var press_insert_key=String.fromCharCode(27,91,50,126);
   inp(press_insert_key);
   inp(ps1+"\n");
-  inp("echo xhr_shell URL is "+URL+"\n");
+  inp("echo xhr_shell URL = "+json(URL)+"\n");
   inp("echo welcome\n");
   process.stdin.resume();
   return req;
