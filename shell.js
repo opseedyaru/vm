@@ -179,7 +179,8 @@ var xhr_shell=(method,URL,ok,err)=>{
   );
   var inp=toR("inp");
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
-  process.stdin.setRawMode(true);
+  var set_rm=s=>{if('setRawMode' in s)s.setRawMode(true);}
+  set_rm(process.stdin);
   process.stdin.setEncoding('utf8');
   process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
   var ps1=(()=>{
