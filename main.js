@@ -272,7 +272,7 @@ var requestListener=(request,response)=>{
   
   if("/rt_sh"==uri)
   {
-    response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked'});
+    response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked','X-Content-Type-Options':'nosniff'});
     var toR=z=>data=>{var d=data?data:"";response.write(d.length+"\0"+z+"\0"+d);};
     var pipe_from_to_func=(stream,func)=>stream.on("data",func).on("end",func);
     var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
