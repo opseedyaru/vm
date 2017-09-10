@@ -264,16 +264,18 @@ xhr_shell_test("post",hosts[1]+"/rt_sh",qap_log,qap_log);
 var xhr=(method,URL,data,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
+    qap_log("passed");
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
     headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
   var req=(secure?https:http).request(options,(res)=>{
+    qap_log("passed 2");
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
-    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
+    res.on('end',()=>{try{qap_log("passed 3");ok(rawData,res);}catch(e){qap_log("passed 4");err(e.message,res);}});
   });
   call_cb_on_err(req,qap_log,'xhr');
   req.end(data);
@@ -352,16 +354,19 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 
-var code=`return new_link().id;`;
-xhr_post(hosts[id]+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
-
 var with_link_id=link_id=>{
+  qap_log("wait!");
   xhr_shell_reader("post",hosts[id]+"/rt_sh",ok,qap_log,link_id);
   var ok=s=>{
     xhr_shell_writer("post",hosts[id]+"/rt_sh",qap_log,qap_log,link_id);
   }
 }
 
+var code=`return new_link().id;`;
+xhr_post(hosts[id]+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
+
+
+qap_log("wtf?");
 
 
 

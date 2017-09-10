@@ -301,6 +301,7 @@ var requestListener=(request,response)=>{
         }catch(err){
           QapNoWay();
           response.writeHead(500,{"Content-Type":"text/plain"});
+          qap_log(qap_err("rt_sh.eval.msg",err));
           response.end(qap_err("rt_sh.eval.msg",err));
           on_exit();
           return;
