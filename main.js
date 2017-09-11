@@ -113,14 +113,15 @@ var emitter_on_data_decoder=(emitter,cb)=>{
       err("error chunk.len is not number: "+json({as_buff:rd.slice(0,e),as_str:rd.slice(0,e).toString("binary")}));
     }
     if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
+    qap_log({zn:zn,len:len,zpos:zpos});
     var out=rd.slice(zn,len);
-    var z=rd.slice(en,zpos-en);
-    var msg=out.slice(0,len);
+    var bz=rd.slice(en,zpos-en);
+    var bmsg=out.slice(0,len);
     var obj={z:z.toString("binary"),msg:msg.toString("binary")};qap_log(json(obj));
     qap_log("frag = "+json(rd.slice(0,zn+len).toString("binary")));
     rd=rd.slice(zn+len);
-    cb(z.toString("binary"),msg.toString("binary"),z,msg);
-    log("(4.ok)"+json({len:len,z:z.toString("binary"),msg:len<80?msg.toString("binary"):"*** "+msg.length+" ***"}));
+    cb(obj.z,obj.msg,bz,bmsg);
+    log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*** "+msg.length+" ***"}));
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
 }
