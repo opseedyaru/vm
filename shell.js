@@ -131,9 +131,9 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   var toR=z=>data=>{
     var sep=Buffer.from([0]);
     req.write(Buffer.concat([
-      Buffer.from((data.length+""),"binary"),sep,
+      Buffer.from(!data?"0":(data.length+""),"binary"),sep,
       Buffer.from(z,"binary"),sep,
-      Buffer.from(data,"binary")
+      Buffer.from(data?data:"","binary")
     ]));
   };
   toR("eval")(
@@ -141,14 +141,15 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
       var stream=false;var off=s=>{if(!s)return;s.destroy();qap_log("stream_off");}
       Object.assign(z2func,{
-        fn:(msg,buf)=>{off(stream);qap_log(json(['msg+buf',msg,buf]));stream=fs.createWriteStream(msg);q("fn = "+msg);stream.write("\0test\n");},
-        data:(msg,buf)=>{stream.write(buf);q(msg.length);}
+        fn:(msg,buf)=>{off(stream);stream=fs.createWriteStream(msg);q("fn = "+msg);},
+        data:(msg,buf)=>{stream.write(buf);q(msg.length);},
+        end:msg=>{q("done!");off(stream);on_exit();}
       });
       q("begin");
       on_exit_funcs.push(()=>off(stream));
     }).toString().split("\n").slice(1,-1).join("\n")
   );
-  var fn="rayenv_L8_scene_v22.bin";
+  var fn="sphere4096.bin";
   toR("fn")(fn);
   fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>{toR("end")();});
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
