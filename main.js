@@ -117,7 +117,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     var out=rd.slice(zn,len);
     var bz=rd.slice(en,zpos-en);
     var bmsg=out.slice(0,len);
-    var obj={z:z.toString("binary"),msg:msg.toString("binary")};qap_log(json(obj));
+    var obj={z:bz.toString("binary"),msg:bmsg.toString("binary")};qap_log(json(obj));
     qap_log("frag = "+json(rd.slice(0,zn+len).toString("binary")));
     rd=rd.slice(zn+len);
     cb(obj.z,obj.msg,bz,bmsg);
