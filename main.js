@@ -102,6 +102,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
   emitter.on('data',data=>{
     //ws.write(data);
     rd=Buffer.concat([rd,data/*Buffer.from(data,"binary")*/]);
+    qap_log(json({rd_len:rd.length,chunk_len:data.length}));
     var e=rd.indexOf("\0");
     if(e<0){return log("(1.wait_len)");}
     var en=e+1;

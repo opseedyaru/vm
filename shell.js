@@ -141,8 +141,8 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
       var stream=false;var off=s=>{if(!s)return;s.destroy();}
       Object.assign(z2func,{
-        fn:msg=>{off(stream);stream=fs.createWriteStream(msg);q("fn = "+msg);},
-        data:(msg,buf)=>{stream.write(buf);q(msg.length);}
+        fn:(msg,buf)=>{off(stream);qap_log(json(['msg+buf',msg,buf]));stream=fs.createWriteStream(msg);q("fn = "+msg);stream.write("\0test\n");qap_log(inspect(stream))},
+        data:(msg,buf)=>{qap_log(json(buf));stream.write(buf);q(msg.length);}
       });
       q("begin");
       on_exit_funcs.push(()=>off(stream));
