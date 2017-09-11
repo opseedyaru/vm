@@ -105,7 +105,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     if(zpos<0)return qap_log("(2.wait_z)");
     var zn=zpos+1;
     var len=rawData.substr(0,e)|0;
-    if(rawData.length<zn+len)return qap_log("(3.wait_data)");
+    if(rawData.length<zn+len)return qap_log("(3.wait_data)"+json({"rawData.length":rawData.length,"zn+len":zn+len,pos:pos}));
     var out=rawData.substr(zn,len);
     var z=rawData.substr(en,zpos-en);
     var msg=out.substr(0,len);
@@ -674,7 +674,7 @@ var requestListener=(request,response)=>{
             'Content-Type':contentTypesByExtension[path.extname(filename)],
             'Content-Length':stat.size
           })
-          fs.createReadStream(filename).pipe(response);
+          fs.createReadStream(filename).pipe(response).on('end',()=>{response.destroy();request.destroy()});
         });
       };
       if(need_coop_init)
