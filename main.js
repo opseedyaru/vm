@@ -121,7 +121,8 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     var bmsg=out;
     var z=bz.toString("binary");
     var msg=bmsg.toString("binary");
-    var obj={z:z,msg:msg.toString("binary")};qap_log(json(obj));
+    var obj={z:z,msg:msg.toString("binary")};
+    //qap_log(json(obj));
     //qap_log("frag = "+json(rd.slice(0,zn+len).toString("binary")));
     rd=rd.slice(zn+len);
     cb(z,msg,bz,bmsg);
