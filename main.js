@@ -281,7 +281,7 @@ var requestListener=(request,response)=>{
     var pipe_from_to_func=(stream,func)=>stream.on("data",func).on("end",func);
     var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
-    toR("log")("["+getDateTime()+"] :: hi");
+    //toR("log")("["+getDateTime()+"] :: hi");
     var on_exit_funcs=[];
     var on_exit=()=>{
       if(!ping_interval)return;

@@ -264,18 +264,16 @@ xhr_shell_test("post",hosts[1]+"/rt_sh",qap_log,qap_log);
 var xhr=(method,URL,data,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
-    qap_log("passed");
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
     headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
   var req=(secure?https:http).request(options,(res)=>{
-    qap_log("passed 2");
     if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
-    res.on('end',()=>{try{qap_log("passed 3");ok(rawData,res);}catch(e){qap_log("passed 4");err(e.message,res);}});
+    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
   });
   call_cb_on_err(req,qap_log,'xhr');
   req.end(data);
@@ -291,9 +289,8 @@ var xhr_post_with_to=(url,obj,ok,err,ms)=>xhr_add_timeout(xhr('post',url,qs.stri
   
 var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
   var fromR=(z,msg)=>{}
-  var req=qap_http_request_decoder(method,URL,fromR,()=>process.exit());
+  var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("writer end");process.exit();});
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
-  toR("link_id")(link_id);
   toR("eval")(
     (()=>{
       var sh=spawn('bash',['-i'],{detached:true});on_exit_funcs.push(()=>sh.kill('SIGHUP'));
@@ -301,11 +298,16 @@ var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
       z2func.inp=msg=>sh.stdin.write(msg);
       on_exit_funcs.push(()=>{delete z2func['inp'];});
       z2func.link_id=msg=>{
-        getmap(g_links,msg).sh=sh;
+        qap_log("got_it");
+        qap_log(inspect([g_links,msg]));
+        var link=getmap(g_links,msg);
+        link.sh=sh;
+        link.on_up(sh,on_exit);
         on_exit_funcs.push(()=>{delete g_links[msg];});
       }
     }).toString().split("\n").slice(1,-1).join("\n")
   );
+  toR("link_id")(link_id);
   var inp=toR("inp");
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   var set_raw_mode=s=>{if('setRawMode' in s)s.setRawMode(true);}
@@ -330,10 +332,10 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
     exit:msg=>process.exit(),
     ok:msg=>ok(msg)
   };
-  var req=qap_http_request_decoder(method,URL,fromR,()=>process.exit());
+  var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("wtf? reader end?");process.exit();});
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   toR("eval")(
-    "var link_id="+json(link_id)+
+    "var link_id="+json(link_id)+";"+
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
       var finish=msg=>{
@@ -341,11 +343,15 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
         toR("exit")();
         on_exit();
       }
-      getmap(g_links,link_id).on_up=sh=>{
+      qap_log("xhr_shell_reader.link_id="+link_id);
+      getmap(g_links,link_id).on_up=(sh,onexit)=>{
+        on_exit_funcs.push(onexit);
+        qap_log("nice!");
         sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
         sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stdout"));
         sh.on('close',code=>finish("bash exited with code "+code));
       }
+      qap_log(inspect(typeof g_links[link_id].on_up));
       q("begin");
       toR("ok")();
     }).toString().split("\n").slice(1,-1).join("\n")
@@ -355,18 +361,14 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
 }
 
 var with_link_id=link_id=>{
-  qap_log("wait!");
-  xhr_shell_reader("post",hosts[id]+"/rt_sh",ok,qap_log,link_id);
   var ok=s=>{
     xhr_shell_writer("post",hosts[id]+"/rt_sh",qap_log,qap_log,link_id);
   }
+  xhr_shell_reader("post",hosts[id]+"/rt_sh",ok,qap_log,link_id);
 }
 
-var code=`return new_link().id;`;
+var code=`g_links={};return new_link().id;`;
 xhr_post(hosts[id]+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
-
-
-qap_log("wtf?");
 
 
 
