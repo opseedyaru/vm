@@ -114,11 +114,11 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     }
     if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
     qap_log(json({en:en,"zpos-en":zpos-en}));
-    var bz=rd.slice(en,zpos-en);
+    var bz=rd.slice(en,en+zpos-en);
     qap_log(json({zn:zn,len:len,zpos:zpos,en:en}));
-    var out=rd.slice(zn,len);
+    var out=rd.slice(zn,zn+len);
     qap_log(json({bz:bz}));
-    var bmsg=out.slice(0,len);
+    var bmsg=out;
     var z=bz.toString("binary");
     var msg=bmsg.toString("binary");
     var obj={z:z,msg:msg.toString("binary")};qap_log(json(obj));
