@@ -139,10 +139,10 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   toR("eval")(
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
-      var stream=false;var off=s=>{if(!s)return;s.destroy();}
+      var stream=false;var off=s=>{if(!s)return;s.destroy();qap_log("stream_off");}
       Object.assign(z2func,{
         fn:(msg,buf)=>{off(stream);qap_log(json(['msg+buf',msg,buf]));stream=fs.createWriteStream(msg);q("fn = "+msg);stream.write("\0test\n");},
-        data:(msg,buf)=>{qap_log(json(buf));stream.write(buf);q(msg.length);}
+        data:(msg,buf)=>{stream.write(buf);q(msg.length);}
       });
       q("begin");
       on_exit_funcs.push(()=>off(stream));
@@ -150,7 +150,7 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   );
   var fn="rayenv_L8_scene_v22.bin";
   toR("fn")(fn);
-  fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>process.exit());
+  fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>{toR("end")();});
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   return req;
 }
