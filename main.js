@@ -97,7 +97,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
   var rd=Buffer.from([]);
   var rawData='';
   emitter.on('data',data=>{
-    rd=Buffer.concat(rd,data);
+    rd=Buffer.concat([rd,data]);
     rawData+=data.toString("binary");
     var e=rawData.indexOf("\0");
     if(e<0){return qap_log("(1.wait_len)");}
