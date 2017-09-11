@@ -99,8 +99,8 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     rawData+=data.toString("binary");
     var e=rawData.indexOf("\0",pos);
     if(e<0){pos=rawData.length;return qap_log("(1.wait_len)");}
+    pos=e;
     var en=e+1;
-    pos=rawData.length;
     var zpos=rawData.indexOf('\0',en);
     if(zpos<0)return qap_log("(2.wait_z)");
     var zn=zpos+1;
@@ -122,8 +122,8 @@ var rawData=data;var pos=0;
 //rawData+=data.toString("binary");
 var e=rawData.indexOf("\0",pos);
 if(e<0){pos=rawData.length;return "(1.wait_len)";}
+pos=e;
 var en=e+1;
-pos=rawData.length;
 var zpos=rawData.indexOf('\0',en);
 if(zpos<0)return "(2.wait_z)";
 var zn=zpos+1;
