@@ -139,11 +139,11 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   toR("eval")(
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
-      var stream=false;var off=s=>{if(!s)return;s.destroy();qap_log("stream_off");}
+      var stream=false;var off=s=>{if(!s)return;s.destroy();}
       Object.assign(z2func,{
         fn:(msg,buf)=>{off(stream);stream=fs.createWriteStream(msg);q("fn = "+msg);},
         data:(msg,buf)=>{stream.write(buf);q(msg.length);},
-        end:msg=>{q("done!");off(stream);on_exit();}
+        end:msg=>{q("done!");on_exit();}
       });
       q("begin");
       on_exit_funcs.push(()=>off(stream));
