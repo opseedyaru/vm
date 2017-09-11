@@ -113,9 +113,11 @@ var emitter_on_data_decoder=(emitter,cb)=>{
       err("error chunk.len is not number: "+json({as_buff:rd.slice(0,e),as_str:rd.slice(0,e).toString("binary")}));
     }
     if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
-    qap_log(json({zn:zn,len:len,zpos:zpos}));
+    qap_log(json({zn:zn,len:len,zpos:zpos,en:en}));
     var out=rd.slice(zn,len);
+    qap_log(json({en:en,"zpos-en":zpos-en}));
     var bz=rd.slice(en,zpos-en);
+    qap_log(json({bz:bz}));
     var bmsg=out.slice(0,len);
     var z=bz.toString("binary");
     var msg=bmsg.toString("binary");

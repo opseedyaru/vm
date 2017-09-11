@@ -88,7 +88,8 @@ var ee_logger=(emitter,name,events)=>{
 }
 ee_logger(sh,'sh','close,disconnect,error,exit,message');
 
-if(process.argv.length==2)sh.on('close',()=>xhr_get(hosts[2]+"/fetch?quit&from=commit_push_and_do_restart.js",qap_log,qap_log));
+var func=xhr_get(hosts[2]+"/fetch?quit&from=commit_push_and_do_restart.js",qap_log,qap_log)
+if(process.argv.length==2)sh.on('close',()=>setTimeout(func,1000));
 
 
 
