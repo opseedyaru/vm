@@ -95,40 +95,25 @@ function getDateTime() {
 
 var emitter_on_data_decoder=(emitter,cb)=>{
   var rd=Buffer.from([]);
-  //var ws=fs.createWriteStream("from_emmiter_"+rand()+".txt");
   var err=qap_log;
-  //var log=()=>{};
-  var log=qap_log;
   emitter.on('data',data=>{
-    //ws.write(data);
-    rd=Buffer.concat([rd,data/*Buffer.from(data,"binary")*/]);
-    qap_log(json({rd_len:rd.length,chunk_len:data.length}));
+    rd=Buffer.concat([rd,data]);
     var e=rd.indexOf("\0");
-    if(e<0){return log("(1.wait_len)");}
+    if(e<0){return;
     var en=e+1;
     var zpos=rd.indexOf('\0',en);
-    if(zpos<0)return log("(2.wait_z)");
+    if(zpos<0)return;
     var zn=zpos+1;
-    var len=rd.slice(0,e).toString("binary")|0;
-    if(!Buffer.from((len+"").toString("binary")).equals(rd.slice(0,e))){
-      err("error chunk.len is not number: "+json({as_buff:rd.slice(0,e),as_str:rd.slice(0,e).toString("binary")}));
+    var blen=rd.slice(0,e);
+    var len=blen.toString("binary")|0;
+    if(!Buffer.from((len+"").toString("binary")).equals(blen)){
+      err("error chunk.len is not number: "+json({as_buff:blen,as_str:blen.toString("binary")}));
     }
-    if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
-    //qap_log(json({en:en,"zpos-en":zpos-en}));
-    var bz=rd.slice(en,en+zpos-en);
-    //qap_log(json({zn:zn,len:len,zpos:zpos,en:en}));
-    var out=rd.slice(zn,zn+len);
-    //qap_log(json({bz:bz}));
-    var bmsg=out;
-    var z=bz.toString("binary");
-    var msg=bmsg.toString("binary");
-    var obj={z:z,msg:msg.toString("binary")};
-    //qap_log(json(obj));
-    //qap_log("frag = "+json(rd.slice(0,zn+len).toString("binary")));
+    if(rd.length<zn+len)return;
+    var bz=rd.slice(en,en+zpos-en);var z=bz.toString("binary");
+    var bmsg=rd.slice(zn,zn+len);var msg=bmsg.toString("binary");
     rd=rd.slice(zn+len);
     cb(z,msg,bz,bmsg);
-    log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*** "+msg.length+" ***"}));
-    //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
 }
 

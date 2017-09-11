@@ -149,9 +149,12 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
       on_exit_funcs.push(()=>off(stream));
     }).toString().split("\n").slice(1,-1).join("\n")
   );
-  var fn="sphere4096.bin";
-  toR("fn")(fn);
-  fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>{toR("end")();});
+  var fn="rayenv_L8_scene_v22.bin";
+  var f=fn=>{
+    toR("fn")(fn);
+    fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>{toR("end")();});
+  }
+  f(fn);
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   return req;
 }
