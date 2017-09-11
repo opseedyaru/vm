@@ -117,10 +117,12 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     var out=rd.slice(zn,len);
     var bz=rd.slice(en,zpos-en);
     var bmsg=out.slice(0,len);
-    var obj={z:bz.toString("binary"),msg:bmsg.toString("binary")};qap_log(json(obj));
+    var z=bz.toString("binary");
+    var msg=bmsg.toString("binary");
+    var obj={z:z,msg:msg.toString("binary")};qap_log(json(obj));
     qap_log("frag = "+json(rd.slice(0,zn+len).toString("binary")));
     rd=rd.slice(zn+len);
-    cb(obj.z,obj.msg,bz,bmsg);
+    cb(z,msg,bz,bmsg);
     log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*** "+msg.length+" ***"}));
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
