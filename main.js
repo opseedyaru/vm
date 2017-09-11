@@ -118,7 +118,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     var msg=out.slice(0,len);
     rd=rd.slice(zn+len);
     cb(z.toString("binary"),msg.toString("binary"),z,msg);
-    log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*** "+msg.length+" ***"}));
+    log("(4.ok)"+json({len:len,z:z,msg:len<80?msg.toString("binary"):"*** "+msg.length+" ***"}));
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
 }
