@@ -99,7 +99,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
   emitter.on('data',data=>{
     rd=Buffer.concat([rd,data]);
     var e=rd.indexOf("\0");
-    if(e<0){return;
+    if(e<0)return;
     var en=e+1;
     var zpos=rd.indexOf('\0',en);
     if(zpos<0)return;
