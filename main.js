@@ -109,7 +109,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     var out=rawData.substr(zn,len);
     var z=rawData.substr(en,zpos-en);
     var msg=out.substr(0,len);
-    rawData=rawData.substr(zn+len);
+    rawData=rawData.substr(zn+len);pos=0;
     cb(z,msg);
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
