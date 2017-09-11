@@ -292,20 +292,18 @@ var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
   var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("writer end");process.exit();});
   var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
   toR("eval")(
+    "var link_id="+json(link_id)+";"+
     (()=>{
       var sh=spawn('bash',['-i'],{detached:true});on_exit_funcs.push(()=>sh.kill('SIGHUP'));
       call_cb_on_err(sh,qap_log,'sh');
       z2func.inp=msg=>sh.stdin.write(msg);
       on_exit_funcs.push(()=>{delete z2func['inp'];});
-      z2func.link_id=msg=>{
-        var link=getmap(g_links,msg);
-        link.sh=sh;
-        link.on_up(sh,on_exit);
-        on_exit_funcs.push(()=>{delete g_links[msg];});
-      }
+      var link=getmap(g_links,link_id);
+      link.sh=sh;
+      link.on_up(sh,on_exit);
+      on_exit_funcs.push(()=>{delete g_links[msg];});
     }).toString().split("\n").slice(1,-1).join("\n")
   );
-  toR("link_id")(link_id);
   var inp=toR("inp");
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   var set_raw_mode=s=>{if('setRawMode' in s)s.setRawMode(true);}
@@ -362,7 +360,7 @@ var with_link_id=link_id=>{
   xhr_shell_reader("post",hosts[id]+"/rt_sh",ok,qap_log,link_id);
 }
 
-var code=`g_links={};return new_link().id;`;
+var code=`return new_link().id;`;
 xhr_post(hosts[id]+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
 
 
