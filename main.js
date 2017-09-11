@@ -94,22 +94,27 @@ function getDateTime() {
 }
 
 var emitter_on_data_decoder=(emitter,cb)=>{
-  var rawData='';var pos=0;
+  var rd=Buffer.from([]);
+  var rawData='';
   emitter.on('data',data=>{
+    rd=Buffer.concat(rd,data);
     rawData+=data.toString("binary");
-    var e=rawData.indexOf("\0",pos);
-    if(e<0){pos=rawData.length;return qap_log("(1.wait_len)");}
-    pos=e;
+    var e=rawData.indexOf("\0");
+    if(e<0){return qap_log("(1.wait_len)");}
     var en=e+1;
     var zpos=rawData.indexOf('\0',en);
     if(zpos<0)return qap_log("(2.wait_z)");
     var zn=zpos+1;
     var len=rawData.substr(0,e)|0;
-    if(rawData.length<zn+len)return qap_log("(3.wait_data)"+json({"rawData.length":rawData.length,"zn+len":zn+len,pos:pos}));
+    if((len+"")!==rawData.substr(0,e)){
+      qap_log("len is not number!!! len = "+json(rawData.substr(0,e)));
+      qap_log("len from rd = "+json(rd.slice(0,e)));
+    }
+    if(rawData.length<zn+len)return qap_log("(3.wait_data)"+json({"rawData.length":rawData.length,"zn+len":zn+len}));
     var out=rawData.substr(zn,len);
     var z=rawData.substr(en,zpos-en);
     var msg=out.substr(0,len);
-    rawData=rawData.substr(zn+len);pos=0;
+    rawData=rawData.substr(zn+len);rd=rd.slice(zn+len);
     cb(z,msg);
     qap_log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*over 80*"}));
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
