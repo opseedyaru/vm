@@ -98,7 +98,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
   //var ws=fs.createWriteStream("from_emmiter_"+rand()+".txt");
   var err=qap_log;
   //var log=()=>{};
-  var log=qap_log();
+  var log=qap_log;
   emitter.on('data',data=>{
     //ws.write(data);
     rd=Buffer.concat([rd,Buffer.from(data,"binary")]);
