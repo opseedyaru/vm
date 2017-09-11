@@ -107,7 +107,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     if(zpos<0)return log("(2.wait_z)");
     var zn=zpos+1;
     var len=rd.slice(0,e).toString("binary")|0;
-    if(!Buffer.from(len.toString("binary")).equals(rd.slice(0,e))){
+    if(!Buffer.from((len+"").toString("binary")).equals(rd.slice(0,e))){
       err("error chunk.len is not number: "+json(rd.slice(0,e)));
     }
     if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
