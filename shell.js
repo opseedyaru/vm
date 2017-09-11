@@ -86,6 +86,23 @@ var hosts=[
   "http://vm-vm.193b.starter-ca-central-1.openshiftapps.com"
 ];
 
+var ps1=(()=>{
+  //COLUMNS=180;
+  //STARTCOLOR='\e[0;32m';
+  //ENDCOLOR="\e[0m"
+  //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
+  //export TERM='xterm'
+  //alias rollback='pkill -f npm'
+  //alias cls='clear'
+  //alias ll='ls -all --color=always'
+  //alias grep='grep --color=always'
+  //LS_COLORS=$LS_COLORS:'di=0;33:' ; export LS_COLORS
+  //ps -aux
+}).toString().split("\n").slice(1,-1).join("\n").split("  //").join("");
+
+
+var press_insert_key=String.fromCharCode(27,91,50,126);
+
 var xhr_blob_upload=(method,URL,ok,err)=>{
   var up=url.parse(URL);var secure=up.protocol=='https';
   var options={
@@ -183,20 +200,6 @@ var xhr_shell=(method,URL,ok,err)=>{
   set_raw_mode(process.stdin);
   process.stdin.setEncoding('utf8');
   process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
-  var ps1=(()=>{
-    //COLUMNS=180;
-    //STARTCOLOR='\e[0;32m';
-    //ENDCOLOR="\e[0m"
-    //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
-    //export TERM='xterm'
-    //alias rollback='pkill -f npm'
-    //alias cls='clear'
-    //alias ll='ls -all --color=always'
-    //alias grep='grep --color=always'
-    //LS_COLORS=$LS_COLORS:'di=0;33:' ; export LS_COLORS
-    //ps -aux
-  }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
-  var press_insert_key=String.fromCharCode(27,91,50,126);
   inp(press_insert_key);
   inp(ps1+"\n");
   inp("echo xhr_shell URL = "+json(URL)+"\n");
@@ -206,60 +209,6 @@ var xhr_shell=(method,URL,ok,err)=>{
 }
 
 var json=JSON.stringify;
-var name2hostid={ca:2,us:0,ae:1};
-var id=1;var api="shell";
-var f=(key,val)=>{
-  if(key==="api"){api=val;}
-  if(key==="host")if(val in name2hostid)id=name2hostid[val];
-};
-process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
-
-/*
-if(api=="inspect")qap_log(inspect(process.argv));
-if(api=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
-if(api=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log);
-*/
-/*
-var xhr_shell_test=(method,URL,ok,err)=>{
-  var fromR=(z,msg)=>{qap_log("\n"+json({z:z,msg:msg}));if(z in z2func)z2func[z](msg);};
-  var z2func={
-    out:msg=>process.stdout.write(msg),
-    err:msg=>process.stderr.write(msg),
-    qap_log:msg=>qap_log("formR :: "+msg),
-    exit:msg=>process.exit()
-  };
-  var req=qap_http_request_decoder(method,URL,fromR,()=>process.exit());
-  var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
-  toR("eval")(
-    (()=>{
-      var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
-      //var i=set_interval(()=>q("begin"),500);on_exit_funcs.push(()=>{clear_interval(i);});
-    }).toString().split("\n").slice(1,-1).join("\n")
-  );
-  req.end();
-  return req;
-}
-
-xhr_shell_test("post",hosts[1]+"/rt_sh",qap_log,qap_log);
-*/
-
-
-  var ps1=(()=>{
-    //COLUMNS=180;
-    //STARTCOLOR='\e[0;32m';
-    //ENDCOLOR="\e[0m"
-    //export PS1="$STARTCOLOR[\$(date +%k:%M:%S)] \w |\$?> $ENDCOLOR"
-    //export TERM='xterm'
-    //alias rollback='pkill -f npm'
-    //alias cls='clear'
-    //alias ll='ls -all --color=always'
-    //alias grep='grep --color=always'
-    //LS_COLORS=$LS_COLORS:'di=0;33:' ; export LS_COLORS
-    //ps -aux
-  }).toString().split("\n").slice(1,-1).join("\n").split("    //").join("");
-
-
-  var press_insert_key=String.fromCharCode(27,91,50,126);
 
 var xhr=(method,URL,data,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
@@ -353,15 +302,25 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 
-var with_link_id=link_id=>{
-  var ok=s=>{
-    xhr_shell_writer("post",hosts[id]+"/rt_sh",qap_log,qap_log,link_id);
+var name2hostid={ca:2,us:0,ae:1};
+var api="duplex";var host="ae";var id=name2hostid[host];
+var f=(key,val)=>{
+  if(key==="api"){api=val;}
+  if(key==="host")if(val in name2hostid)id=name2hostid[val];
+};
+process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
+
+if(api=="inspect")qap_log(inspect(process.argv));
+if(api=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
+if(api=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log);
+if(api=="duplex"||api=="dup"){
+  var with_link_id=link_id=>{
+    var ok=s=>{
+      xhr_shell_writer("post",hosts[id]+"/rt_sh",qap_log,qap_log,link_id);
+    }
+    xhr_shell_reader("post",hosts[id]+"/rt_sh",ok,qap_log,link_id);
   }
-  xhr_shell_reader("post",hosts[id]+"/rt_sh",ok,qap_log,link_id);
+
+  var code=`return new_link().id;`;
+  xhr_post(hosts[id]+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
 }
-
-var code=`return new_link().id;`;
-xhr_post(hosts[id]+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
-
-
-
