@@ -63,20 +63,26 @@ var ee_logger_v2=(emitter,name,cb,events)=>{
 }
 
 var emitter_on_data_decoder=(emitter,cb)=>{
-  var rawData='';
+  var rd=Buffer.from([]);
+  var err=qap_log;
   emitter.on('data',data=>{
-    rawData+=data.toString("binary");
-    var e=rawData.indexOf("\0");
+    rd=Buffer.concat([rd,data]);
+    var e=rd.indexOf("\0");
     if(e<0)return;
-    var t=rawData.split("\0");
-    if(t.length<3)return;
-    var len=t[0]|0;
-    var out=t.slice(2).join("\0");
-    if(out.length<len)return;
-    var z=t[1];
-    var msg=out.substr(0,len);
-    rawData=out.substr(len);
-    cb(z,msg);
+    var en=e+1;
+    var zpos=rd.indexOf('\0',en);
+    if(zpos<0)return;
+    var zn=zpos+1;
+    var blen=rd.slice(0,e);
+    var len=blen.toString("binary")|0;
+    if(!Buffer.from((len+"").toString("binary")).equals(blen)){
+      err("error chunk.len is not number: "+json({as_buff:blen,as_str:blen.toString("binary")}));
+    }
+    if(rd.length<zn+len)return;
+    var bz=rd.slice(en,en+zpos-en);var z=bz.toString("binary");
+    var bmsg=rd.slice(zn,zn+len);var msg=bmsg.toString("binary");
+    rd=rd.slice(zn+len);
+    cb(z,msg,bz,bmsg);
   });
 }
 
