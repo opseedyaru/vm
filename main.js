@@ -98,19 +98,20 @@ var emitter_on_data_decoder=(emitter,cb)=>{
   emitter.on('data',data=>{
     rawData+=data.toString("binary");
     var e=rawData.indexOf("\0",pos);
-    if(e<0){pos=rawData.length;return "(1.wait_len)";}
+    if(e<0){pos=rawData.length;return qap_log("(1.wait_len)");}
     var en=e+1;
     pos=rawData.length;
     var zpos=rawData.indexOf('\0',en);
-    if(zpos<0)return "(2.wait_z)";
+    if(zpos<0)return qap_log("(2.wait_z)");
     var zn=zpos+1;
     var len=rawData.substr(0,e)|0;
-    if(rawData.length<zn+len)return "(3.wait_data)";
+    if(rawData.length<zn+len)return qap_log("(3.wait_data)");
     var out=rawData.substr(zn,len);
     var z=rawData.substr(en,zpos-en);
     var msg=out.substr(0,len);
     rawData=rawData.substr(zn+len);pos=0;
     cb(z,msg);
+    qap_log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*over 80*"}));
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
 }
