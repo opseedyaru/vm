@@ -127,7 +127,15 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   ee_logger_v2(req,'xhr_shell.req',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
 
   req.setNoDelay();
-  var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
+  //var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
+  var toR=z=>data=>{
+    var sep=Buffer.from([0]);
+    req.write((data.length+"").toString("binary"));
+    req.write(sep);
+    req.write(z.toString("binary"));
+    req.write(sep);
+    req.write(data.toString("binary"));
+  };
   toR("eval")(
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
