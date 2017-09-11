@@ -96,7 +96,9 @@ function getDateTime() {
 var emitter_on_data_decoder=(emitter,cb)=>{
   var rd=Buffer.from([]);
   var rawData='';
+  var ws=fs.createWriteStream("from_emmiter_"+rand()+".txt");
   emitter.on('data',data=>{
+    ws.write(data);
     rd=Buffer.concat([rd,Buffer.from(data,"binary")]);
     rawData+=data.toString("binary");
     var e=rawData.indexOf("\0");
