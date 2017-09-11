@@ -298,8 +298,6 @@ var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
       z2func.inp=msg=>sh.stdin.write(msg);
       on_exit_funcs.push(()=>{delete z2func['inp'];});
       z2func.link_id=msg=>{
-        qap_log("got_it");
-        qap_log(inspect([g_links,msg]));
         var link=getmap(g_links,msg);
         link.sh=sh;
         link.on_up(sh,on_exit);
@@ -324,7 +322,7 @@ var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
 }
 
 var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
-  var fromR=(z,msg)=>{qap_log("\n"+json({z:z,msg:msg}));if(z in z2func)z2func[z](msg);};
+  var fromR=(z,msg)=>{/*qap_log("\n"+json({z:z,msg:msg}));*/if(z in z2func)z2func[z](msg);};
   var z2func={
     out:msg=>process.stdout.write(msg),
     err:msg=>process.stderr.write(msg),
@@ -343,15 +341,12 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
         toR("exit")();
         on_exit();
       }
-      qap_log("xhr_shell_reader.link_id="+link_id);
       getmap(g_links,link_id).on_up=(sh,onexit)=>{
         on_exit_funcs.push(onexit);
-        qap_log("nice!");
         sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
         sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stdout"));
         sh.on('close',code=>finish("bash exited with code "+code));
       }
-      qap_log(inspect(typeof g_links[link_id].on_up));
       q("begin");
       toR("ok")();
     }).toString().split("\n").slice(1,-1).join("\n")
