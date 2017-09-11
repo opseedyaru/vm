@@ -110,7 +110,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     var zn=zpos+1;
     var len=rd.slice(0,e).toString("binary")|0;
     if(!Buffer.from((len+"").toString("binary")).equals(rd.slice(0,e))){
-      err("error chunk.len is not number: "+json(rd.slice(0,e)));
+      err("error chunk.len is not number: "+json({as_buff:rd.slice(0,e),as_str:as_buff:rd.slice(0,e).toString("binary")}));
     }
     if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
     var out=rd.slice(zn,len);
@@ -118,7 +118,7 @@ var emitter_on_data_decoder=(emitter,cb)=>{
     var msg=out.slice(0,len);
     rd=rd.slice(zn+len);
     cb(z.toString("binary"),msg.toString("binary"),z,msg);
-    log("(4.ok)"+json({len:len,z:z,msg:len<80?msg.toString("binary"):"*** "+msg.length+" ***"}));
+    log("(4.ok)"+json({len:len,z:z.toString("binary"),msg:len<80?msg.toString("binary"):"*** "+msg.length+" ***"}));
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
 }
