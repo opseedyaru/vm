@@ -142,7 +142,7 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
       var stream=false;var off=s=>{if(!s)return;s.destroy();}
       Object.assign(z2func,{
         fn:msg=>{off(stream);stream=fs.createWriteStream(msg);q("fn = "+msg);},
-        data:msg=>{stream.write(msg);q(msg.length);}
+        data:(msg,buf)=>{stream.write(buf);q(msg.length);}
       });
       q("begin");
       on_exit_funcs.push(()=>off(stream));
@@ -150,7 +150,7 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
   );
   var fn="rayenv_L8_scene_v22.bin";
   toR("fn")(fn);
-  fs.createReadStream("../../Release/"+fn).on('data',toR("data"));
+  fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>process.exit());
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   return req;
 }

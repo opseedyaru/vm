@@ -95,53 +95,31 @@ function getDateTime() {
 
 var emitter_on_data_decoder=(emitter,cb)=>{
   var rd=Buffer.from([]);
-  var rawData='';
-  var ws=fs.createWriteStream("from_emmiter_"+rand()+".txt");
+  //var ws=fs.createWriteStream("from_emmiter_"+rand()+".txt");
+  var err=qap_log;var log=()=>{};//var log=qap_log();
   emitter.on('data',data=>{
-    ws.write(data);
+    //ws.write(data);
     rd=Buffer.concat([rd,Buffer.from(data,"binary")]);
-    rawData+=data.toString("binary");
-    var e=rawData.indexOf("\0");
-    if(e<0){return qap_log("(1.wait_len)");}
+    var e=rd.indexOf("\0");
+    if(e<0){return log("(1.wait_len)");}
     var en=e+1;
-    var zpos=rawData.indexOf('\0',en);
-    if(zpos<0)return qap_log("(2.wait_z)");
+    var zpos=rd.indexOf('\0',en);
+    if(zpos<0)return log("(2.wait_z)");
     var zn=zpos+1;
-    var len=rawData.substr(0,e)|0;
-    if((len+"")!==rawData.substr(0,e)){
-      qap_log("len is not number!!! len = "+json(rawData.substr(0,e)));
-      qap_log("len from rd = "+json(rd.slice(0,e)));
+    var len=rd.slice(0,e).toString("binary")|0;
+    if(!Buffer.from(len.toString("binary")).equals(rd.slice(0,e))){
+      err("error chunk.len is not number: "+json(rd.slice(0,e)));
     }
-    if(rawData.length<zn+len)return qap_log("(3.wait_data)"+json({"rawData.length":rawData.length,"zn+len":zn+len}));
-    var out=rawData.substr(zn,len);
-    var z=rawData.substr(en,zpos-en);
-    var msg=out.substr(0,len);
-    rawData=rawData.substr(zn+len);rd=rd.slice(zn+len);
-    cb(z,msg);
-    qap_log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*over 80*"}));
+    if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
+    var out=rd.slice(zn,len);
+    var z=rd.slice(en,zpos-en);
+    var msg=out.slice(0,len);
+    rd=rd.slice(zn+len);
+    cb(z.toString("binary"),msg.toString("binary"),z,msg);
+    log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*** "+msg.length+" ***"}));
     //return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
   });
 }
-/*
-// http://adler3d.github.io/test2013/
-var data="4|ping-5|data_shit".split("|").join("\0");
-var rawData=data;var pos=0;
-//rawData+=data.toString("binary");
-var e=rawData.indexOf("\0",pos);
-if(e<0){pos=rawData.length;return "(1.wait_len)";}
-pos=e;
-var en=e+1;
-var zpos=rawData.indexOf('\0',en);
-if(zpos<0)return "(2.wait_z)";
-var zn=zpos+1;
-var len=rawData.substr(0,e)|0;
-if(rawData.length<zn+len)return "(3.wait_data)";
-var out=rawData.substr(zn,len);
-var z=rawData.substr(en,zpos-en);
-var msg=out.substr(0,len);
-rawData=rawData.substr(zn+len);
-return "(4.ok)\n"+JSON.stringify({z:z,msg:msg,rd:rawData});
-*/
 
 var cl_and_exec_cpp=(code,async_cb,flags)=>{
   var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
@@ -327,7 +305,7 @@ var requestListener=(request,response)=>{
       request.destroy();
       response.destroy();
     }
-    var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
+    var fromR=(z,msg,bz,bmsg)=>{if(z in z2func)z2func[z](msg,bmsg);};
     var mem={};
     var z2func={
       eval:msg=>{
