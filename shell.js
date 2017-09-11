@@ -94,7 +94,7 @@ var ps1=(()=>{
   //export TERM='xterm'
   //alias rollback='pkill -f npm'
   //alias cls='clear'
-  //alias ll='ls -all --color=always'
+  //alias ll='ls -alh --color=always'
   //alias grep='grep --color=always'
   //LS_COLORS=$LS_COLORS:'di=0;33:' ; export LS_COLORS
   //ps -aux

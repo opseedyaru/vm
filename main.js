@@ -168,6 +168,11 @@ var ee_logger=(emitter,name,events)=>{
   events.split(',').map(event=>emitter.on(event,e=>qap_log(name+' :: Got '+event)));
 }
 
+var ee_logger_v2=(emitter,name,cb,events)=>{
+  events.split(',').map(event=>emitter.on(event,e=>cb(name+' :: Got '+event)));
+  call_cb_on_err(emitter,cb,name);
+}
+
 var xhr_get=(url,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
@@ -309,10 +314,8 @@ var requestListener=(request,response)=>{
       }
     };
     emitter_on_data_decoder(request,fromR);
-    ee_logger(request,'rt_sh.request','end,abort,aborted,connect,continue,response,upgrade');
-    ee_logger(response,'rt_sh.response','end,abort,aborted,connect,continue,response,upgrade');
-    call_cb_on_err(request,qap_log,'rt_sh.request');
-    call_cb_on_err(response,qap_log,'rt_sh.response');
+    ee_logger_v2(request,'rt_sh.request',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
+    ee_logger_v2(response,'rt_sh.response',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
     request.on('aborted',on_exit);
     response.on('aborted',on_exit);
     return;
