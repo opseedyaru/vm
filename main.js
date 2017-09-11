@@ -113,16 +113,16 @@ var emitter_on_data_decoder=(emitter,cb)=>{
       err("error chunk.len is not number: "+json({as_buff:rd.slice(0,e),as_str:rd.slice(0,e).toString("binary")}));
     }
     if(rd.length<zn+len)return log("(3.wait_data)"+json({"rd.length":rd.length,"zn+len":zn+len}));
-    qap_log(json({en:en,"zpos-en":zpos-en}));
+    //qap_log(json({en:en,"zpos-en":zpos-en}));
     var bz=rd.slice(en,en+zpos-en);
-    qap_log(json({zn:zn,len:len,zpos:zpos,en:en}));
+    //qap_log(json({zn:zn,len:len,zpos:zpos,en:en}));
     var out=rd.slice(zn,zn+len);
-    qap_log(json({bz:bz}));
+    //qap_log(json({bz:bz}));
     var bmsg=out;
     var z=bz.toString("binary");
     var msg=bmsg.toString("binary");
     var obj={z:z,msg:msg.toString("binary")};qap_log(json(obj));
-    qap_log("frag = "+json(rd.slice(0,zn+len).toString("binary")));
+    //qap_log("frag = "+json(rd.slice(0,zn+len).toString("binary")));
     rd=rd.slice(zn+len);
     cb(z,msg,bz,bmsg);
     log("(4.ok)"+json({len:len,z:z,msg:len<80?msg:"*** "+msg.length+" ***"}));
