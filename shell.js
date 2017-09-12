@@ -86,6 +86,15 @@ var emitter_on_data_decoder=(emitter,cb)=>{
   });
 }
 
+var stream_write_encoder=(stream,z)=>data=>{
+  var sep=Buffer.from([0]);
+  stream.write(Buffer.concat([
+    Buffer.from(!data?"0":(data.length+""),"binary"),sep,
+    Buffer.from(z,"binary"),sep,
+    Buffer.from(data?data:"","binary")
+  ]));
+};
+
 var hosts=[
   "http://vm-vm.1d35.starter-us-east-1.openshiftapps.com",
   "http://agile-eyrie-44522.herokuapp.com",
@@ -110,38 +119,16 @@ var ps1=(()=>{
 var press_insert_key=String.fromCharCode(27,91,50,126);
 
 var xhr_blob_upload=(method,URL,ok,err)=>{
-  var up=url.parse(URL);var secure=up.protocol=='https';
-  var options={
-    hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
-    headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
+  var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
+  var z2func={
+    out:msg=>process.stdout.write(msg),
+    err:msg=>process.stderr.write(msg),
+    qap_log:msg=>qap_log("formR :: "+msg),
+    exit:msg=>process.exit()
   };
-  var req=(secure?https:http).request(options,(res)=>
-  {
-    var statusCode=res.statusCode;
-    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
-    ee_logger_v2(res,'xhr_shell.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
-    var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
-    var z2func={
-      out:msg=>process.stdout.write(msg),
-      err:msg=>process.stderr.write(msg),
-      qap_log:msg=>qap_log("formR :: "+msg),
-      exit:msg=>process.exit()
-    };
-    emitter_on_data_decoder(res,fromR);
-    res.on('end',()=>process.exit());
-  });
-  ee_logger_v2(req,'xhr_shell.req',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
-
-  req.setNoDelay();
-  //var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
-  var toR=z=>data=>{
-    var sep=Buffer.from([0]);
-    req.write(Buffer.concat([
-      Buffer.from(!data?"0":(data.length+""),"binary"),sep,
-      Buffer.from(z,"binary"),sep,
-      Buffer.from(data?data:"","binary")
-    ]));
-  };
+  var req=qap_http_request_decoder(method,URL,fromR,()=>{process.exit();});
+  
+  var toR=z=>stream_write_encoder(req,z);
   toR("eval")(
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
@@ -193,7 +180,7 @@ var xhr_shell=(method,URL,ok,err)=>{
     exit:msg=>process.exit()
   };
   var req=qap_http_request_decoder(method,URL,fromR,()=>process.exit());
-  var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
+  var toR=z=>stream_write_encoder(req,z);
   toR("eval")(
     (()=>{
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
@@ -257,7 +244,7 @@ var xhr_post_with_to=(url,obj,ok,err,ms)=>xhr_add_timeout(xhr('post',url,qs.stri
 var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
   var fromR=(z,msg)=>{}
   var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("writer end");process.exit();});
-  var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
+  var toR=z=>stream_write_encoder(req,z);
   toR("eval")(
     "var link_id="+json(link_id)+";"+
     (()=>{
@@ -296,7 +283,7 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
     ok:msg=>ok(msg)
   };
   var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("wtf? reader end?");process.exit();});
-  var toR=z=>data=>req.write(data.length+"\0"+z+"\0"+data);
+  var toR=z=>stream_write_encoder(req,z);
   toR("eval")(
     "var link_id="+json(link_id)+";"+
     (()=>{
