@@ -298,8 +298,6 @@ var requestListener=(request,response)=>{
   {
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked','X-Content-Type-Options':'nosniff'});
     var toR=z=>stream_write_encoder(response,z);
-    var pipe_from_to_func=(stream,func)=>stream.on("data",func).on("end",func);
-    var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
     //toR("log")("["+getDateTime()+"] :: hi");
     var on_exit_funcs=[];
