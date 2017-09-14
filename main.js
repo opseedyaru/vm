@@ -117,6 +117,15 @@ var emitter_on_data_decoder=(emitter,cb)=>{
   });
 }
 
+var stream_write_encoder=(stream,z)=>data=>{
+  var sep=Buffer.from([0]);
+  stream.write(Buffer.concat([
+    Buffer.from(!data?"0":(data.length+""),"binary"),sep,
+    Buffer.from(z,"binary"),sep,
+    Buffer.from(data?data:"","binary")
+  ]));
+};
+
 var cl_and_exec_cpp=(code,async_cb,flags)=>{
   var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
   var fn="main["+getDateTime().split(":").join("-").split(" ").join("_")+"]_"+rnd+".cpp";
@@ -288,7 +297,7 @@ var requestListener=(request,response)=>{
   if("/rt_sh"==uri)
   {
     response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked','X-Content-Type-Options':'nosniff'});
-    var toR=z=>data=>{var d=data?data:"";response.write(d.length+"\0"+z+"\0"+d);};
+    var toR=z=>stream_write_encoder(response,z);
     var pipe_from_to_func=(stream,func)=>stream.on("data",func).on("end",func);
     var pipe_from_to=(stream,z)=>{var f=toR(z);pipe_from_to_func(stream,f);}
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
