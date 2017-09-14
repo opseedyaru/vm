@@ -4,5 +4,5 @@ OUT=$?
 if [ $OUT -ne 0 ];then
   exit
 fi
-./main20170914.elf
+nice -n15 ./main20170914.elf
 exit $?
