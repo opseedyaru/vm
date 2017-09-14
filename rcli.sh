@@ -1,0 +1,2 @@
+node shell.js "$@"
+exit $?
