@@ -14,8 +14,9 @@ var f=()=>{
   return arr.map(e=>typeof e.join!="function"?e:e.join(" ")).join("\n")+"\n\n"/*+execSync("tail mainloop.log -n 20")*/;
 };
 var win7=false;
-if(win7){
-var q=b=>process.stdout.write(b);
+if(win7)
+{
+  var q=b=>process.stdout.write(b);
   var cls="";
   return q(cls+f());
 }
