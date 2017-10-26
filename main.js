@@ -421,7 +421,7 @@ var requestListener=(request,response)=>{
           hosts_sync(s=>txt(s));
           return;
         }
-        if("/e"==url){
+        if("/e"==uri){
           return txt("selfafiliate.txt");
         }
         if("/shadows_links"==uri){
