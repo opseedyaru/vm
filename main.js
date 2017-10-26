@@ -421,6 +421,9 @@ var requestListener=(request,response)=>{
           hosts_sync(s=>txt(s));
           return;
         }
+        if("/e"==url){
+          return txt("selfafiliate.txt");
+        }
         if("/shadows_links"==uri){
           response.off();var ls='<a href="/fetch?quit">this/fetch?quit</a><hr><a href="/ls">this/ls</a>';
           return html(ls+"<hr>"+shadows.map(e=>"http://"+e+"/fetch?quit").map(e=>'<a href="'+e+'">'+e+'</a>').join("<hr>"));
