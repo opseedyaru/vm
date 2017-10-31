@@ -436,7 +436,7 @@ var requestListener=(request,response)=>{
         if("/ps_aux"==uri){return txt(execSync("ps -aux"));}
         if("/ps_aux_ll"==uri){return txt(execSync("ps -aux\nls -l"));}
         if("/top"==uri){
-          var files=g_obj.files;
+          var files=getmap(g_obj,'files');
           var cb=arr=>jstable(arr);
           var filter=fn=>fn.indexOf("eval/rec[")<0;
           if('all' in qp)filter=any=>any;
