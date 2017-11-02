@@ -285,7 +285,7 @@ http_server.on('clientError',(err,socket)=>{
 });
 
 var g_links={};
-var gen_link_id=()=>{return rand()+getDateTime();}
+var gen_link_id=()=>{return rand()+" "+getDateTime();}
 var new_link=()=>{var out={id:gen_link_id()};g_links[out.id]=out;return out;}
 
 var requestListener=(request,response)=>{
