@@ -433,6 +433,24 @@ var requestListener=(request,response)=>{
           map(e=>e=="/inc"?+1:(e=="/dec"?-1:0)).reduce((p,v)=>p+v,0);
         }
         if("/ll"==uri){return txt(execSync("ls -l"));}
+        if("/sysinfo"==uri)
+        {
+          var f=cmd=>execSync(cmd)+"";
+          var mem=e=>"MemTotal,MemFree,MemAvailable".split(",").includes(e.split(":")[0]);
+          return txt(
+            f([
+              "cat /proc/cpuinfo|grep 'model name'|awk 'NR==0;END{print}'",
+              "cat /proc/cpuinfo|grep 'cache size'|awk 'NR==0;END{print}'",
+              "cat /proc/cpuinfo|grep 'cpu MHz'|awk 'NR==0;END{print}'",
+              "echo 'nproc --all : '`nproc --all`",
+              "echo 'nproc       : '`nproc`",
+              ""
+            ].join("\n"))+"\n"+
+            f("cat /proc/meminfo").split("\n").filter(mem).join("\n")
+          );
+        }
+        if("/cpuinfo"==uri){return txt(execSync("cat /proc/cpuinfo"));}
+        if("/meminfo"==uri){return txt(execSync("cat /proc/meminfo"));}
         if("/ps_aux"==uri){return txt(execSync("ps -aux"));}
         if("/ps_aux_ll"==uri){return txt(execSync("ps -aux\nls -l"));}
         if("/top"==uri){
