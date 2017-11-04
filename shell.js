@@ -102,7 +102,8 @@ var hosts=[
   "https://vm50.herokuapp.com",
   "https://vm51.herokuapp.com",
   "http://vm10-vm10.1d35.starter-us-east-1.openshiftapps.com",
-  "http://vm20-vm20.1d35.starter-us-east-1.openshiftapps.com"
+  "http://vm20-vm20.1d35.starter-us-east-1.openshiftapps.com",
+  "http://vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
 ];
 
 var ps1=(()=>{
@@ -311,7 +312,7 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 var fn="mask_basepix_log.txt";
-var name2hostid={ca:2,us:0,ae:1,vm50:3,vm51:4,vm10:5,vm20:6};
+var name2hostid={ca:2,us:0,ae:1,vm50:3,vm51:4,vm10:5,vm20:6,vm30:7};
 var api="duplex";var host="ae";var id=name2hostid[host];
 var f=(key,val)=>{
   if(key==="api"){api=val;}
