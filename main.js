@@ -286,7 +286,9 @@ g_conf_info.on_set_our_name=()=>{
       "nohup nice -n15 ./app.cpp.out|tee app.log",
       "echo done"
     ].join("\n");
-    exec(cmd);
+    fs.writeFileSync("worker.sh",cmd);
+
+    exec("chmod +x worker.sh\n./worker.sh|worker.log");
     //var we_need_mbpl_txt=()=>{
     //  exec("curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt");
     //}
