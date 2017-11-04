@@ -288,7 +288,7 @@ g_conf_info.on_set_our_name=()=>{
     ].join("\n");
     fs.writeFileSync("worker.sh",cmd);
 
-    exec("chmod +x worker.sh\n./worker.sh|worker.log");
+    exec("chmod +x worker.sh\n./worker.sh|tee worker.log");
     //var we_need_mbpl_txt=()=>{
     //  exec("curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt");
     //}
