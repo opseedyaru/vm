@@ -95,16 +95,18 @@ var stream_write_encoder=(stream,z)=>data=>{
   ]));
 };
 
-var hosts=[
-  "http://vm-vm.1d35.starter-us-east-1.openshiftapps.com",
-  "http://agile-eyrie-44522.herokuapp.com",
-  "http://vm-vm.193b.starter-ca-central-1.openshiftapps.com",
-  "https://vm50.herokuapp.com",
-  "https://vm51.herokuapp.com",
-  "http://vm10-vm10.1d35.starter-us-east-1.openshiftapps.com",
-  "http://vm20-vm20.1d35.starter-us-east-1.openshiftapps.com",
-  "http://vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
-];
+var dns2h={
+  "vm-vm.1d35.starter-us-east-1.openshiftapps.com":"us",
+  "agile-eyrie-44522.herokuapp.com":"ae",
+  "vm-vm.193b.starter-ca-central-1.openshiftapps.com":"ca",
+  "vm50.herokuapp.com":"vm50",
+  "vm51.herokuapp.com":"vm51",
+  "vm52.herokuapp.com":"vm52",
+  "vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
+  "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
+  "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
+};
+var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
 
 var ps1=(()=>{
   //COLUMNS=180;
@@ -312,26 +314,25 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 var fn="mask_basepix_log.txt";
-var name2hostid={ca:2,us:0,ae:1,vm50:3,vm51:4,vm10:5,vm20:6,vm30:7};
-var api="duplex";var host="ae";var id=name2hostid[host];
+var api="duplex";var our_name="ae";var host=h2dns[our_name];
 var f=(key,val)=>{
   if(key==="api"){api=val;}
   if(key==="fn"){fn=val;}
-  if(key==="host")if(val in name2hostid)id=name2hostid[val];
+  if(key==="host"){if(val in h2dns){our_name=val;host="http://"+h2dns[val];}else{qap_log(val+" - host is unk");}}
 };
 process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 
 if(api=="inspect")qap_log(inspect(process.argv));
-if(api=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
-if(api=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log,fn);
+if(api=="shell")xhr_shell("post",host+"/rt_sh",qap_log,qap_log);
+if(api=="upload")xhr_blob_upload("post",host+"/rt_sh",qap_log,qap_log,fn);
 if(api=="duplex"||api=="dup"){
   var with_link_id=link_id=>{
     var ok=s=>{
-      xhr_shell_writer("post",hosts[id]+"/rt_sh",qap_log,qap_log,link_id);
+      xhr_shell_writer("post",host+"/rt_sh",qap_log,qap_log,link_id);
     }
-    xhr_shell_reader("post",hosts[id]+"/rt_sh",ok,qap_log,link_id);
+    xhr_shell_reader("post",host+"/rt_sh",ok,qap_log,link_id);
   }
 
   var code=`return new_link().id;`;
-  xhr_post(hosts[id]+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
+  xhr_post(host+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
 }

@@ -254,12 +254,13 @@ var g_conf_info=(()=>{
     "vm-vm.193b.starter-ca-central-1.openshiftapps.com":"ca",
     "vm50.herokuapp.com":"vm50",
     "vm51.herokuapp.com":"vm51",
+    "vm52.herokuapp.com":"vm52",
     "vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
     "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
     "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
   var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
-  var power={ae:5,vm50:5,vm51:5,ca:2,vm10:2,vm20:2,us:0};
+  var power={ae:5,vm50:5,vm51:5,ca:2,vm10:2,vm20:2,us:0,vm30:0,vm52:0};
   var tot=0;for(var h in power)tot+=power[h];
   var h2pos={};var pos=0;for(var h in power){h2pos[h]=pos;pos+=power[h]/tot;}
   var out={our_name:"",need_init:true,power:power,tot:tot,h2pos:h2pos,dns2h:dns2h,h2dns:h2dns};
