@@ -146,7 +146,7 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
       on_exit_funcs.push(()=>off(stream));
     }).toString().split("\n").slice(1,-1).join("\n")
   );
-  var fn="rayenv_L8_scene_v22.bin";
+  var fn="mask_basepix_log.txt";
   var f=fn=>{
     toR("fn")(fn);
     fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>{toR("end")();});

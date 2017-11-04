@@ -247,6 +247,53 @@ var on_start_sync=()=>{
 
 on_start_sync();
 
+var g_conf_info=(()=>{
+  var dns2h={
+    "vm-vm.1d35.starter-us-east-1.openshiftapps.com":"us",
+    "agile-eyrie-44522.herokuapp.com":"ae",
+    "vm-vm.193b.starter-ca-central-1.openshiftapps.com":"ca",
+    "vm50.herokuapp.com":"vm50",
+    "vm51.herokuapp.com":"vm51",
+    "vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
+    "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20"
+  };
+  var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
+  var power={ae:5,vm50:5,vm51:5,ca:2,vm10:2,vm20:2,us:0};
+  var tot=0;for(var h in power)tot+=power[h];
+  var h2pos={};var pos=0;for(var h in power){h2pos[h]=pos;pos+=power[h]/tot;}
+  var out={our_name:"",need_init:true,power:power,tot:tot,h2pos:h2pos,dns2h:dns2h,h2dns:h2dns};
+  out.set_our_name_from_host=host=>{
+    out.our_name=dns2h[host];
+    qap_log("our_name = "+out.our_name);
+    g_conf_info.on_set_our_name();
+  };
+  return out;
+})();
+
+g_conf_info.on_set_our_name=()=>{
+  var mask_id_pos=0;
+  if(g_conf_info.power[g_conf_info.our_name]){
+    mask_id_pos=g_conf_info.h2pos[g_conf_info.our_name];
+  }
+  fs.writeFileSync("mask_id_pos.txt",mask_id_pos);
+  if(g_conf_info.our_name!="us"){
+    var cmd=[
+      "curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
+      "curl "+g_conf_info.h2dns.us+"/app.cpp.out>app.cpp.out",
+      "chmod +x ./app.cpp.out",
+      "curl "+g_conf_info.h2dns.us+"/app.zip>app.zip",
+      "unzip app.zip",
+      "nohup nice -n15 ./app.cpp.out|tee app.log",
+      "echo done"
+    ].join("\n");
+    exec(cmd);
+    //var we_need_mbpl_txt=()=>{
+    //  exec("curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt");
+    //}
+    //add_task(we_need_mbpl_txt);
+  }
+};
+
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
 
@@ -263,6 +310,7 @@ var request_to_log_object=request=>{
     hostname:os.hostname()
   }
 };
+// TODO: think about bad story when: server got request, but hosts.json in loading stage...
 var http_server=http.createServer((a,b)=>requestListener(a,b)).listen(port,ip);
 var g_http_server_debug=true;var g_err_socks={};var g_err_socks_func=(err,socket)=>{
   if(inspect(socket.address())=="{}")return;
@@ -689,6 +737,7 @@ var requestListener=(request,response)=>{
       if(need_coop_init)
       {
         need_coop_init=false;
+        g_conf_info.set_our_name_from_host(request.headers.host);
         var pub=is_public(request.headers.host);var none=()=>{};
         if(g_interval){clearInterval(g_interval);g_interval=false;}
         var period=1000*30;var net_gap=1000*10;
