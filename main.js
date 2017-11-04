@@ -279,6 +279,7 @@ g_conf_info.on_set_our_name=()=>{
   if(g_conf_info.our_name!="us"){
     var cmd=[
       "curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
+      "curl "+g_conf_info.h2dns.us+"/app.cpp>app.cpp",
       "curl "+g_conf_info.h2dns.us+"/app.cpp.out>app.cpp.out",
       "chmod +x ./app.cpp.out",
       "curl "+g_conf_info.h2dns.us+"/app.zip>app.zip",
