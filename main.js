@@ -499,10 +499,11 @@ var requestListener=(request,response)=>{
             f("cat /proc/meminfo").split("\n").filter(mem).join("\n")
           );
         }
-        if("/cpuinfo"==uri){return txt(execSync("cat /proc/cpuinfo"));}
-        if("/meminfo"==uri){return txt(execSync("cat /proc/meminfo"));}
-        if("/ps_aux"==uri){return txt(execSync("ps -aux"));}
-        if("/ps_aux_ll"==uri){return txt(execSync("ps -aux\nls -l"));}
+        var txt_conf_exec=cmd=>"conf = "+g_conf_info.our_name+"\n"+execSync(cmd);
+        if("/cpuinfo"==uri){return txt_conf_exec("cat /proc/cpuinfo");}
+        if("/meminfo"==uri){return txt_conf_exec("cat /proc/meminfo");}
+        if("/ps_aux"==uri){return txt_conf_exec("ps -aux");}
+        if("/ps_aux_ll"==uri){return txt_conf_exec("ps -aux\nls -l");}
         if("/top"==uri){
           var files=getmap(g_obj,'files');
           var cb=arr=>jstable(arr);
