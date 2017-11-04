@@ -499,7 +499,7 @@ var requestListener=(request,response)=>{
             f("cat /proc/meminfo").split("\n").filter(mem).join("\n")
           );
         }
-        var txt_conf_exec=cmd=>"conf = "+g_conf_info.our_name+"\n"+execSync(cmd);
+        var txt_conf_exec=cmd=>txt("conf = "+g_conf_info.our_name+"\n"+execSync(cmd));
         if("/cpuinfo"==uri){return txt_conf_exec("cat /proc/cpuinfo");}
         if("/meminfo"==uri){return txt_conf_exec("cat /proc/meminfo");}
         if("/ps_aux"==uri){return txt_conf_exec("ps -aux");}
