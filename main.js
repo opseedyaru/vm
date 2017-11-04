@@ -569,8 +569,9 @@ var requestListener=(request,response)=>{
             "position:absolute;top:10%;left:50%;margin-top:-50px;margin-left:-50px;width:100px;height:100px;"+
             "}</style><body><div><h3>"
           );
+          var preproc=s=>s.split('+"/').join("*cut*");
           return html(head+qap_unique(
-            (fs.readFileSync("main.js")+"").split('"'+'/').map(e=>e.split('"')[0]).slice(1).filter(e=>e.length)
+            preproc(fs.readFileSync("main.js")+"").split('"'+'/').map(e=>e.split('"')[0]).slice(1).filter(e=>e.length)
           ).filter(e=>hide.indexOf(e)<0).map(e=>'/'+e).map(e=>'<a href="'+e+'">'+e+'</a><br>').join("\n"));
         }
         var cmds={
