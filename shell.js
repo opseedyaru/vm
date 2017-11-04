@@ -122,7 +122,8 @@ var ps1=(()=>{
 
 var press_insert_key=String.fromCharCode(27,91,50,126);
 
-var xhr_blob_upload=(method,URL,ok,err)=>{
+var xhr_blob_upload=(method,URL,ok,err,fn)=>{
+  if(typeof(fn)=='undefined')fn="mask_basepix_log.txt";
   var fromR=(z,msg)=>{if(z in z2func)z2func[z](msg);};
   var z2func={
     out:msg=>process.stdout.write(msg),
@@ -146,7 +147,6 @@ var xhr_blob_upload=(method,URL,ok,err)=>{
       on_exit_funcs.push(()=>off(stream));
     }).toString().split("\n").slice(1,-1).join("\n")
   );
-  var fn="mask_basepix_log.txt";
   var f=fn=>{
     toR("fn")(fn);
     fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>{toR("end")();});
@@ -310,18 +310,19 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   req.end();
   return req;
 }
-
+var fn="mask_basepix_log.txt";
 var name2hostid={ca:2,us:0,ae:1,vm50:3,vm51:4,vm10:5,vm20:6};
 var api="duplex";var host="ae";var id=name2hostid[host];
 var f=(key,val)=>{
   if(key==="api"){api=val;}
+  if(key==="fn"){fn=val;}
   if(key==="host")if(val in name2hostid)id=name2hostid[val];
 };
 process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 
 if(api=="inspect")qap_log(inspect(process.argv));
 if(api=="shell")xhr_shell("post",hosts[id]+"/rt_sh",qap_log,qap_log);
-if(api=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log);
+if(api=="upload")xhr_blob_upload("post",hosts[id]+"/rt_sh",qap_log,qap_log,fn);
 if(api=="duplex"||api=="dup"){
   var with_link_id=link_id=>{
     var ok=s=>{
