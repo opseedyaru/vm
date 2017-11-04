@@ -273,12 +273,12 @@ var g_conf_info=(()=>{
 })();
 
 g_conf_info.on_set_our_name=()=>{
-  var mask_id_pos=0;
-  if(g_conf_info.power[g_conf_info.our_name]){
-    mask_id_pos=g_conf_info.h2pos[g_conf_info.our_name];
-  }
-  fs.writeFileSync("mask_id_pos.txt",mask_id_pos);
-  if(g_conf_info.our_name!="us"){
+  var mask_id_pos=0;var c=g_conf_info;
+  var is_worker=(c.our_name in c.power)&&(c.power[c.our_name]>0);
+  fs.writeFileSync("our_name.txt",c.our_name);
+  fs.writeFileSync("mask_id_pos.txt",is_worker?c.h2pos[c.our_name]:0);
+  if(is_worker)
+  {
     var cmd=[
       "curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
       "curl "+g_conf_info.h2dns.us+"/app.cpp>app.cpp",
@@ -292,10 +292,8 @@ g_conf_info.on_set_our_name=()=>{
     fs.writeFileSync("worker.sh",cmd);
 
     exec("chmod +x worker.sh\n./worker.sh|tee worker.log");
-    //var we_need_mbpl_txt=()=>{
-    //  exec("curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt");
-    //}
-    //add_task(we_need_mbpl_txt);
+  }else{
+    fs.writeFileSync("NOT_WORKER.txt","");
   }
 };
 
