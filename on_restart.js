@@ -1,3 +1,12 @@
+/*
+set_interval(()=>{
+  xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/on_restart.js?t='+rand(),
+    s=>{fs.writeFileSync("on_restart.js",s);eval(s);},
+    s=>{fs.writeFileSync("on_restart.js.errmsg",s);}
+  );
+  on_start_sync();
+},60*1000);*/
+
 setTimeout(()=>start_auto_backup(),30*1000);
 var nope=()=>{};
 set_interval(()=>get_hosts_by_type('backup').map(
