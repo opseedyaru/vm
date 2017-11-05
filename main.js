@@ -46,7 +46,7 @@ var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 
 var FToS=n=>(n+0).toFixed(2);
-var mapswap=(k2v)=>{var v2k={};for(var k in k2v){v2k[k2v[k]]=k;}return out;}
+var mapswap=(k2v)=>{var v2k={};for(var k in k2v){v2k[k2v[k]]=k;}return v2k;}
 var qapavg=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.length?arr.reduce((pv,ex)=>pv+cb(ex),0)/arr.length:0;}
 var qapsum=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.reduce((pv,ex)=>pv+cb(ex),0);}
 var qapmin=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;var out;var i=0;for(var k in arr){var v=cb(arr[k]);if(!i){out=v;}i++;out=Math.min(out,v);}return out;}
@@ -260,8 +260,8 @@ var g_conf_info=/*return inspect*/((()=>{
     "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
     "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
-  var vh2host=mapswap(host2vh);
   var power={ae:5,vm50:5,vm51:5,ca:2,vm10:2,vm20:2,us:0,vm30:2,vm52:5};
+  var vh2host=mapswap(host2vh);
   var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host};
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
   out.set_vhost_from_host=host=>{
