@@ -270,7 +270,7 @@ var g_conf_info=/*return inspect*/((()=>{
     g_conf_info.on_set_vhost();
   };
   out.update_pos=()=>{
-    var tot=0;for(var vh in power)tot+=power[h];
+    var tot=0;for(var vh in power)tot+=power[vh];
     var vh2pos={};var pos=0;for(var vh in power){vh2pos[vh]=pos;pos+=power[vh]/tot;}
     out.tot=tot;
     out.vh2pos=vh2pos;
