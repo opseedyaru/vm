@@ -267,7 +267,7 @@ var g_conf_info=(()=>{
   out.set_our_name_from_host=host=>{
     out.our_name=dns2h[host];
     qap_log("our_name = "+out.our_name);
-    //g_conf_info.on_set_our_name();
+    g_conf_info.on_set_our_name();
   };
   return out;
 })();
@@ -279,6 +279,8 @@ g_conf_info.on_set_our_name=()=>{
   fs.writeFileSync("mask_id_pos.txt",is_worker?c.h2pos[c.our_name]:0);
   if(is_worker)
   {
+    fs.writeFileSync("WORKER.txt","");
+    return;
     var cmd=[
       "curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
       "curl "+g_conf_info.h2dns.us+"/app.cpp>app.cpp",
