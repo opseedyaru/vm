@@ -326,6 +326,15 @@ var dyn_host=()=>{
   */
 }
 
+var about_links=()=>{
+/*
+links:
+  cpp_app -> w.js::w_to_us_serv // without protocol. just stream
+  w.js -> us.js // http+rt_sh. w.js::w_to_us_serv.on_client_data=s=>us.toR('from_cpp')(s); // toR('cpp_app_up')();toR('cpp_app_down')();
+  us.js::z2func.from_cpp=msg=>check_decode_store_and_maybe_send_to_human(msg,worker_vhost);
+*/
+};
+
 var run_cpp_app=()=>{
   
 };
