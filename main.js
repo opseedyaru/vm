@@ -46,6 +46,7 @@ var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
 var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
 
 var FToS=n=>(n+0).toFixed(2);
+var mapswap=(k2v)=>{var v2k={};for(var k in k2v){v2k[k2v[k]]=k;}return out;}
 var qapavg=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.length?arr.reduce((pv,ex)=>pv+cb(ex),0)/arr.length:0;}
 var qapsum=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.reduce((pv,ex)=>pv+cb(ex),0);}
 var qapmin=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;var out;var i=0;for(var k in arr){var v=cb(arr[k]);if(!i){out=v;}i++;out=Math.min(out,v);}return out;}
@@ -247,8 +248,8 @@ var on_start_sync=()=>{
 
 on_start_sync();
 
-var g_conf_info=(()=>{
-  var dns2h={
+var g_conf_info=/*return inspect*/((()=>{
+  var host2vh={
     "vm-vm.1d35.starter-us-east-1.openshiftapps.com":"us",
     "agile-eyrie-44522.herokuapp.com":"ae",
     "vm-vm.193b.starter-ca-central-1.openshiftapps.com":"ca",
@@ -259,34 +260,41 @@ var g_conf_info=(()=>{
     "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
     "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
-  var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
+  var vh2host=mapswap(host2vh);
   var power={ae:5,vm50:5,vm51:5,ca:2,vm10:2,vm20:2,us:0,vm30:2,vm52:5};
-  var tot=0;for(var h in power)tot+=power[h];
-  var h2pos={};var pos=0;for(var h in power){h2pos[h]=pos;pos+=power[h]/tot;}
-  var out={our_name:"",need_init:true,power:power,tot:tot,h2pos:h2pos,dns2h:dns2h,h2dns:h2dns};
-  out.set_our_name_from_host=host=>{
-    out.our_name=dns2h[host];
-    qap_log("our_name = "+out.our_name);
-    g_conf_info.on_set_our_name();
+  var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host};
+  out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
+  out.set_vhost_from_host=host=>{
+    out.vhost=host2vh[host];
+    qap_log("vhost = "+out.vhost);
+    g_conf_info.on_set_vhost();
   };
+  out.update_pos=()=>{
+    var tot=0;for(var vh in power)tot+=power[h];
+    var vh2pos={};var pos=0;for(var vh in power){vh2pos[vh]=pos;pos+=power[vh]/tot;}
+    out.tot=tot;
+    out.vh2pos=vh2pos;
+    out.arr.map(e=>e.pos=vh2pos[e.vh]);
+  }
+  out.update_pos();
   return out;
-})();
+})());
 
-g_conf_info.on_set_our_name=()=>{
+g_conf_info.on_set_vhost=()=>{
   var mask_id_pos=0;var c=g_conf_info;
-  var is_worker=(c.our_name in c.power)&&(c.power[c.our_name]>0);
-  fs.writeFileSync("our_name.txt",c.our_name);
-  fs.writeFileSync("mask_id_pos.txt",is_worker?c.h2pos[c.our_name]:0);
+  var is_worker=(c.vhost in c.power)&&(c.power[c.vhost]>0);
+  fs.writeFileSync("vhost.txt",c.vhost);
+  fs.writeFileSync("mask_id_pos.txt",is_worker?c.vh2pos[c.vhost]:0);
   if(is_worker)
   {
     fs.writeFileSync("WORKER.txt","");
     return;
     var cmd=[
-      "curl "+g_conf_info.h2dns.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
-      "curl "+g_conf_info.h2dns.us+"/app.cpp>app.cpp",
-      "curl "+g_conf_info.h2dns.us+"/app.cpp.out>app.cpp.out",
+      "curl "+c.vh2host.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
+      "curl "+c.vh2host.us+"/app.cpp>app.cpp",
+      "curl "+c.vh2host.us+"/app.cpp.out>app.cpp.out",
       "chmod +x ./app.cpp.out",
-      "curl "+g_conf_info.h2dns.us+"/app.zip>app.zip",
+      "curl "+c.vh2host.us+"/app.zip>app.zip",
       "unzip app.zip",
       "nohup nice -n15 ./app.cpp.out|tee app.log",
       "echo exit status = $?"
@@ -297,6 +305,33 @@ g_conf_info.on_set_our_name=()=>{
   }else{
     fs.writeFileSync("NOT_WORKER.txt","");
   }
+};
+
+var do_rollback_workers=()=>{
+  var c=g_conf_info;
+  c.arr.map((e,i)=>{
+    if(!e.p)return;
+    setTimeout(()=>xhr_get('http://'+e.host+'/rollback',qap_log,qap_log),i*2000);
+  });
+};
+
+var dyn_host=()=>{
+  /*
+  //run it on up
+  var arr=get_def_list_of_host();
+  arr.map
+  e is t_host
+  xhr_get("http://"+e.host+""
+  now u need to pass over 
+  */
+}
+
+var run_cpp_app=()=>{
+  
+};
+
+var run_app_server=()=>{
+  
 };
 
 var is_public=host=>hosts[host]=='public';
@@ -485,7 +520,7 @@ var requestListener=(request,response)=>{
           return log.map(e=>e.request_uri).map(e=>url.parse(e).pathname).
           map(e=>e=="/inc"?+1:(e=="/dec"?-1:0)).reduce((p,v)=>p+v,0);
         }
-        var txt_conf_exec=cmd=>txt("conf = "+g_conf_info.our_name+"\n"+execSync(cmd));
+        var txt_conf_exec=cmd=>txt("conf = "+g_conf_info.vhost+"\n"+execSync(cmd));
         if("/ll"==uri){return txt_conf_exec("ls -l");}
         if("/sysinfo"==uri)
         {
@@ -744,7 +779,7 @@ var requestListener=(request,response)=>{
       if(need_coop_init)
       {
         need_coop_init=false;
-        g_conf_info.set_our_name_from_host(request.headers.host);
+        g_conf_info.set_vhost_from_host(request.headers.host);
         var pub=is_public(request.headers.host);var none=()=>{};
         if(g_interval){clearInterval(g_interval);g_interval=false;}
         var period=1000*30;var net_gap=1000*10;
