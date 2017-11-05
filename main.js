@@ -267,7 +267,7 @@ var g_conf_info=(()=>{
   out.set_our_name_from_host=host=>{
     out.our_name=dns2h[host];
     qap_log("our_name = "+out.our_name);
-    g_conf_info.on_set_our_name();
+    //g_conf_info.on_set_our_name();
   };
   return out;
 })();
