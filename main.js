@@ -260,7 +260,7 @@ var g_conf_info=/*return inspect*/((()=>{
     "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
     "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
-  var power={ae:5,vm50:5,vm51:5,ca:2,vm10:2,vm20:2,us:0,vm30:2,vm52:5};
+  var power={ae:5,vm50:5,vm51:0,vm52:0,ca:2,vm10:2,vm20:2,vm30:2,us:0};
   var vh2host=mapswap(host2vh);
   var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host};
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
