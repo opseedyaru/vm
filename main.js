@@ -147,6 +147,7 @@ var get_backup=()=>{
   getarr(tmp,'g_obj.json').push({
     time:getDateTime(),
     hostname:os.hostname(),
+    host:request.headers.host,
     size:Buffer.byteLength(data),
     sha1:crypto.createHash('sha1').update(data).digest('hex')
   });
