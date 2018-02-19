@@ -229,10 +229,22 @@ var xhr_post_with_to=(url,obj,ok,err,ms)=>xhr_add_timeout(xhr('post',url,qs.stri
 
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
+var hosts_update=hosts=>{
+  var conv=x=>{
+    var out={host2vh:{},public:[]};
+    for(var host in x.host2str){out.host2vh[host]=x.host2str[host].split("|")[0];}
+    out.public=x.public.split("|").map(e=>mapswap(out.host2vh)[e]);
+    mapkeys(x.host2str).map(k=>{if(out.public.includes(k))return;out.public.push(k);});
+    return out;
+  };
+  hosts.main_out=conv(hosts.main);
+  return hosts;
+};
+
 var hosts_sync=(cb)=>{
   if((typeof cb)!="function")cb=()=>{};
   xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
-    s=>{try{hosts=JSON.parse(s);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);}cb(s);},
+    s=>{try{hosts=JSON.parse(s);hosts=hosts_update(hosts);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);}cb(s);},
     s=>{hosts_err_msg=s;cb(s);}
   );
 };
