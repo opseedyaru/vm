@@ -232,7 +232,7 @@ var hosts={};var hosts_err_msg='';var need_coop_init=true;
 var hosts_update=hosts=>{
   var conv=x=>{
     var out={host2vh:{},public:[]};
-    for(var host in x.host2str){out.host2vh[host]=x.host2str[host].split("|")[0];}
+    for(var host in x.host2str){var a=x.host2str[host].split("|");out.host2vh[host]=a[0];out.power[a[0]]=a[1];}
     out.public=x.public.split("|").map(e=>mapswap(out.host2vh)[e]);
     mapkeys(x.host2str).map(k=>{if(out.public.includes(k))return;out.public.push(k);});
     return out;
