@@ -554,7 +554,7 @@ var requestListener=(request,response)=>{
           var ht=s=>"http://"+s+"/sysinfo";
           var f=s=>"<html><body>"+s+"</body></html>";
           var ug=url=>iframe.split("???").join(json(url));
-          var out=urls.map(ht).map(e=>ug(e));
+          var out=urls.map(ht).map(e=>ug(e)).join("\n");
           return html(f(out));
         }
         if("/cpuinfo"==uri){return txt_conf_exec("cat /proc/cpuinfo");}
