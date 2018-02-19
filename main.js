@@ -547,6 +547,16 @@ var requestListener=(request,response)=>{
             f("cat /proc/meminfo").split("\n").filter(mem).join("\n")
           );
         }
+        if("/sysinfos"==uri)
+        {
+          var iframe='???<br><iframe src=??? width="95%" height="150px"></iframe><hr>';
+          var urls=mapkeys(g_conf_info.host2vh);
+          var ht=s=>"http://"+s+"/sysinfo";
+          var f=s=>"<html><body>"+s+"</body></html>";
+          var ug=url=>iframe.split("???").join(json(url));
+          var out=urls.map(ht).map(e=>ug(e));
+          return html(f(out));
+        }
         if("/cpuinfo"==uri){return txt_conf_exec("cat /proc/cpuinfo");}
         if("/meminfo"==uri){return txt_conf_exec("cat /proc/meminfo");}
         if("/ps_aux"==uri){return txt_conf_exec("ps -aux");}
