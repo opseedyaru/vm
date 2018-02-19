@@ -147,7 +147,7 @@ var get_backup=()=>{
   getarr(tmp,'g_obj.json').push({
     time:getDateTime(),
     hostname:os.hostname(),
-    host:request.headers.host,
+    host:g_conf_info.last_request_host,
     size:Buffer.byteLength(data),
     sha1:crypto.createHash('sha1').update(data).digest('hex')
   });
@@ -276,7 +276,7 @@ var g_conf_info=/*return inspect*/((()=>{
   };
   var power={ae:5,vm50:5,vm51:0,vm52:0,ca:2,vm10:2,vm20:2,vm30:2,us:0,os3:0};
   var vh2host=mapswap(host2vh);
-  var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host};
+  var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host,last_request_host:"empty"};
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
   out.set_vhost_from_host=host=>{
     out.vhost=host2vh[host];
@@ -479,6 +479,7 @@ var requestListener=(request,response)=>{
     var arr=getarr(getmap(g_obj,'logs'),os.hostname()).push(f(request));
   };
   on_request_end((POST_BODY)=>{
+    g_conf_info.last_request_host=request.headers.host;
     var POST=POST_BODY.length?qs.parse(POST_BODY):{};
     mapkeys(POST).map(k=>qp[k]=POST[k]);POST=qp;
     g_logger_func(request);
