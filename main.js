@@ -816,6 +816,10 @@ var requestListener=(request,response)=>{
         };
         if(pub)g_interval=setInterval(send_tick_to_shadows,period);
         var server=pub?shadow:master;
+        //variable 'shadow' and 'public' must be deleted!
+        //now we need make list_of_ordered workers. some workers is 'public', but this is dynamic role.
+        //better idea: shadows.map(server=>...); // if(fail){try_next();}else{use_response();
+        //also think about consistency.
         xhr_post('http://'+server+'/g_obj.json?from='+os.hostname(),{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
         return;
       }
