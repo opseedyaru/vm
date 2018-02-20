@@ -29,7 +29,7 @@ xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/main.js?t='+rand(),
     if(fs.readFileSync("main.js")==s){qap_log("on_restart.js :: main.js is up-to-date");return;}
     qap_log("on_restart.js :: main.js is old");
     fs.writeFileSync("main.js",s);
-    fetch_other_file(["eval.html"]);
+    //fetch_other_file(["eval.html"]); // don't work when "process.exit();" at next line
     process.exit();
   },
   s=>{qap_log("on_restart.js :: fail :: "+s);fs.writeFileSync("main.js.errmsg","//from on_restart.js\n"+s);}
