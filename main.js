@@ -506,7 +506,7 @@ var requestListener=(request,response)=>{
       var shadow=shadows[0];
       var master=get_hosts_by_type('public')[0];
       var req_handler=()=>{
-        response.off=()=>response={writeHead:()=>{},end:()=>{}};
+        response.off=()=>response={writeHead:()=>{},end:()=>{},off:()=>{}};
         var resp_off=()=>{response.off();}
         var jstable=arr=>{
           response.off();
@@ -587,6 +587,14 @@ var requestListener=(request,response)=>{
           return cb(qapsort(mapkeys(files).filter(filter).map(fn=>(
             {fn:fn,mass:log_incdec_sumator(files[fn].log)}
           )),e=>e.mass));
+        }
+        if("/mmll"==uri){
+          var fn='mainloop.log';
+          var pos=fs.statSync(fn).size-8*1024;
+          if(pos<0)pos=0;
+          fs.createReadStream(fn,{start:pos}).pipe(response);
+          resp_off();
+          return;
         }
         if("/evals"==uri)
         {
@@ -766,7 +774,7 @@ var requestListener=(request,response)=>{
         if("/close"==uri||"/quit"==uri||"/exit"==uri)quit();
         if("/"==uri)return txt("count = "+inc(g_obj,'counter'));
         if("/yt.title"==uri){
-          response.off();response.off=()=>{};
+          response.off();
           xhr("GET","https://www.youtube.com/get_video_info?video_id="+qp.v,"",
             yt_title,s=>txt("yt.title('failed')\n"+s)
           );
