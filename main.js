@@ -512,10 +512,10 @@ var requestListener=(request,response)=>{
           response.off();
           //  safe_json=obj=>json(obj).split("</script>").join("<\\/script>");
           var safe_json=obj=>json(obj).split("/").join("\\/");
-          var cb=data=>html(data.split("</body>").join("<script>draw("+safe_json(arr)+");</script></body>"));
+          var cb=data=>html(data.split("</body>").join("<script>document.title+='("+g_conf_info.vhost+")';draw("+safe_json(arr)+");</script></body>"));
           fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
-        }; 
+        };
         var yt_title=s=>{
           response.off();
           var safe_json=obj=>json(obj).split("/").join("\\/");
