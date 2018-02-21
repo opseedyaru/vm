@@ -536,6 +536,17 @@ var requestListener=(request,response)=>{
         if("/e"==uri){
           return txt("selfafiliate.txt");
         }
+        if("/mem_detect"==uri){
+          resp_off();
+          var fn="proc_mem_limit_detector.cpp";
+          exec("g++ -std=c++11 -O2 "+fn+" -o mem_detect.out").on('exit',()=>{
+            var p=exec("./mem_detect.out 16 mset all dual json no no no");
+            var out='';
+            p.stdout.on('data',s=>out+=s);p.stderr.on('data',s=>out+=s);
+            p.on('exit',()=>jstable(JSON.parse("["+out.slice(0,-2)+"]")));
+          });
+          return;
+        }
         if("/shadows_links"==uri){
           response.off();var ls='<a href="/fetch?quit">this/fetch?quit</a><hr><a href="/ls">this/ls</a>';
           return html(ls+"<hr>"+shadows.map(e=>"http://"+e+"/fetch?quit").map(e=>'<a href="'+e+'">'+e+'</a>').join("<hr>"));
