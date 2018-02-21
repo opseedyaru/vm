@@ -54,11 +54,11 @@ void loop(size_t*p,size_t n){for(size_t i=0;i<n;i++)p[i]=7;}
 void mset(size_t*p,size_t n){memset(p,7,n*sizeof(size_t));}
 typedef const string&CSR;
 void json_like(vector<string>&out,CSR n,CSR v,CSR u){
-  auto q=[](string s){return "\""+s+"\"";};
+  auto q=[](CSR s){return "\""+s+"\"";};
   out.push_back(q(n)+":"+q(v+u));
 }
 void text_like(vector<string>&out,CSR n,CSR v,CSR u){
-  auto q=[](string s){return s;};
+  auto q=[](CSR s){return s;};
   out.push_back(q(n)+"="+q(v+u));
 }
 
