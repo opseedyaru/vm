@@ -15,13 +15,25 @@ set_interval(()=>get_hosts_by_type('backup').map(
 get_hosts_by_type('backup').map(e=>xhr_get('http://'+e+'/vm/on_start?from='+os.hostname(),nope,nope));
 xhr_get('http://adler.hol.es/vm/on_start?from='+os.hostname(),nope,nope);
 
-var fetch_other_file=(files)=>files.map(fn=>xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/'+fn+'?t='+rand(),
-  data=>{
-    qap_log("fetch :: "+fn+" :: ok //"+data.length);
-    fs.writeFile(fn,data);
-  },
-  s=>qap_log("fetch :: "+fn+" :: fail :: "+s)
-));
+var fetch_other_file=(files)=>{
+  var tasks=[];var tasks_n=shadows.length;
+  var on=(host,mode)=>(s=>{
+    tasks.push({mode:mode,host:host,s:s});if(tasks_n!=tasks.length)return;
+    if(tasks.filter(e=>e.mode=='ok').length==tasks_n){
+      cb(tasks,tmp);
+    }else txt('coop_fail:\n'+inspect(tasks));// but on some shadows server requests performed...
+  });
+  if(!tasks_n)cb(tasks,tmp);
+  shadows.map(e=>xhr_post_with_to('http://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on(e,'ok'),on(e,'fail'),1000*5));
+  var xhr_get_with_to=(url,ok,fail,ms)=>xhr_add_timeout(xhr_get(url,ok,fail),ms);
+  files.map(fn=>xhr_get_with_to('https://raw.githubusercontent.com/gitseo/vm/master/'+fn+'?t='+rand(),
+    data=>{
+      qap_log("fetch :: "+fn+" :: ok //"+data.length);
+      fs.writeFileSync(fn,data);
+    },
+    s=>qap_log("fetch :: "+fn+" :: fail :: "+s),5000
+  ));
+}
 
 xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/main.js?t='+rand(),
   s=>{
