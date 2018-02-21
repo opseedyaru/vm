@@ -26,7 +26,12 @@ var fetch_other_file=(files)=>files.map(fn=>xhr_get('https://raw.githubuserconte
 xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/main.js?t='+rand(),
   s=>{
     qap_log("on_restart.js :: ok");
-    if(fs.readFileSync("main.js")==s){qap_log("on_restart.js :: main.js is up-to-date");return;}
+    if(fs.readFileSync("main.js")==s)
+    {
+      qap_log("on_restart.js :: main.js is up-to-date");
+      fetch_other_file(["eval.html","proc_mem_limit_detector.cpp"]);
+      return;
+    }
     qap_log("on_restart.js :: main.js is old");
     fs.writeFileSync("main.js",s);
     //fetch_other_file(["eval.html"]); // don't work when "process.exit();" at next line
