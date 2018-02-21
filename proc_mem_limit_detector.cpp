@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
-#include <functional>
 #ifndef _MSC_VER
 #include <unistd.h>
 #include <sys/time.h>
