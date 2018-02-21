@@ -102,13 +102,15 @@ int main(int argc, char **argv)
       F(ms,ms," ms");
       F(using,mb/ms," MiB/ms");
       if(show_dots==2)dots2.resize(int(mb/ms),'.');
+      static auto max_ms=ms*8;
+      if(detect_swap)if(ms>max_ms){cerr<<"swap detected..."<<endl;break;}
     }
     if(show_dots)f(line,"dots",dots,"");
     if(show_dots==2)f(line,"dots2",dots2,"");
     #undef F
     string s=json?"{"+join(line,",")+"},":join(line,"    ");
     cout<<s<<"\n"<<std::flush;
-    if(detect_swap)if(t>max_t){cout<<"swap detected..."<<endl;break;}
+    if(detect_swap)if(t>max_t){cerr<<"swap detected..."<<endl;break;}
     //usleep(1000*16);
   }
   return 0;
