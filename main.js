@@ -502,6 +502,13 @@ var requestListener=(request,response)=>{
           flags
         );
       }
+      var parse_json_lines=out=>JSON.parse("["+out.slice(0,-2)+"]");
+      var exec_with_cb=(cmd,cb)=>{
+        var out='';var p=exec(cmd);
+        p.stdout.on('data',s=>out+=s);p.stderr.on('data',s=>out+=s);
+        p.on('exit',()=>cb(out));
+        return p;
+      }
       var shadows=get_hosts_by_type('shadow');
       var shadow=shadows[0];
       var master=get_hosts_by_type('public')[0];
@@ -576,10 +583,7 @@ var requestListener=(request,response)=>{
           resp_off();
           var fn="proc_mem_limit_detector.cpp";
           exec("g++ -std=c++11 -O2 "+fn+" -o mem_detect.out").on('exit',()=>{
-            var p=exec("./mem_detect.out 16 mset no dual json no no");
-            var out='';
-            p.stdout.on('data',s=>out+=s);p.stderr.on('data',s=>out+=s);
-            p.on('exit',()=>jstable(JSON.parse("["+out.slice(0,-2)+"]")));
+            exec_with_cb("./mem_detect.out 16 mset no dual json no no",s=>jstable(parse_json_lines(s)));
           });
           return;
         }
