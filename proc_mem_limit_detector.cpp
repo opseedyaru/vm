@@ -143,7 +143,9 @@ int main(int argc, char **argv)
     cout<<s<<"\n"<<std::flush;
     if(detect_swap)if(t>max_t){cerr<<"swap detected. // mem init"<<endl;done=true;}
     if(done)break;
+    #ifdef _MSC_VER
     if((i+1)*mb>700)return 0;
+    #endif
     //usleep(1000*16);
   }
   return 0;
