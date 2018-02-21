@@ -662,7 +662,7 @@ var requestListener=(request,response)=>{
         if("/sitemap"==uri){
           var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
           var head=("<html><style>table{border-spacing:64px 0;font-size:1.17em;font-weight:bold;}div{"+
-            "position:absolute;top:10%;left:50%;transform: translate(-50%,-50%);"+
+            "position:absolute;top:5%;left:50%;transform:translate(-50%,0%);"+
             "}</style><body><div>"
           );
           var preproc=s=>s.split('+"/').join("*cut*");
