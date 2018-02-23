@@ -29,7 +29,7 @@ xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/main.js?t='+rand(),
     if(fs.readFileSync("main.js")==s)
     {
       qap_log("on_restart.js :: main.js is up-to-date");
-      fetch_other_file(["eval.html","proc_mem_limit_detector.cpp"]);
+      fetch_other_file(["shell.js","eval.html","proc_mem_limit_detector.cpp"]);
       return;
     }
     qap_log("on_restart.js :: main.js is old");
