@@ -302,9 +302,10 @@ g_conf_info.on_set_vhost=()=>{
   var pub=get_hosts_by_type('public')[0];
   xhr_get("http://"+pub+'/put?fn=/vhosts/'+c.vhost+'&data='+os.hostname(),()=>{},()=>{});
   if(c.last_request_host!==pub){
-    //get_hosts_by_type('shadow').map(e=>exec("node shell.js api=duplex host="+e+" task=nope"));
     var pub_lost=true;
     var connect_to_pub=()=>{
+      qap_log('connect_to_pub');
+      pub_lost=false;
       exec("node shell.js api=duplex host="+get_hosts_by_type('public')[0]+" task=nope",()=>{pub_lost=true;});
     }
     set_interval(()=>{if(!pub_lost)return;connect_to_pub();},10*1000);
