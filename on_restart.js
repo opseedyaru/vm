@@ -18,7 +18,7 @@ xhr_get('http://adler.hol.es/vm/on_start?from='+os.hostname(),nope,nope);
 var fetch_other_file=(files)=>files.map(fn=>xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/'+fn+'?t='+rand(),
   data=>{
     qap_log("fetch :: "+fn+" :: ok //"+data.length);
-    fs.writeFile(fn,data);
+    fs.writeFileSync(fn,data);
   },
   s=>qap_log("fetch :: "+fn+" :: fail :: "+s)
 ));
