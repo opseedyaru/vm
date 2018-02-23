@@ -314,8 +314,8 @@ g_conf_info.on_set_vhost=()=>{
   fs.writeFileSync("mask_id_pos.txt",is_worker?c.vh2pos[c.vhost]:0);
   if(is_worker)
   {
-    fs.writeFile("WORKER.txt","");
-    fs.writeFile("WORKER_"+c.vhost+".txt","");
+    fs.writeFileSync("WORKER.txt","");
+    fs.writeFileSync("WORKER_"+c.vhost+".txt","");
     return;
     var cmd=[
       "curl "+c.vh2host.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
@@ -331,8 +331,8 @@ g_conf_info.on_set_vhost=()=>{
 
     exec("chmod +x worker.sh\n./worker.sh|tee worker.log");
   }else{
-    fs.writeFile("NOT_WORKER.txt","");
-    fs.writeFile("NOT_WORKER_"+c.vhost+".txt","");
+    fs.writeFileSync("NOT_WORKER.txt","");
+    fs.writeFileSync("NOT_WORKER_"+c.vhost+".txt","");
   }
 };
 
