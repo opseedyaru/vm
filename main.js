@@ -263,7 +263,7 @@ var on_start_sync=()=>{
 
 on_start_sync();
 
-var g_conf_info=/*return inspect*/((()=>{
+var g_conf_info=((()=>{
   var host2vh={
     //"vm-vm.1d35.starter-us-east-1.openshiftapps.com":"us",
     "vm-os3.7e14.starter-us-west-2.openshiftapps.com":"os3",
@@ -299,7 +299,16 @@ var g_conf_info=/*return inspect*/((()=>{
 g_conf_info.on_set_vhost=()=>{
   var mask_id_pos=0;var c=g_conf_info;
   var is_worker=(c.vhost in c.power)&&(c.power[c.vhost]>0);
-  xhr_get("http://"+get_hosts_by_type('public')[0]+'/put?fn=/vhosts/'+c.vhost+'&data='+os.hostname(),()=>{},()=>{});
+  var pub=get_hosts_by_type('public')[0];
+  xhr_get("http://"+pub+'/put?fn=/vhosts/'+c.vhost+'&data='+os.hostname(),()=>{},()=>{});
+  if(c.last_request_host!==pub){
+    //get_hosts_by_type('shadow').map(e=>exec("node shell.js api=duplex host="+e+" task=nope"));
+    var pub_lost=true;
+    var connect_to_pub=()=>{
+      exec("node shell.js api=duplex host="+get_hosts_by_type('public')[0]+" task=nope",()=>{pub_lost=true;});
+    }
+    set_interval(()=>{if(!pub_lost)return;connect_to_pub();},10*1000);
+  }
   fs.writeFileSync("vhost.txt",c.vhost);
   fs.writeFileSync("mask_id_pos.txt",is_worker?c.vh2pos[c.vhost]:0);
   if(is_worker)
@@ -534,7 +543,35 @@ var requestListener=(request,response)=>{
           var cb=data=>html(data.split("</body>").join("<script>draw("+safe_json(s)+");</script></body>"));
           fs.readFile("yt.title.fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
-        }; 
+        };
+        if("/api"==uri){
+          if(!('a' in qp))return txt("param 'a' - required");
+          if(qp.a=='get_backend'){
+            if(!('task_id' in qp))return txt("param 'task_id' - required");
+            var is_int=v=>((v|0)+'')===v;if(!is_int(qp.task_id))return txt("no way");
+            return txt('no impl');
+          }
+          return txt('no impl');
+        }
+        if("/perform"=uri){
+          return txt('wrong way');
+          if(!('task_id' in qp))return txt("param 'task_id' - required");
+          if(!('remotehost' in qp))return txt("remotehost - required");
+          var is_int=v=>((v|0)+'')===v;if(!is_int(qp.task_id))return txt("no way");
+          execSync("mkdir tmp");
+          var tmp="./tmp/rnd"+rand();
+          exec(
+            "mkdir "+tmp+";cd "+tmp+";"+
+            "curl "+qp.remotehost+"/api?a=get_backend?tmp="+tmp+"&task_id="+qp.task_id+">backend.zip|tee ./curl.backend.log;"+
+            "unzip backend.zip|tee ./backend.unzip.log;"+
+            "nohup nice -n15 ./start.sh 2>&1|tee ./start.sh.log",
+            (err,so,se)=>{
+              if(err)return qap_log("error at /perform:"+inspect(err));
+              qap_log("task done: "+qp.task_id);
+            }
+          );
+          return txt("ok. //"+getDateTime());
+        }
         if("/g_obj.json"==uri){
           if('raw' in qp)return txt(json(g_obj));
           if('data' in qp)return json(mapdrop(mapclone(g_obj),'g_obj.json'));

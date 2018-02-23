@@ -314,11 +314,11 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 var fn="mask_basepix_log.txt";
-var api="duplex";var our_name="ae";var host=h2dns[our_name];
+var api="duplex";var host=h2dns["ae"];
 var f=(key,val)=>{
   if(key==="api"){api=val;}
   if(key==="fn"){fn=val;}
-  if(key==="host"){if(val in h2dns){our_name=val;host="http://"+h2dns[val];}else{qap_log(val+" - host is unk");}}
+  if(key==="host"){if(val in h2dns){host="http://"+h2dns[val];}else{host="http://"+val;}}
 };
 process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 
