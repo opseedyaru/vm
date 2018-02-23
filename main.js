@@ -299,11 +299,13 @@ var g_conf_info=/*return inspect*/((()=>{
 g_conf_info.on_set_vhost=()=>{
   var mask_id_pos=0;var c=g_conf_info;
   var is_worker=(c.vhost in c.power)&&(c.power[c.vhost]>0);
+  xhr_get("http://"+get_hosts_by_type('public')[0]+'/put?fn=/vhosts/'+c.vhost+'&data='+os.hostname(),()=>{},()=>{});
   fs.writeFileSync("vhost.txt",c.vhost);
   fs.writeFileSync("mask_id_pos.txt",is_worker?c.vh2pos[c.vhost]:0);
   if(is_worker)
   {
-    fs.writeFileSync("WORKER.txt","");
+    fs.writeFile("WORKER.txt","");
+    fs.writeFile("WORKER_"+c.vhost+".txt","");
     return;
     var cmd=[
       "curl "+c.vh2host.us+"/mask_basepix_log.txt>mask_basepix_log.txt",
@@ -319,7 +321,8 @@ g_conf_info.on_set_vhost=()=>{
 
     exec("chmod +x worker.sh\n./worker.sh|tee worker.log");
   }else{
-    fs.writeFileSync("NOT_WORKER.txt","");
+    fs.writeFile("NOT_WORKER.txt","");
+    fs.writeFile("NOT_WORKER_"+c.vhost+".txt","");
   }
 };
 
