@@ -554,7 +554,7 @@ var requestListener=(request,response)=>{
           }
           return txt('no impl');
         }
-        if("/perform"=uri){
+        if("/perform"==uri){
           return txt('wrong way');
           if(!('task_id' in qp))return txt("param 'task_id' - required");
           if(!('remotehost' in qp))return txt("remotehost - required");
