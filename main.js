@@ -736,6 +736,7 @@ var requestListener=(request,response)=>{
               var ignore="host,hostname,method".split(",");
               f=mapclone(f);f.log=f.log.map(e=>mapdrop(e,ignore));
             }
+            if('jstable' in qp)return jstable(f.log);
             return json(f,null,2);
             //return json(['found at '+os.hostname(),f],null,2);
           },
