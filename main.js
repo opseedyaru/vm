@@ -736,7 +736,7 @@ var requestListener=(request,response)=>{
               var ignore="host,hostname,method".split(",");
               f=mapclone(f);f.log=f.log.map(e=>mapdrop(e,ignore));
             }
-            if('jstable' in qp)return jstable(f.log);
+            if('log' in qp)return json(f.log);
             return json(f,null,2);
             //return json(['found at '+os.hostname(),f],null,2);
           },
@@ -790,6 +790,7 @@ var requestListener=(request,response)=>{
           if('bin' in qp)func=binary;
           if('html' in qp)func=html;
           if('txtbin' in qp)func=txtbin;
+          if('jstable' in qp)func=s=>{try{return jstable(parse(s));}catch(err){qap_err('cmds[uri].jstable',err);}};
           return coop(
             (arr,log_object)=>func(
               //arrjoin(
