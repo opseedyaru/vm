@@ -632,8 +632,8 @@ var requestListener=(request,response)=>{
         }
         if("/cpuinfo"==uri){return txt_conf_exec("cat /proc/cpuinfo");}
         if("/meminfo"==uri){return txt_conf_exec("cat /proc/meminfo");}
-        if("/ps_aux"==uri){return txt_conf_exec("ps -aux");}
-        if("/ps_aux_ll"==uri){return txt_conf_exec("ps -aux\nls -l");}
+        if("/ps_aux"==uri){return txt_conf_exec('ps -aux|grep -v "<defunct>"');}
+        if("/ps_aux_ll"==uri){return txt_conf_exec('ps -aux|grep -v "<defunct>"\nls -l');}
         if("/top"==uri){
           var files=getmap(g_obj,'files');
           var cb=arr=>jstable(arr);
@@ -802,6 +802,7 @@ var requestListener=(request,response)=>{
             )
           );
         }
+        if("/fs"==uri){return txt(os.hostname());}
         if("/hostname"==uri){return txt(os.hostname());}
         if("/fetch"==uri){
           (()=>{
