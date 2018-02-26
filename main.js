@@ -814,7 +814,6 @@ var requestListener=(request,response)=>{
             )
           );
         }
-        if("/fs"==uri){return txt(os.hostname());}
         if("/hostname"==uri){return txt(os.hostname());}
         if("/fetch"==uri){
           (()=>{
