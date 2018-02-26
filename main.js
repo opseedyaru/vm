@@ -524,6 +524,13 @@ var requestListener=(request,response)=>{
         p.on('exit',()=>cb(out));
         return p;
       }
+      var exec_with_stream=(cmd,stream,cb)=>{
+        var p=exec("npm install "+m);
+        p.stdout.on('data',s=>stream.write(s));
+        p.stderr.on('data',s=>stream.write(s));
+        p.on('exit',cb?cb:()=>stream.end());
+        return p;
+      }
       var shadows=get_hosts_by_type('shadow');
       var shadow=shadows[0];
       var master=get_hosts_by_type('public')[0];
