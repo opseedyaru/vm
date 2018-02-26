@@ -1,13 +1,6 @@
 //return parseFloat('1.2')+"";
 var r=response;
 resp_off();
-var exec_with_stream=(cmd,stream,cb)=>{
-  var p=exec(cmd);
-  p.stdout.on('data',s=>stream.write(s));
-  p.stderr.on('data',s=>stream.write(s));
-  p.on('exit',cb?cb:()=>stream.end());
-  return p;
-};
 var hack_require=m=>{
   try{require.resolve(m);}catch(e){
     r.write(m+" is not found, but ok, i already run... 'npm install "+m+"'\n");
