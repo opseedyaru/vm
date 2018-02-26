@@ -879,7 +879,7 @@ var requestListener=(request,response)=>{
           return;
         }
         if("/crudes"==uri){
-          return fs.readdir('./c',(err,arr)=>html(links2table(arr.map(e=>'/c/'+e))));
+          return fs.readdir('./crude',(err,arr)=>html(links2table(arr.map(e=>'/c/'+e))));
         }
         if(uri.slice(0,3)=='/c/'){
           var fn="./crude/"+uri.slice(3);
