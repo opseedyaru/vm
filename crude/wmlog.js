@@ -17,6 +17,7 @@ var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 var tables={};
 var check_done=()=>{
   if(mapkeys(tables).length!=2)return;
+  if('json' in qp){return txt(json(tables));}
   var t2=tables[2];
   var t2_keys=mapkeys(t2[0]).reverse();
   jstable(tables[1].map((e,i)=>{
