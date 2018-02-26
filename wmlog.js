@@ -2,7 +2,7 @@
 var r=response;
 resp_off();
 var exec_with_stream=(cmd,stream,cb)=>{
-  var p=exec("npm install "+m);
+  var p=exec(cmd);
   p.stdout.on('data',s=>stream.write(s));
   p.stderr.on('data',s=>stream.write(s));
   p.on('exit',cb?cb:()=>stream.end());
