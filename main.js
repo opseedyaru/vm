@@ -709,17 +709,22 @@ var requestListener=(request,response)=>{
           var arr=m['hostname' in qp?qp.hostname:os.hostname()];
           return func(arr);
         }
-        if("/sitemap"==uri){
-          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
+        var links2table=arr=>{
           var head=("<html><style>table{border-spacing:64px 0;font-size:1.17em;font-weight:bold;}div{"+
             "position:absolute;top:5%;left:50%;transform:translate(-50%,0%);"+
             "}</style><body><div>"
           );
+          var as_table=arr=>'<table>'+(arr.map(e=>'<tr><td><a href="'+e+'">'+e+'</a></td></tr>').join("\n"))+"</table>";
+          return head+as_table(arr);
+        }
+        if("/sitemap"==uri){
+          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
           var preproc=s=>s.split('+"/').join("*cut*");
-          var as_table=arr=>'<table>'+(arr)+"</table>";
-          return html(head+as_table(qap_unique(
-            preproc(fs.readFileSync("main.js")+"").split('"'+'/').map(e=>e.split('"')[0]).slice(1).filter(e=>e.length)
-          ).filter(e=>hide.indexOf(e)<0).map(e=>'/'+e).map(e=>'<tr><td><a href="'+e+'">'+e+'</a></td></tr>').join("\n")));
+          return html(links2table(
+            qap_unique(
+              preproc(fs.readFileSync("main.js")+"").split('"'+'/').map(e=>e.split('"')[0]).slice(1).filter(e=>e.length)
+            ).filter(e=>hide.indexOf(e)<0).map(e=>'/'+e))
+          );
         }
         var cmds={
           "/del":(qp,log_object)=>{
@@ -851,26 +856,38 @@ var requestListener=(request,response)=>{
         }
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
-        if("/eval"==uri){
-          var impl=()=>{
-            try{
-              var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
-              system_tmp=system_tmp();
-              if(response){
-                response.writeHead(200, {"Content-Type": "text/plain"});
-                response.end(system_tmp);
-                return;
-              }
-            }catch(err){
-              response.writeHead(500,{"Content-Type":"text/plain"});
-              response.end(qap_err('/eval.POST.code',err));
+        var eval_impl=()=>{
+          try{
+            var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
+            system_tmp=system_tmp();
+            if(response){
+              response.writeHead(200, {"Content-Type": "text/plain"});
+              response.end(system_tmp);
               return;
             }
-          };
-          if('nolog' in qp)return impl();
+          }catch(err){
+            response.writeHead(500,{"Content-Type":"text/plain"});
+            response.end(qap_err('/eval.POST.code',err));
+            return;
+          }
+        };
+        if("/eval"==uri){
+          if('nolog' in qp)return eval_impl();
           var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
           var rec="http://"+master+'/put?fn=eval/rec['+getDateTime()+"]"+rnd+"_"+os.hostname()+".json";
-          xhr_post(rec,{data:json({code:qp.code,data:qp.data})},impl,err=>txt('rec_error:\n'+err));
+          xhr_post(rec,{data:json({code:qp.code,data:qp.data})},eval_impl,err=>txt('rec_error:\n'+err));
+          return;
+        }
+        if("/crudes"==uri){
+          return fs.readdir('./c',(err,arr)=>html(links2table(arr.map(e=>'/c/'+e))));
+        }
+        if(uri.slice(0,3)=='/c/'){
+          var fn="./crude/"+uri.slice(3);
+          fs.stat(fn,(err,stat)=>{
+            if(err){throw err;}
+            POST.code='';
+            fs.createReadStream(fn).on('data',s=>POST.code+=s).on('end',eval_impl);
+          });
           return;
         }
         if(!exists){
