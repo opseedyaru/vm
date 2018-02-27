@@ -315,10 +315,17 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
 }
 var fn="mask_basepix_log.txt";
 var api="duplex";var host=h2dns["ae"];
+var with_protocol=host=>{
+  var a=['http://','https://'];
+  var out=host;
+  var tmp=a.map(p=>host.substr(0,p.length)===p).filter(e=>e);
+  if(!tmp.length)return a[0]+host;
+  return host;
+}; 
 var f=(key,val)=>{
   if(key==="api"){api=val;}
   if(key==="fn"){fn=val;}
-  if(key==="host"){if(val in h2dns){host="http://"+h2dns[val];}else{host="http://"+val;}}
+  if(key==="host"){if(val in h2dns){host="http://"+h2dns[val];}else{host=with_protocol(val);}}
 };
 process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 
