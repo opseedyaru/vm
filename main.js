@@ -535,10 +535,10 @@ var requestListener=(request,response)=>{
         p.on('exit',cb?cb:()=>stream.end());
         return p;
       }
-      var hack_require=((res)=>{var r=res;return m=>{
+      var hack_require=((res)=>{var r=res;return (m,tarball)=>{
         try{require.resolve(m);}catch(e){
-          r.write(m+" is not found, but ok, i already run... 'npm install "+m+"'\n");
-          exec_with_stream("echo npm install "+m+"\n npm install "+m,r);
+          r.write(m+" is not found, but ok, i already run 'npm install "+m+"'\n\n");
+          exec_with_stream("echo npm install "+(tarball?tarball:m)+"\n npm install "+m,r);
           return false;//throw new Error('hack_require.fail');
         }
         return require(m);
