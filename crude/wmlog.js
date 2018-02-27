@@ -6,9 +6,14 @@ var d=s=>parseFloat(s.split(",").join("."));
 var div=(a,b)=>d(a)/d(b);
 var out_in=(out,e)=>{out['out/in']=div(e.amountout,e.amountin).toFixed(3)};
 var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
+
+var ids='1,2';
+if('ids' in qp){ids=qp.ids;}
+var ids_arr=ids.split(",");
+
 var tables={};
 var check_done=()=>{
-  if(mapkeys(tables).length!=2)return;
+  if(mapkeys(tables).length!=ids_arr.length)return;
   if('json' in qp){return txt(json(tables));}
   var t2=tables[2];
   var t2_keys=mapkeys(t2[0]).reverse();
@@ -39,5 +44,5 @@ var run=exchtype=>{
   }
   return xhr_get("https://wmeng.exchanger.ru/asp/XMLWMList.asp?exchtype="+exchtype,ok,txt);
 }
-run(1);run(2);
+ids_arr.map(run);
 return;
