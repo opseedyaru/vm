@@ -470,7 +470,11 @@ var requestListener=(request,response)=>{
     '.mem':  "application/octet-stream",
     '.bin':  "application/octet-stream",
     '.png':  "image/png",
-    '.ico':  "image/x-icon"
+    '.ico':  "image/x-icon",
+    '.zip':  "application/zip",
+    '.tar':  "application/x-tar",
+    '.tgz':  "application/octet-stream",
+    '.gz':  "application/gzip"
   };
   var on_request_end=(cb)=>{
     var body=[];
@@ -531,6 +535,15 @@ var requestListener=(request,response)=>{
         p.on('exit',cb?cb:()=>stream.end());
         return p;
       }
+      var hack_require=((res)=>{var r=res;return m=>{
+        try{require.resolve(m);}catch(e){
+          r.write(m+" is not found, but ok, i already run... 'npm install "+m+"'\n");
+          exec_with_stream("echo npm install "+m+"\n npm install "+m,r);
+          return false;//throw new Error('hack_require.fail');
+        }
+        return require(m);
+      };})(response);
+      //((res)=>{var r=res;return $$$;})(response);
       var shadows=get_hosts_by_type('shadow');
       var shadow=shadows[0];
       var master=get_hosts_by_type('public')[0];
@@ -896,8 +909,11 @@ var requestListener=(request,response)=>{
         }
         fs.stat(filename,(error,stat)=>{
           if(error){throw error;}
+          var arr=contentTypesByExtension;
+          var ext=path.extname(filename);
+          var ct=ext in arr?arr[ext]:'application/octet-stream';
           response.writeHead(200,{
-            'Content-Type':contentTypesByExtension[path.extname(filename)],
+            'Content-Type':ct,
             'Content-Length':stat.size
           })
           fs.createReadStream(filename).pipe(response).on('end',()=>{response.destroy();request.destroy()});

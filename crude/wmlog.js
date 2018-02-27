@@ -1,14 +1,6 @@
 //return parseFloat('1.2')+"";
 var r=response;
 resp_off();
-var hack_require=m=>{
-  try{require.resolve(m);}catch(e){
-    r.write(m+" is not found, but ok, i already run... 'npm install "+m+"'\n");
-    exec_with_stream("echo npm install "+m+"\n npm install "+m,r);
-    return false;//throw new Error('hack_require.fail');
-  }
-  return require(m);
-}
 var xml2js=hack_require('xml2js');if(!xml2js)return;
 var d=s=>parseFloat(s.split(",").join("."));
 var div=(a,b)=>d(a)/d(b);
