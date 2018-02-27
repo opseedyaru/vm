@@ -30,7 +30,7 @@ xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/main.js?t='+rand(),
     {
       qap_log("on_restart.js :: main.js is up-to-date");
       fs.mkdir("crude",err=>{
-        fetch_other_file(["shell.js","eval.html","proc_mem_limit_detector.cpp","crude/wmlog.js"]);
+        fetch_other_file(["shell.js","eval.html","proc_mem_limit_detector.cpp","crude/wmlog.js","crude/run_logging.js"]);
       });
       return;
     }
