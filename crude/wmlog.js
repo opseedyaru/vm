@@ -15,9 +15,10 @@ var tables={};
 var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
   if('json' in qp){return txt(json(tables));}
-  var t2=tables[2];
+  var t1=tables[ids_arr[0]];
+  var t2=tables[ids_arr[1]];
   var t2_keys=mapkeys(t2[0]).reverse();
-  jstable(tables[1].map((e,i)=>{
+  jstable(t1.map((e,i)=>{
     t2_keys.map(k=>e[k+'`']=t2[i][k]);
     return e;
   }));
