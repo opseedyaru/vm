@@ -645,6 +645,15 @@ var requestListener=(request,response)=>{
           var out=urls.map(ht).map(e=>ug(e)).join("\n");
           return html(f(out));
         }
+        if("/node_versions"==uri){
+          var iframe='???<br><iframe src=??? width="95%" height="150px"></iframe><hr>';
+          var urls=mapkeys(g_conf_info.host2vh);
+          var ht=s=>"http://"+s+"/eval?nolog&code=return execSync('node -v').toString();";
+          var f=s=>"<html><body>"+s+"</body></html>";
+          var ug=url=>iframe.split("???").join(json(url));
+          var out=urls.map(ht).map(e=>ug(e)).join("\n");
+          return html(f(out));
+        }
         if("/mem_detect"==uri){
           resp_off();
           var fn="proc_mem_limit_detector.cpp";
