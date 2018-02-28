@@ -8,7 +8,7 @@ fs.mkdir("./wmlogs",err=>{
   exec_with_stream('ls '+dir,r,()=>{
     r.write('\n\n');
     set_interval(()=>{
-      xhr_get("http://vm-os3.7e14.starter-us-west-2.openshiftapps.com/c/wmlog.js?json"+ids,
+      xhr_get("http://"+request.headers.host+"/c/wmlog.js?json"+ids,
         s=>{
           var fn=dir+'/'+counter+'.json';
           fs.writeFileSync(fn,s);
