@@ -523,16 +523,19 @@ var requestListener=(request,response)=>{
       }
       var parse_json_lines=out=>JSON.parse("["+out.slice(0,-2)+"]");
       var exec_with_cb=(cmd,cb)=>{
+        // bullshit. use exec(cmd,cb) instead. where cb=(err,so,se)=>{}
         var out='';var p=exec(cmd);
         p.stdout.on('data',s=>out+=s);p.stderr.on('data',s=>out+=s);
         p.on('exit',()=>cb(out));
         return p;
       }
       var exec_with_stream=(cmd,stream,cb)=>{
-        var p=exec(cmd);
-        p.stdout.on('data',s=>stream.write(s));
-        p.stderr.on('data',s=>stream.write(s));
-        p.on('exit',cb?cb:()=>stream.end());
+        var to_stream=s=>stream.write(s);
+        var p=spawn('bash',[]);
+        p.stdin.end(cmd+"\n");
+        p.stdout.on('data',to_stream);
+        p.stderr.on('data',to_stream);
+        p.on('exit',cb?()=>cb(stream):()=>stream.end());
         return p;
       }
       var hack_require=((res)=>{var r=res;return (m,tarball)=>{
