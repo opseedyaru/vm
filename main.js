@@ -313,7 +313,7 @@ g_conf_info.on_set_vhost=()=>{
   }
   if(c.vhost in c.wm_ids_src){
     setTimeout(
-      ()=>xhr_get("http://"+c.last_request_host+'/c/run_logging.js?sure&json&ids='+c.wm_ids_src[c.vhost],qap_log,qap_log),
+      ()=>xhr_get("http://"+c.last_request_host+'/c/run_logging.js?sure&json&ids='+c.wm_ids_src[c.vhost],()=>{},qap_log),
       5*1000
     );
   }
