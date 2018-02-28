@@ -9,7 +9,9 @@ fs.mkdir("./wmlogs",err=>{
     r.write('\n\n');
     set_interval(()=>{
       xhr_get("http://"+request.headers.host+"/c/wmlog.js?json"+ids,
-        s=>{
+        s=>{          
+          if(!s.length)return;
+          if(s[0]!='{')return;
           var fn=dir+'/'+counter+'.json';
           fs.writeFileSync(fn,s);
           if(!r.finished)r.write(fn+'    // '+s.length);

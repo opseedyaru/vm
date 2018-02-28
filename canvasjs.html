@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>  
+<script>
+window.onload = function () {
+
+var chart = new CanvasJS.Chart("chartContainer", {
+	animationEnabled: true*0,
+	zoomEnabled: true,//zoomType:'xy',
+	title:{
+		text: "Try Zooming and Panning" 
+	},
+  axisX:{
+     title: "axisX Title"
+  },
+	axisY :{
+       title: "axisX Title",
+		includeZero:false
+	},
+	data: data  // random generator below
+});
+chart.render();
+
+}
+
+@@@           
+
+</script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script></head>
+<body>
+<div id="chartContainer" style="height: 1024px; width: 95%;">
+</div>
+</body>
+</html>

@@ -277,6 +277,7 @@ var g_conf_info=((()=>{
     "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
   var power={ae:5,vm50:5,vm51:0,vm52:0,ca:2,vm10:2,vm20:2,vm30:2,us:0,os3:0};
+  var wm_ids_src={"os3":"1,2","vm10":"34,33","vm20":"37,38"};
   var vh2host=mapswap(host2vh);
   var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host,last_request_host:"empty"};
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
@@ -648,7 +649,7 @@ var requestListener=(request,response)=>{
         if("/node_versions"==uri){
           var iframe='???<br><iframe src=??? width="95%" height="150px"></iframe><hr>';
           var urls=mapkeys(g_conf_info.host2vh);
-          var ht=s=>"http://"+s+"/eval?nolog&code=return execSync('node -v').toString();";
+          var ht=s=>"http://"+s+"/eval?nolog&code=return process.version;";
           var f=s=>"<html><body>"+s+"</body></html>";
           var ug=url=>iframe.split("???").join(json(url));
           var out=urls.map(ht).map(e=>ug(e)).join("\n");
