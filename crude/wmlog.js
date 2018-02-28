@@ -10,6 +10,7 @@ var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 var ids='1,2';
 if('ids' in qp){ids=qp.ids;}
 var ids_arr=ids.split(",");
+var type2dir=t=>{return "33,34".split(",").includes(t)?1:0};
 
 var tables={};
 var check_done=()=>{
@@ -30,7 +31,7 @@ var check_done=()=>{
 };
 //var exchtype=2; // 1={in:WMZ,out:WMR}; 2={in:WMR,out:WMZ};
 var run=exchtype=>{
-  var insert_special_field=exchtype%2?out_in:in_out;
+  var insert_special_field=exchtype%2==type2dir(exchtype)?out_in:in_out;
   var ok=xml=>{
     var g=obj=>{tables[exchtype]=obj;check_done();};//0?(obj=>txt(inspect(obj))):obj=>jstable(obj);
     var pretty=s=>{
