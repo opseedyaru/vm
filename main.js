@@ -907,7 +907,7 @@ var requestListener=(request,response)=>{
           return fs.readdir('./crude',(err,arr)=>html(links2table(arr.map(e=>'/c/'+e))));
         }
         if("/intervals"==uri){
-          return ('json' in qp?inspect:jstable)(g_intervals.map(e=>{return {date:e.date,ms:e.ref['_idleTimeout'],func:func+''}}));
+          return ('json' in qp?inspect:jstable)(g_intervals.map(e=>{return {data:e.data,ms:e.ref['_idleTimeout'],func:e.func+''}}));
         }
         if(uri.slice(0,3)=='/c/'){
           var fn="./crude/"+uri.slice(3);
