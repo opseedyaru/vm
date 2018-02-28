@@ -277,9 +277,9 @@ var g_conf_info=((()=>{
     "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
   var power={ae:5,vm50:5,vm51:0,vm52:0,ca:2,vm10:2,vm20:2,vm30:2,us:0,os3:0};
-  var wm_ids_src={"os3":"1,2","vm10":"34,33","vm20":"37,38","vm30":"1,2,33,34,37,38"};
   var vh2host=mapswap(host2vh);
   var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host,last_request_host:"empty"};
+  out.wm_ids_src={"os3":"1,2","vm10":"34,33","vm20":"37,38","vm30":"1,2,33,34,37,38"};
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
   out.set_vhost_from_host=host=>{
     out.vhost=host2vh[host];
@@ -310,6 +310,12 @@ g_conf_info.on_set_vhost=()=>{
       exec("node shell.js api=duplex host="+get_hosts_by_type('public')[0]+" task=nope",()=>{pub_lost=true;});
     }
     set_interval(()=>{if(!pub_lost)return;connect_to_pub();},10*1000);
+  }
+  if(c.vhost in c.wm_ids_src){
+    setTimeout(
+      ()=>xhr_get("http://"+c.last_request_host+'/c/run_logging.js?sure&json&ids='+c.wm_ids_src[c.vhost],qap_log,qap_log),
+      5*1000
+    );
   }
   fs.writeFileSync("vhost.txt",c.vhost);
   fs.writeFileSync("mask_id_pos.txt",is_worker?c.vh2pos[c.vhost]:0);
