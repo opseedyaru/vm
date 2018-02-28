@@ -2,7 +2,7 @@ if(!('sure' in qp))return 'sure in qp required';
 var counter=10000;
 if('counter' in qp)counter=qp.counter|0;
 var ids='ids' in qp?"&ids="+qp.ids:'';
-var r=request;
+var r=response;
 var dir='./wmlogs';
 fs.mkdir("./wmlogs",err=>{
   exec_with_stream('ls '+dir,r,()=>{
@@ -18,6 +18,7 @@ fs.mkdir("./wmlogs",err=>{
         qap_log
       );
     },30*1000);
+    r.write("begin\n");
   });
 });
 return resp_off();
