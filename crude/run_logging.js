@@ -1,5 +1,5 @@
 if(!('sure' in qp))return 'sure in qp required';
-var counter=10000;
+var counter=(new Date()/1000)|0;
 if('counter' in qp)counter=qp.counter|0;
 var ids='ids' in qp?"&ids="+qp.ids:'';
 var r=response;
