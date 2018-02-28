@@ -30,7 +30,7 @@ var check_done=()=>{
 };
 //var exchtype=2; // 1={in:WMZ,out:WMR}; 2={in:WMR,out:WMZ};
 var run=exchtype=>{
-  var insert_special_field=exchtype==1?out_in:in_out;
+  var insert_special_field=exchtype%2?out_in:in_out;
   var ok=xml=>{
     var g=obj=>{tables[exchtype]=obj;check_done();};//0?(obj=>txt(inspect(obj))):obj=>jstable(obj);
     var pretty=s=>{
