@@ -16,12 +16,17 @@ var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
   if('json' in qp){return txt(json(tables));}
   var t1=tables[ids_arr[0]];
-  var t2=tables[ids_arr[1]];
-  var t2_keys=mapkeys(t2[0]).reverse();
-  jstable(t1.map((e,i)=>{
-    t2_keys.map(k=>e[k+'`']=t2[i][k]);
-    return e;
-  }));
+  if(ids_arr.length==1)return jstable(t1);
+  if(ids_arr.length==2)
+  {
+    var t2=tables[ids_arr[1]];
+    var t2_keys=mapkeys(t2[0]).reverse();
+    jstable(t1.map((e,i)=>{
+      t2_keys.map(k=>e[k+'`']=t2[i][k]);
+      return e;
+    }));
+  }
+  if(ids_arr.length>2)return txt('ids_arr.length>2\nno way');
 };
 //var exchtype=2; // 1={in:WMZ,out:WMR}; 2={in:WMR,out:WMZ};
 var run=exchtype=>{
