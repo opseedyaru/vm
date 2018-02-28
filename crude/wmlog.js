@@ -10,7 +10,7 @@ var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 var ids='1,2';
 if('ids' in qp){ids=qp.ids;}
 var ids_arr=ids.split(",");
-var type2dir=t=>{return "33,34".split(",").includes(t)?1:0};
+var type2dir=t=>{return "33,34".split(",").includes(t)?0:1};
 
 var tables={};
 var check_done=()=>{
