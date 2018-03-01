@@ -229,6 +229,10 @@ var xhr_add_timeout=(req,ms)=>req.on('socket',sock=>sock.on('timeout',()=>req.ab
 var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
 var xhr_post_with_to=(url,obj,ok,err,ms)=>xhr_add_timeout(xhr('post',url,qs.stringify(obj),ok,err),ms);
 
+var axhr_get=(url,ud)=>{
+  return new Promise((ok,err)=>{xhr_get(url,s=>ok((typeof ud)==="undefined"?s:{ud:ud,data:s}),err);return;});
+}
+
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
 var hosts_update=hosts=>{
