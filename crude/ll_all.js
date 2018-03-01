@@ -1,7 +1,7 @@
 resp_off();
 var c=g_conf_info;
 var a=c.vh2host;
-if('wm' in qp)return a=c.wm_ids_src;
+if('wm' in qp)a=c.wm_ids_src;
 var out_func=jstable;
 if('jstable_right' in qp)out_func=arr=>jstable_right(arr);
 if('json' in qp)out_func=arr=>txt(json(arr));
