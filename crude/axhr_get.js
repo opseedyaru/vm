@@ -1,4 +1,4 @@
-var c=g_conf_info;var a=c.wm_ids_src;
+var a=g_conf_info.wm_ids_src;
 if('show_links' in qp)return mapkeys(a).map(e=>"http://"+c.vh2host[e]+"/wmlogs.all.txt.tgz").join("\n");
 resp_off();
 var code=encodeURIComponent(
