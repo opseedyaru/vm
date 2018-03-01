@@ -16,7 +16,7 @@ var code=encodeURIComponent(
     exec_with_stream('cat wmlogs/*.*>wmlogs.all.txt;tar -czvf wmlogs.all.txt.tgz wmlogs.all.txt;ls -l',response);
     return resp_off();
     return txt(inspect(trash)+get_ms()+'');
-  }).toString().split("\n").slice(1,-1).join("\n");
+  }).toString().split("\n").slice(1,-1).join("\n")
 );
 var path="/eval?&nolog&code="+code;
 Promise.all(
