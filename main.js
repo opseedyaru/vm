@@ -231,7 +231,17 @@ var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
 var xhr_post_with_to=(url,obj,ok,err,ms)=>xhr_add_timeout(xhr('post',url,qs.stringify(obj),ok,err),ms);
 
 var axhr_get=(url,ud)=>{
-  return new Promise((ok,err)=>{xhr_get(url,s=>ok((typeof ud)==="undefined"?s:{ud:ud,data:s}),err);return;});
+  return new Promise((ok,err)=>xhr_get(url,
+    s=>ok((typeof ud)==="undefined"?s:{ud:ud,data:s}),
+    s=>err(new Error('axhr_get::'+inspect({url:url,userdata:ud,response_body:s})))
+  ));
+}
+
+var axhr_post=(url,obj,ud)=>{
+  return new Promise((ok,err)=>xhr_post(url,obj,
+    s=>ok((typeof ud)==="undefined"?s:{obj:obj,ud:ud,data:s}),
+    s=>err(new Error('axhr_get::'+inspect({obj:obj,url:url,userdata:ud,response_body:s})))
+  ));
 }
 
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
@@ -565,6 +575,8 @@ var requestListener=(request,response)=>{
       var req_handler=()=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{},off:()=>{}};
         var resp_off=()=>{response.off();}
+        var safe_promise_all_to=(err_cb,arr)=>Promise.all(arr).catch(err=>err_cb(qap_err('Promise.all',err)));
+        var safe_promise_all=arr=>safe_promise_all_to(txt,arr);
         var jstable=arr=>{
           resp_off();
           //  safe_json=obj=>json(obj).split("</script>").join("<\\/script>");
