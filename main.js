@@ -561,7 +561,7 @@ var requestListener=(request,response)=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{},off:()=>{}};
         var resp_off=()=>{response.off();}
         var jstable=arr=>{
-          response.off();
+          resp_off();
           //  safe_json=obj=>json(obj).split("</script>").join("<\\/script>");
           var safe_json=obj=>json(obj).split("/").join("\\/");
           var cb=data=>html(data.split("</body>").join("<script>document.title+='("+g_conf_info.vhost+")';draw("+safe_json(arr)+");</script></body>"));
