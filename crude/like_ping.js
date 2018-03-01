@@ -1,4 +1,3 @@
-var a=wm_ids_src;
 a=c.vh2host;
 //return mapkeys(a).map(e=>"http://"+c.vh2host[e]+"/wmlogs.all.txt.tgz").join("\n");
 resp_off();
