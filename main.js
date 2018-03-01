@@ -568,6 +568,14 @@ var requestListener=(request,response)=>{
           fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
         };
+        var jstable_right=arr=>{
+          resp_off();
+          var right=s=>s.split('<tbody>').join('<tbody align="right">');
+          var safe_json=obj=>json(obj).split("/").join("\\/");
+          var cb=data=>html(right(data).split("</body>").join("<script>document.title+='("+g_conf_info.vhost+")';draw("+safe_json(arr)+");</script></body>"));
+          fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
+          return;
+        }
         var yt_title=s=>{
           response.off();
           var safe_json=obj=>json(obj).split("/").join("\\/");
