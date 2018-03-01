@@ -575,7 +575,7 @@ var requestListener=(request,response)=>{
       var req_handler=()=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{},off:()=>{}};
         var resp_off=()=>{response.off();}
-        var safe_promise_all_to=(err_cb,arr)=>Promise.all(arr).catch(err=>err_cb(qap_err('Promise.all',err)));
+        var safe_promise_all_to=(err_cb,arr)=>Promise.all(arr).catch(err=>err_cb(qap_err('safe_promise_all',err)));
         var safe_promise_all=arr=>safe_promise_all_to(txt,arr);
         var jstable=arr=>{
           resp_off();
