@@ -7,11 +7,18 @@ if('jstable_right' in qp)out_func=arr=>jstable_right(arr);
 if('json' in qp)out_func=arr=>txt(json(arr));
 var path='/ll';
 if('path' in qp)path=qp.path;
-Promise.all(
-  mapkeys(a).map(e=>"http://"+c.vh2host[e]+"/ll").map(e=>axhr_get(e))
+var axhr_get=(url,ud)=>{
+  return new Promise((ok,err)=>xhr_get(url,
+    s=>ok((typeof ud)==="undefined"?s:{ud:ud,data:s}),
+    s=>err(new Error('axhr_get::'+inspect({url:url,userdata:ud,body:s})))
+  ));
+}
+
+        var safe_promise_all_to=(err_cb,arr)=>Promise.all(arr).catch(err=>err_cb(qap_err('Promise.all',err)));
+        var safe_promise_all=arr=>safe_promise_all_to(txt,arr);
+safe_promise_all(
   mapkeys(a).map(e=>
-    axhr_get("http://"+c.vh2host[e]+path+'&unixtime='+unixtime(),{vhost:e,host:c.vh2host[e],bef_ms:get_ms()}).
+    axhr_get("http://"+c.vh2host[e]+path,{vhost:e,host:c.vh2host[e],bef_ms:get_ms()}).
     then(e=>mapaddfront(e,{ms:get_ms()-e.ud.bef_ms}))
   )
-).then(arr=>jstable(arr.map(e=>{return {vhost:e.ud.vhost,data:e.data}})))
- .catch(err=>txt('promise.all failed with: '+inspect(err)));
+).then(arr=>jstable(arr.map(e=>{return {vhost:e.ud.vhost,ms:e.ms.toFixed(3),data:e.data}})));
