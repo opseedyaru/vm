@@ -27,7 +27,7 @@ var code=(
     var resp=response;
     add(0,add,()=>{
       out.end();
-      exec_with_stream('tar -czvf wmlogs.all.txt.tgz wmlogs.all.txt;ls -lh',resp);
+      exec_with_stream('gzip wmlogs.all.txt;ls -lh',resp);
     });
     return resp_off();
     if(false)exec_with_stream('cat wmlogs/*.*>wmlogs.all.txt;tar -czvf wmlogs.all.txt.tgz wmlogs.all.txt;ls -l',response);

@@ -18,23 +18,26 @@ if(need_make_tmp30txt){
 */
 
 var pf=parseFloat;var div_with_dir=(dir,a,b)=>!dir?a/b:b/a;
-var g=(e,dir)=>div_with_dir(1,pf(e.amountout),pf(e.amountin));
+var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
 
-var points=[];
-var p=split_reader('wmlog.vm30.txt','}{',s=>{
-  //if(s==="{")return;
-  //if(s==="{}")return;
+var points=[];var points2=[];
+var p=split_reader('wmlog.vm30.txt','\n',s=>{
+  if(s==="")return;
   try{
-    var e=JSON.parse(s)[2][0];
+    var e1=JSON.parse(s)[1][0];
+    var e2=JSON.parse(s)[2][0];
   }catch(err){
     qap_log(qap_err('split_reader.cb.'+points.length+'\n/* s ------> ------> ------> */\n'+s+'\n/* <------ <------ <------ s */',err));
     return;
   }
-  e=g(e);
-  points.push({x:points.length,y:e});
+  e1=g(e1,0);
+  e2=g(e2,1);
+  points.push({x:points.length,y:e1});
+  points2.push({x:points.length,y:e2});
 },()=>{
   var data=[
-    {type:"line",dataPoints:points}
+    {type:"line",color:"#F08080",dataPoints:points},
+    {type:"line",dataPoints:points2},
   ];
   var out=json(data);
   html(POST.data.split("@@@").join("var data="+out));
