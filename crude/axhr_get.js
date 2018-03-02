@@ -13,9 +13,14 @@ var code=(
     }
     fs.readdirSync('wmlogs').map(fn=>'wmlogs/'+fn).map(check);
     fs.writeFileSync('trash.txt',json(trash));
+    response.write(inspect(trash)+get_ms()+'\n');
     exec_with_stream('cat wmlogs/*.*>wmlogs.all.txt;tar -czvf wmlogs.all.txt.tgz wmlogs.all.txt;ls -l',response);
+    //exec_with_stream("ls -lh wmtmp;exit;cd ./wmtmp/;\n"+mapkeys(c.wm_ids_src).map(e=>"tar -xzvf "+e+'.tgz;mv wmlogs.all.txt wmlog.'+e+'.txt').join(";\n")+";ls -l",response);return resp_off();
+
+    //exec_with_stream("mkdir wmtmp;\n"+mapkeys(c.wm_ids_src).map(e=>"curl http://"+c.vh2host[e]+path+">./wmtmp/"+e+'.tgz').join(";\n")+";\necho done");    return resp_off();
+
+    //exec_with_stream('unlink wmlogs.all.txt;echo done',response);
     return resp_off();
-    return txt(inspect(trash)+get_ms()+'');
   }).toString().split("\n").slice(1,-1).join("\n")
 );
 var path="/eval?&nolog";
