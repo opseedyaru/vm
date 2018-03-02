@@ -240,7 +240,7 @@ var axhr_get=(url,ud)=>{
 var axhr_post=(url,obj,ud)=>{
   return new Promise((ok,err)=>xhr_post(url,obj,
     s=>ok((typeof ud)==="undefined"?s:{obj:obj,ud:ud,data:s}),
-    s=>err(new Error('axhr_get::'+inspect({obj:obj,url:url,userdata:ud,response_body:s})))
+    s=>err(new Error('axhr_post::'+inspect({obj:obj,url:url,userdata:ud,response_body:s})))
   ));
 }
 
