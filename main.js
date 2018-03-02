@@ -97,6 +97,12 @@ function getDateTime() {
   return dateTime;
 }
 
+var parse_wmdatetime=s=>{
+  var t=s.split(' ');var ymd=t[0].split('.').reverse();var hms=t[1].split(':');
+  return new Date(ymd[0],ymd[1],ymd[2],hms[0],hms[1],hms[2]);
+}
+//parse_wmdatetime("28.02.2018 18:42:43");
+
 var emitter_on_data_decoder=(emitter,cb)=>{
   var rd=Buffer.from([]);
   var err=qap_log;
