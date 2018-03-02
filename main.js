@@ -554,6 +554,7 @@ var requestListener=(request,response)=>{
         return p;
       }
       var exec_with_stream=(cmd,stream,cb)=>{
+        if(!('write' in stream))throw Error('exec_with_stream.stream is not stream, wtf?');
         var to_stream=s=>stream.write(s);
         var p=spawn('bash',[]);
         p.stdin.end(cmd+"\n");
