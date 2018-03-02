@@ -20,6 +20,7 @@ if(need_make_tmp30txt){
 var pf=parseFloat;var div_with_dir=(dir,a,b)=>!dir?a/b:b/a;
 var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
 
+// curl http://vm30-vm30.193b.starter-ca-central-1.openshiftapps.com/wmlogs.all.txt.gz|gzip -d>wmlog.vm30.txt
 var points=[];var points2=[];
 var p=split_reader('wmlog.vm30.txt','\n',s=>{
   if(s==="")return;
@@ -36,8 +37,8 @@ var p=split_reader('wmlog.vm30.txt','\n',s=>{
   points2.push({x:points.length,y:e2});
 },()=>{
   var data=[
-    {type:"line",color:"#F08080",dataPoints:points},
-    {type:"line",dataPoints:points2},
+    {name:"WMZ",type:"line",color:"#F08080",dataPoints:points},
+    {name:"WMR",type:"line",dataPoints:points2},
   ];
   var out=json(data);
   html(POST.data.split("@@@").join("var data="+out));

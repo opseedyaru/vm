@@ -8,13 +8,25 @@ var chart = new CanvasJS.Chart("chartContainer", {
 	animationEnabled: true*0,
 	zoomEnabled: true,//zoomType:'xy',
 	title:{
-		text: "Try Zooming and Panning" 
+		text: "nope" 
+	},
+	theme: "light2",
+
+	toolTip:{
+		shared:1
+	},  
+	legend:{
+		cursor:"pointer",
+		verticalAlign: "bottom",
+		horizontalAlign: "left",
+		dockInsidePlotArea: true,
+		itemclick: toogleDataSeries
 	},
   axisX:{
-     title: "axisX Title"
+    title: "time"
   },
 	axisY :{
-       title: "axisX Title",
+    title: "rate",
 		includeZero:false
 	},
 	data: data  // random generator below
@@ -24,7 +36,14 @@ chart.render();
 }
 
 @@@           
-
+function toogleDataSeries(e){
+	if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+		e.dataSeries.visible = false;
+	} else{
+		e.dataSeries.visible = true;
+	}
+	chart.render();
+}
 </script>
 <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script></head>
 <body>
