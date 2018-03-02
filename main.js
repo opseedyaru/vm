@@ -553,8 +553,10 @@ var requestListener=(request,response)=>{
         p.on('exit',()=>cb(out));
         return p;
       }
+      var isObject=a=>!!a&&a.constructor===Object;
       var exec_with_stream=(cmd,stream,cb)=>{
-        if(!('write' in stream))throw Error('exec_with_stream.stream is not stream, wtf?');
+        if(typeof stream!=='object')throw Error('no way. // atm "typeof stream" = '+(typeof stream));
+        if(typeof stream.write!=='function')throw Error('no way. // atm "typeof stream.write" = '+(typeof stream.write));
         var to_stream=s=>stream.write(s);
         var p=spawn('bash',[]);
         p.stdin.end(cmd+"\n");
