@@ -24,20 +24,28 @@ var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
 var points=[];var points2=[];
 var p=split_reader('wmlog.vm30.txt','\n',s=>{
   if(s==="")return;
-  try{
-    var e1=JSON.parse(s)[1][0];
-    var e2=JSON.parse(s)[2][0];
+  try{//34 WMX->WMZ //38 WMX->WMR //1 WMZ->WMR
+    var t=JSON.parse(s);
+    //WMZ->WMX->WMR->WMZ
+    //34->37->1
+    var a=[34,37,1].map(e=>g(t[e|0][0],0));
+    var b=[2,38,33].map(e=>g(t[e|0][0],0));
+    var e1=t[38][0];
+    var e2=t[37][0];
   }catch(err){
     qap_log(qap_err('split_reader.cb.'+points.length+'\n/* s ------> ------> ------> */\n'+s+'\n/* <------ <------ <------ s */',err));
     return;
   }
-  e1=g(e1,0);
-  e2=g(e2,1);
+  var f=x=>x-x*0.0025;
+  e1=f(f(f(100)*a[0])*a[1])*a[2];
+  e2=f(f(f(100)*b[0])*b[1])*b[2];
+  //e1=g(e1,0);
+  //e2=g(e2,1);
   points.push({x:points.length,y:e1});
-  points2.push({x:points.length,y:e2});
+  points2.push({x:points2.length,y:e2});
 },()=>{
   var data=[
-    {name:"WMZ",type:"line",color:"#F08080",dataPoints:points},
+    {name:"WMX",type:"line",color:"#F08080",dataPoints:points},
     {name:"WMR",type:"line",dataPoints:points2},
   ];
   var out=json(data);
