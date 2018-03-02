@@ -1,16 +1,6 @@
 let path='/wmlogs.all.txt.tgz';var c=g_conf_info;
 var bef=get_ms();
 
-var split_reader=(fn,sep,cb,end)=>{
-  if((typeof sep)!=typeof '')sep="\n";
-  if((typeof cb)!='function')throw Error('no way. // wrong callback');
-  if((typeof end)!='function')end=()=>{};
-  var buff='';
-  fs.createReadStream(fn,'binary').on('data',s=>{
-    var arr=(buff+s).split(sep);buff=arr.pop();arr.map(cb);
-  }).on('end',s=>{if(buff.length)cb(buff);end();})
-}
-
 //var out=fs.readFileSync("wmlog.vm30.txt").toString().split('}{').join("}\n{")
 
 var fn="wmlog.vm30.txt";
@@ -35,9 +25,13 @@ var g=(e,dir)=>//{return {qd:parse_wmdatetime(e.querydate)|1,y:
   //}};
 ;
 //return jstable(JSON.parse(fs.readFileSync('tmp.txt').toString().split("\n")[4803])['1']);//7989
-var points=[];(
-  fs.readFileSync('tmp30.txt','binary').split("\n")/*.slice(0,128)*/.map(e=>JSON.parse(e)[2][0]).map(e=>g(e)).map((e,i)=>points.push({x:i,y:e}))
-);
+var points=[];
+split_reader('tmp30.txt','\n',s=>{
+  var e=JSON.parse(s)[2][0];
+  e=g(e);
+  points.push({x:points.length,y:e});
+})
+//fs.readFileSync('tmp30.txt','binary').split("\n")/*.slice(0,128)*/.map(e=>JSON.parse(e)[2][0]).map(e=>g(e)).map((e,i)=>points.push({x:i,y:e}))
 
 var limit = 100+0*10000;
 var y = 0;var f=0;

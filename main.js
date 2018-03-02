@@ -252,6 +252,17 @@ var axhr_post=(url,obj,ud)=>{
   ));
 }
 
+var split_stream=(stream,sep,cb,end)=>{
+  if((typeof sep)!=typeof '')sep="\n";
+  if((typeof cb)!='function')throw Error('no way. // wrong callback');
+  if((typeof end)!='function')end=()=>{};
+  var buff='';
+  stream.on('data',s=>{
+    var arr=(buff+s).split(sep);buff=arr.pop();arr.map(cb);
+  }).on('end',s=>{if(buff.length)cb(buff);end();})
+}
+var split_reader=(fn,sep,cb,end)=>split_stream(fs.createReadStream(fn,'binary'),sep,cb,end);
+
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
 
 var hosts_update=hosts=>{
