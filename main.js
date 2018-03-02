@@ -197,10 +197,11 @@ var xhr_get=(url,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
   var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
-    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+    var cb=ok;
+    if(res.statusCode!==200){cb=(s,res)=>err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);}
     //res.setEncoding('utf8');
-    var rawData='';res.on('data',(chunk)=>rawData+=chunk);
-    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
+    var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
+    res.on('end',()=>{try{cb(rawData,res);}catch(e){err(qap_err('xhr_get.mega_huge_error',e),res);}});
   });
   call_cb_on_err(req,qap_log,'xhr_get');
   return req;
@@ -215,10 +216,11 @@ var xhr=(method,URL,data,ok,err)=>{
     headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
   var req=(secure?https:http).request(options,(res)=>{
-    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+    var cb=ok;
+    if(res.statusCode!==200){cb=(s,res)=>err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
-    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
+    res.on('end',()=>{try{cb(rawData,res);}catch(e){err(qap_err('xhr.mega_huge_error',e),res);}});
   });
   call_cb_on_err(req,qap_log,'xhr');
   req.end(data);
