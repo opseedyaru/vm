@@ -918,17 +918,18 @@ var requestListener=(request,response)=>{
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
         var eval_impl=()=>{
+          var eval_impl_response=response;
           try{
             var system_tmp=eval("()=>{"+POST['code']+"\n;return '';}");
             system_tmp=system_tmp();
             if(response){
-              response.writeHead(200, {"Content-Type": "text/plain"});
+              response.writeHead(200,{"Content-Type": "text/plain"});
               response.end(system_tmp);
               return;
             }
           }catch(err){
-            response.writeHead(500,{"Content-Type":"text/plain"});
-            response.end(qap_err('/eval.POST.code',err));
+            eval_impl_response.writeHead(500,{"Content-Type":"text/plain"});
+            eval_impl_response.end(qap_err(uri+'.code',err));
             return;
           }
         };
