@@ -6,8 +6,13 @@ var d=s=>parseFloat(s.split(",").join("."));
 var div=(a,b)=>d(a)/d(b);
 var out_in=(out,e)=>{out['out/in']=div(e.amountout,e.amountin).toFixed(3)};
 var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
-
-var ids=('profit' in qp)?'1,2,33,34,37,38':'1,2';
+if(uri==='/eval')qp.profit=1;
+var white_list='Z,R,X,E,B,G';
+var dir2str={
+  1:'WMZ->WMR',37:'WMR->WMX',34:'WMX->WMZ',50:'WMX->WMB',24:'WMB->WMR',29:'WMR->WMG',26:'WMG->WMZ'
+};
+mapkeys(dir2str).map(k=>k|0).map(k=>dir2str[k+(k%2==1?+1:-1)]=dir2str[k].split('->').reverse().join('->'));
+var ids=('profit' in qp)?mapkeys(dir2str).join(','):'1,2';
 if('ids' in qp){ids=qp.ids;}
 var ids_arr=ids.split(",");
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
@@ -21,13 +26,15 @@ var check_done=()=>{
     var div_with_dir=(dir,a,b)=>!dir?a/b:b/a;
     var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
     var t=tables;
-    var a=[34,37,1].map(e=>g(t[e|0][0],0));
-    var b=[2,38,33].map(e=>g(t[e|0][0],0));
+    var f=x=>x-x*0.0015;
+    var rot=(arr,reverse)=>{return (reverse?arr.unshift(arr.pop()):arr.push(arr.shift())),arr};
+    var WM='4.37';var WM=pf(WM.split(",").join("."));
+    var ad=[34,37,1];var a=ad.map(e=>g(t[e|0][0],0));var cur_v=WM;var aa=ad.map((e,i)=>[dir2str[e],a[i],t[e][0],[cur_v,cur_v/a[i],cur_v=f(cur_v)/a[i]]]);
+    var bd=[2,38,33];var b=bd.map(e=>g(t[e|0][0],0));var cur_v=WM;var bb=bd.map((e,i)=>[dir2str[e],b[i],t[e][0],[cur_v,cur_v/b[i],cur_v=f(cur_v)/b[i]]]);
 
-    var f=x=>x-x*0.0025;
-    e1=f(f(f(100)*a[0])*a[1])*a[2];
-    e2=f(f(f(100)*b[0])*b[1])*b[2];
-    return txt(inspect({'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2}));
+    e1=f(f(f(100)/a[0])/a[1])/a[2];
+    e2=f(f(f(100)/b[0])/b[1])/b[2];
+    return txt(inspect({'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2,a:aa,b:bb}));
   }
   if('json' in qp){return txt(json(tables));}
   var t1=tables[ids_arr[0]];

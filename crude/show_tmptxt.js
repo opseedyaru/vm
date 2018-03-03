@@ -20,27 +20,33 @@ if(need_make_tmp30txt){
 var pf=parseFloat;var div_with_dir=(dir,a,b)=>!dir?a/b:b/a;
 var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
 
-// curl http://vm30-vm30.193b.starter-ca-central-1.openshiftapps.com/wmlogs.all.txt.gz|gzip -d>wmlog.vm30.txt
-var points=[];var points2=[];
+// resp_off();exec_with_stream("curl http://vm30-vm30.193b.starter-ca-central-1.openshiftapps.com/wmlogs.all.txt.gz|gzip -d>wmlog.vm30.txt;ls -l",eval_impl_response);
+var points=[];var points2=[];var show_profit=true;
 var p=split_reader('wmlog.vm30.txt','\n',s=>{
   if(s==="")return;
   try{//34 WMX->WMZ //38 WMX->WMR //1 WMZ->WMR
     var t=JSON.parse(s);
     //WMZ->WMX->WMR->WMZ
     //34->37->1
-    var a=[34,37,1].map(e=>g(t[e|0][0],0));
-    var b=[2,38,33].map(e=>g(t[e|0][0],0));
-    var e1=t[38][0];
-    var e2=t[37][0];
+    if(show_profit){
+      var a=[34,37,1].map(e=>g(t[e][0],0));
+      var b=[2,38,33].map(e=>g(t[e][0],0));
+    }else{
+      var e1=t[1][0];
+      var e2=t[2][0];
+    }
   }catch(err){
     qap_log(qap_err('split_reader.cb.'+points.length+'\n/* s ------> ------> ------> */\n'+s+'\n/* <------ <------ <------ s */',err));
     return;
   }
   var f=x=>x-x*0.0025;
-  e1=f(f(f(100)*a[0])*a[1])*a[2];
-  e2=f(f(f(100)*b[0])*b[1])*b[2];
-  //e1=g(e1,0);
-  //e2=g(e2,1);
+  if(show_profit){
+    e1=f(f(f(100)/a[0])/a[1])/a[2];
+    e2=f(f(f(100)/b[0])/b[1])/b[2];
+  }else{
+    e1=g(e1,0);
+    e2=g(e2,1);
+  }
   points.push({x:points.length,y:e1});
   points2.push({x:points2.length,y:e2});
 },()=>{
