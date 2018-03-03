@@ -25,8 +25,10 @@ var ids_arr=ids.split(",");
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
 var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
 var tables={};
+var bef_ms=get_ms();
 var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
+  var load_time=get_ms()-bef_ms;
   if('profit' in qp)
   {
     var pf=parseFloat;
@@ -41,7 +43,7 @@ var check_done=()=>{
 
     e1=f(f(f(100)/a[0])/a[1])/a[2];
     e2=f(f(f(100)/b[0])/b[1])/b[2];
-    return txt(inspect({fee_koef:fee_koef,'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2,a:aa,b:bb}));
+    return txt(inspect({load_time:load_time,fee_koef:fee_koef,'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2,a:aa,b:bb}));
   }
   if('json' in qp){return txt(json(tables));}
   var t1=tables[ids_arr[0]];
@@ -72,11 +74,9 @@ var run=exchtype=>{
 }
 ids_arr.map(run);
 return;
-/*
+
 if(0)
-{
-  var getdef=(m,k,def)=>{if(!(k in m))m[k]=def;return m[k];};
-  
+{  
   var dir2wms=JSON.parse(POST.data);
   var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
 
@@ -84,10 +84,34 @@ if(0)
   qap_foreach_key(dir2wms,(obj,k,v)=>getdef(mid2info,v[0],{mid:v[0],outmid2dir:{}}).outmid2dir[v[1]]=k);
   
   var dir_from_to=(from,to)=>mid2info[from].outmid2dir[to];
+  var reverse_dir=dir=>{var wms=dir2wms[dir];return mid2info[wms[1]].outmid2dir[wms[0]]};
   var pay_fee=x=>x-x*0.0025;
-    
-  return inspect(dir_from_to('WMX','WMZ'));
-  m=qap_unique(m);
+  var paths=[
+    'WMZ->WMR->WMX->WMZ',
+    'WMZ->WMX->WMR->WMZ',
+    'WMZ->WMX->WMB->WMZ',
+    'WMZ->WMB->WMX->WMZ',
+    'WMZ->WMX->WMU->WMZ',
+    'WMZ->WMU->WMX->WMZ',
+    'WMZ->WMX->WML->WMZ',
+    'WMZ->WML->WMX->WMZ',
+    'WMZ->WMX->WMH->WMZ',
+    'WMZ->WMH->WMX->WMZ',
+    'WMZ->WMR->WMG->WMZ',
+    'WMZ->WMG->WMR->WMZ',
+  ].map(e=>e.split('->'));
+  var arr='WMZ->WMX->WMR->WMZ'.split('->');
+  var wms_path_to_buydirs=arr=>{
+    var out=[];
+    for(var i=1;i<arr.length;i++){
+      var prev=arr[i-1];
+      var cur=arr[i-0];
+      out.push(dir_from_to(cur,prev));// reverse direction because we need buydirs
+    }
+    return out;
+  };
+  return inspect(paths.map(arr=>wms_path_to_buydirs(arr)));
+  /*m=qap_unique(m);
 
   t_world{
     mid;
@@ -100,7 +124,7 @@ if(0)
       w.amount=pay_fee(w.amount)*rate[reverse_dir(dir)];
       w.mid=dir2wms[dir][1];
     }
-  }
+  }*/
 
   return txt(inspect(m));
 }
@@ -108,7 +132,7 @@ if(0)
 
 
 
-*/
+
 
 
 

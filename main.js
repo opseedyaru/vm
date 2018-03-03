@@ -67,6 +67,8 @@ var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
 var getdef=(m,k,def)=>{if(!(k in m))m[k]=def;return m[k];};
 
+var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
+
 var json_once=(obj,replacer,indent,limit)=>{
   var objs=[];var keys=[];if(typeof(limit)=='undefined')limit=2048;
   return json(obj,(key,v)=>{
