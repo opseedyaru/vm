@@ -65,6 +65,7 @@ var mapclone=obj=>mapaddfront(obj,{});
 
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
+var getdef=(m,k,def)=>{if(!(k in m))m[k]=def;return m[k];};
 
 var json_once=(obj,replacer,indent,limit)=>{
   var objs=[];var keys=[];if(typeof(limit)=='undefined')limit=2048;
