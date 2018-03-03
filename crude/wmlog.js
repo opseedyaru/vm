@@ -23,7 +23,7 @@ var ids=('profit' in qp)?mapkeys(dir2str).join(','):'1,2';
 if('ids' in qp){ids=qp.ids;}
 var ids_arr=ids.split(",");
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
-var fee_koef=('fee' in qp)?parseFloat(qp.fee):0.0025;
+var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
 var tables={};
 var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
@@ -41,7 +41,7 @@ var check_done=()=>{
 
     e1=f(f(f(100)/a[0])/a[1])/a[2];
     e2=f(f(f(100)/b[0])/b[1])/b[2];
-    return txt(inspect({{fee_koef:fee_koef},'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2,a:aa,b:bb}));
+    return txt(inspect({fee_koef:fee_koef,'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2,a:aa,b:bb}));
   }
   if('json' in qp){return txt(json(tables));}
   var t1=tables[ids_arr[0]];
