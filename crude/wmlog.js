@@ -9,13 +9,13 @@ var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 //qp.json=1;
 if(uri==='/eval')qp.profit=1;
 var white_list='Z,R,X,E,B,G';
-if('profit' in qp){
+if(uri==='/eval'||'full' in qp){
   var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
   var dir2wms=JSON.parse(POST.data);
   var dir2str=qap_foreach_key(dir2wms,(obj,k,v)=>{obj[k]=v.join('->');});//return txt(inspect(dir2str));
 }else{
   var dir2str={
-    1:'WMZ->WMR',37:'WMR->WMX',34:'WMX->WMZ',50:'WMX->WMB',24:'WMB->WMR',29:'WMR->WMG',26:'WMG->WMZ'
+    1:'WMZ->WMR',37:'WMR->WMX',34:'WMX->WMZ'//,50:'WMX->WMB',24:'WMB->WMR',29:'WMR->WMG',26:'WMG->WMZ'
   };
   mapkeys(dir2str).map(k=>k|0).map(k=>dir2str[k+(k%2==1?+1:-1)]=dir2str[k].split('->').reverse().join('->'));
 }
