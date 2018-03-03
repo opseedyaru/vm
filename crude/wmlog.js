@@ -7,7 +7,7 @@ var div=(a,b)=>d(a)/d(b);
 var out_in=(out,e)=>{out['out/in']=div(e.amountout,e.amountin).toFixed(3)};
 var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 
-var ids='1,2';
+var ids=('profit' in qp)?'1,2,33,34,37,38':'1,2';
 if('ids' in qp){ids=qp.ids;}
 var ids_arr=ids.split(",");
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
@@ -15,6 +15,20 @@ var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
 var tables={};
 var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
+  if('profit' in qp)
+  {
+    var pf=parseFloat;
+    var div_with_dir=(dir,a,b)=>!dir?a/b:b/a;
+    var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
+    var t=tables;
+    var a=[34,37,1].map(e=>g(t[e|0][0],0));
+    var b=[2,38,33].map(e=>g(t[e|0][0],0));
+
+    var f=x=>x-x*0.0025;
+    e1=f(f(f(100)*a[0])*a[1])*a[2];
+    e2=f(f(f(100)*b[0])*b[1])*b[2];
+    return txt(inspect({'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2}));
+  }
   if('json' in qp){return txt(json(tables));}
   var t1=tables[ids_arr[0]];
   if(ids_arr.length==1)return jstable(t1);
