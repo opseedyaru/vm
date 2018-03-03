@@ -23,7 +23,7 @@ var ids=('profit' in qp)?mapkeys(dir2str).join(','):'1,2';
 if('ids' in qp){ids=qp.ids;}
 var ids_arr=ids.split(",");
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
-var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
+var fee_koef=('fee' in qp)?parseFloat(qp.fee):0.0025;
 var tables={};
 var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
