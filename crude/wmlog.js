@@ -75,7 +75,7 @@ var check_done=()=>{
       if(!t[k].length)bullshits.push(k);
     }
     if(bullshits.length)txt(inspect(bullshits));
-    var WM='wm' in qp?'100':qp.wm;var WM=pf(WM.split(",").join("."));
+    var WM='wm' in qp?qp.wm:'100';var WM=pf(WM.split(",").join("."));
     var paths=[];
     if('any' in qp){
       WM=100;
