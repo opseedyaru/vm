@@ -50,10 +50,10 @@ var div=(a,b)=>d(a)/d(b);
 var out_in=(out,e)=>{out['out/in']=div(e.amountout,e.amountin).toFixed(3)};
 var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 //qp.json=1;
-if(uri==='/eval')qp.profit=1;
+//if(uri==='/eval')qp.profit=1;
 var white_list='Z,R,X,E,B,G';
 if(uri==='/eval'||'full' in qp){
-  let dir2wms=JSON.parse(POST.data);
+  //let dir2wms=JSON.parse(POST.data);
   var dir2str=qap_foreach_key(dir2wms,(obj,k,v)=>{obj[k]=v.join('->');});//return txt(inspect(dir2str));
 }else{
   var dir2str={
@@ -70,6 +70,7 @@ var tables={};
 var bef_ms=get_ms();
 var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
+  //return txt(inspect([mapkeys(tables).length,ids_arr.length,ids_arr,tables]));
   var load_time=get_ms()-bef_ms;
   if('profit' in qp)
   {
@@ -134,6 +135,7 @@ var check_done=()=>{
     return txt(txtout);
   }
   if('json' in qp){return txt(json(tables));}
+  //return txt("debug:\n"+json(tables));
   var t1=tables[ids_arr[0]];
   if(ids_arr.length==1)return jstable_right(t1);
   if(ids_arr.length==2)
@@ -151,14 +153,20 @@ var check_done=()=>{
 var run=exchtype=>{
   var insert_special_field=exchtype%2==type2dir(exchtype)?out_in:in_out;
   var ok=xml=>{
-    var g=obj=>{tables[exchtype]=obj;check_done();};//0?(obj=>txt(inspect(obj))):obj=>jstable(obj);
+    var g=obj=>{tables[exchtype]=obj;check_done(obj);};//0?(obj=>txt(inspect(obj))):obj=>jstable(obj);
     var pretty=s=>s;
     var select=(e,arr)=>{var out={};arr.split(',').map((k,i)=>out[k]=(i==2||i==3)?pretty(d(e[k]).toFixed(2)):e[k]);insert_special_field(out,e);return out;};
-    var f=obj=>obj["wm.exchanger.response"]["WMExchnagerQuerys"][0].query.map(e=>e['$']).map(e=>select(e,'id,querydate,amountin,amountout'));
+    var f=obj=>{
+      var wer=obj["wm.exchanger.response"];
+      if(!'WMExchnagerQuerys' in wer){txt(inspect(['error in wm.exchanger.response for ',obj]));}
+      wer_weq=wer.WMExchnagerQuerys;
+      if(!'0' in wer_weq){txt(inspect(['error in wm.exchanger.response.WMExchnagerQuerys for ',obj]));}
+      return wer_weq[0].query.map(e=>e['$']).map(e=>select(e,'id,querydate,amountin,amountout'));
+    }
     var cb=(err,obj)=>g(f(obj));
     return xml2js.parseString(xml,cb);
   }
-  return xhr_get("https://wmeng.exchanger.ru/asp/XMLWMList.asp?exchtype="+exchtype,ok,txt);
+  return xhr_get("https:/"+"/wmeng.exchanger.ru/asp/XMLWMList.asp?exchtype="+exchtype,ok,txt);
 }
 ids_arr.map(run);
 return;
