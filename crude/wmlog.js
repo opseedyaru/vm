@@ -1,6 +1,49 @@
 //return parseFloat('1.2')+"";
 var r=response;
 resp_off();
+//---
+  var dir2wms=JSON.parse(POST.data);
+  var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
+
+  var mid2info={};//money_id_to_info
+  qap_foreach_key(dir2wms,(obj,k,v)=>getdef(mid2info,v[0],{mid:v[0],outmid2dir:{}}).outmid2dir[v[1]]=k);
+  
+  var dir_from_to=(from,to)=>{
+    if(!(from in mid2info))txt(qap_err("field 'from' - not found",new Error(inspect({from:from,to:to,mid2info}))));
+    return mid2info[from].outmid2dir[to];
+  }
+  var reverse_dir=dir=>{var wms=dir2wms[dir];return mid2info[wms[1]].outmid2dir[wms[0]]};
+  var pay_fee=x=>x-x*0.0025;
+
+  var wms_path_to_buydirs=arr=>{
+    var out=[];
+    for(var i=1;i<arr.length;i++){
+      var prev=arr[i-1];
+      var cur=arr[i-0];
+      out.push(dir_from_to(cur,prev));// reverse direction because we need buydirs
+    }
+    return out;
+  };
+  var gen_paths=(from,to,levels)=>{
+    var clone=w=>w.slice();
+    var wm_arr=mapkeys(mid2info).filter(e=>!'WMB'.split(',').includes(e));
+    var out=[];
+    var arr=wm_arr.filter(e=>e!=from);
+    var way=[from];
+    var func=(way,arr,LVL)=>{
+      if(!LVL)return out.push(way);
+      arr.map(mid=>{
+        var next=clone(way);next.push(mid);
+        func(next,wm_arr.filter(e=>e!=mid),LVL-1);
+      });
+    };
+    for(var i=1;i<=levels;i++)func([from],arr,i);
+    out.filter(e=>e[e.length-1]!=to).map(e=>e.push(to));
+    return out.map(e=>e.join("->"));
+  };
+  //return txt(inspect(paths));
+  //return inspect(paths);
+//---
 var xml2js=hack_require('xml2js');if(!xml2js)return;
 var d=s=>parseFloat(s.split(",").join("."));
 var div=(a,b)=>d(a)/d(b);
@@ -10,8 +53,7 @@ var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 if(uri==='/eval')qp.profit=1;
 var white_list='Z,R,X,E,B,G';
 if(uri==='/eval'||'full' in qp){
-  var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
-  var dir2wms=JSON.parse(POST.data);
+  let dir2wms=JSON.parse(POST.data);
   var dir2str=qap_foreach_key(dir2wms,(obj,k,v)=>{obj[k]=v.join('->');});//return txt(inspect(dir2str));
 }else{
   var dir2str={
@@ -35,15 +77,61 @@ var check_done=()=>{
     var div_with_dir=(dir,a,b)=>!dir?a/b:b/a;
     var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
     var t=tables;
+    fs.writeFileSync("wm_tables.txt",json(tables));
+    var bullshits=[];
+    for(var k in t){
+      if(!t[k].length)bullshits.push(k);
+    }
+    if(bullshits.length)txt(inspect(bullshits));
     var f=x=>x-x*fee_koef;
     var rot=(arr,reverse)=>{return (reverse?arr.unshift(arr.pop()):arr.push(arr.shift())),arr};
-    var WM='4.37';var WM=pf(WM.split(",").join("."));
-    var ad=[34,37,1];var a=ad.map(e=>g(t[e|0][0],0));var cur_v=WM;var aa=ad.map((e,i)=>[dir2str[e],a[i],t[e][0],[cur_v,cur_v/a[i],cur_v=f(cur_v)/a[i]]]);
-    var bd=[2,38,33];var b=bd.map(e=>g(t[e|0][0],0));var cur_v=WM;var bb=bd.map((e,i)=>[dir2str[e],b[i],t[e][0],[cur_v,cur_v/b[i],cur_v=f(cur_v)/b[i]]]);
-
-    e1=f(f(f(100)/a[0])/a[1])/a[2];
-    e2=f(f(f(100)/b[0])/b[1])/b[2];
-    return txt(inspect({load_time:load_time,fee_koef:fee_koef,'WMZ->WMX->WMR->WMZ':e1,'WMZ->WMR->WMX->WMZ':e2,a:aa,b:bb}));
+    var inp100=100;
+    var WM=0?'100':'0.39';var WM=pf(WM.split(",").join("."));
+    var out={WM:WM,load_time:load_time,fee_koef:fee_koef,paths_info:{},paths:[],};
+    
+    var paths=gen_paths('WMX','WMZ',5).map(e=>e.split('->'));
+    /*var paths=[];
+    mapkeys(mid2info)
+      .filter(e=>!'WMB'.split(',')
+      .includes(e))
+      .map(mid=>paths=paths.concat(gen_paths(mid,mid,4).map(e=>e.split('->'))));*/
+    //var wmout=fs.createWriteStream('wmout.txt');
+    //var path_index=0;
+    paths.map(path=>{//path_index++;
+      var buydirs=wms_path_to_buydirs(path);
+      buydirs.map(e=>{
+        if(!(e in t))txt(inspect(["WTH?",path,e,buydirs,t]));
+        var tmp=t[e];
+        if(!(0 in tmp))txt(inspect(['hm.hm...',path]));
+      });
+      var rates=buydirs.map(e=>g(t[e][0],0));
+      var arr=[];
+      var add=inp=>{
+        var cur_v=inp;
+        var log=buydirs.map((e,i)=>[dir2str[e],[rates[i],1/rates[i]],t[e][0],[cur_v,cur_v/rates[i],cur_v=f(cur_v)/rates[i]]]);
+        arr.push({inp:inp,out:cur_v,log:log});
+      }
+      add(WM);
+      //add(inp100);
+      out.paths.push({path:path.join("->"),arr:arr});
+      /*if(path_index%130==0){
+        qapsort(out.paths,e=>e.arr[0].out);
+        out.paths.length=128;
+      }*/
+      //var rec=json({path:path.join("->"),arr:arr})+"\n";
+      //wmout.write(rec);
+      //eval_impl_response.write(rec);
+    });
+    //wmout.end();
+    //return;
+    //qapsort(out.paths,e=>e.arr[0].out).slice(0,128).map(e=>out.paths_info[e.path]=e.arr[1].out+" %     // or out = "+e.arr[0].out);
+    qapsort(out.paths,e=>e.arr[0].out).slice(0,128).map(e=>out.paths_info[e.path]=e.arr[0].out);
+    out.paths=out.paths.slice(0,16).map(e=>e.arr.map(e=>{
+      e.log.map(e=>{e[2]=mapclone(e[2]);return e;});
+      return e;
+    }));
+    var txtout=inspect(out);fs.writeFileSync("wm.txt",txtout);
+    return txt(txtout);
   }
   if('json' in qp){return txt(json(tables));}
   var t1=tables[ids_arr[0]];
@@ -86,6 +174,16 @@ if(0)
   var dir_from_to=(from,to)=>mid2info[from].outmid2dir[to];
   var reverse_dir=dir=>{var wms=dir2wms[dir];return mid2info[wms[1]].outmid2dir[wms[0]]};
   var pay_fee=x=>x-x*0.0025;
+
+  var wms_path_to_buydirs=arr=>{
+    var out=[];
+    for(var i=1;i<arr.length;i++){
+      var prev=arr[i-1];
+      var cur=arr[i-0];
+      out.push(dir_from_to(cur,prev));// reverse direction because we need buydirs
+    }
+    return out;
+  };
   var paths=[
     'WMZ->WMR->WMX->WMZ',
     'WMZ->WMX->WMR->WMZ',
@@ -99,18 +197,8 @@ if(0)
     'WMZ->WMH->WMX->WMZ',
     'WMZ->WMR->WMG->WMZ',
     'WMZ->WMG->WMR->WMZ',
-  ].map(e=>e.split('->'));
-  var arr='WMZ->WMX->WMR->WMZ'.split('->');
-  var wms_path_to_buydirs=arr=>{
-    var out=[];
-    for(var i=1;i<arr.length;i++){
-      var prev=arr[i-1];
-      var cur=arr[i-0];
-      out.push(dir_from_to(cur,prev));// reverse direction because we need buydirs
-    }
-    return out;
-  };
-  return inspect(paths.map(arr=>wms_path_to_buydirs(arr)));
+  ].map(e=>e.split('->')).map(arr=>wms_path_to_buydirs(arr));
+  return inspect(paths);
   /*m=qap_unique(m);
 
   t_world{

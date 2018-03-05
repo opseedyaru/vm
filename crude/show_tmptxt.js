@@ -21,7 +21,7 @@ var pf=parseFloat;var div_with_dir=(dir,a,b)=>!dir?a/b:b/a;
 var g=(e,dir)=>div_with_dir(dir,pf(e.amountout),pf(e.amountin));
 
 // resp_off();exec_with_stream("curl http://vm30-vm30.193b.starter-ca-central-1.openshiftapps.com/wmlogs.all.txt.gz|gzip -d>wmlog.vm30.txt;ls -l",eval_impl_response);
-var points=[];var points2=[];var show_profit=true;
+var points=[];var points2=[];var show_profit=0;
 var p=split_reader('wmlog.vm30.txt','\n',s=>{
   if(s==="")return;
   try{//34 WMX->WMZ //38 WMX->WMR //1 WMZ->WMR
@@ -55,7 +55,7 @@ var p=split_reader('wmlog.vm30.txt','\n',s=>{
     {name:"WMR",type:"line",dataPoints:points2},
   ];
   var out=json(data);
-  html(POST.data.split("@@@").join("var data="+out));
+  html(fs.readFileSync('canvasjs.html','binary').split("@@@").join("var data="+out));
 });
 return resp_off();;
 
