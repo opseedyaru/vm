@@ -317,6 +317,8 @@ var g_conf_info=((()=>{
   var vh2host=mapswap(host2vh);
   var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host,last_request_host:"empty"};
   out.wm_ids_src={"os3":"1,2","vm10":"34,33","vm20":"37,38","vm30":"1,2,33,34,37,38"};
+  var all=(beg,end)=>{var arr=[];for(var i=beg;i<=end;i++)arr.push(i);return arr.join(",");};
+  out.wm_ids_src.ae=all(1,160);
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
   out.set_vhost_from_host=host=>{
     out.vhost=host2vh[host];
