@@ -13,7 +13,6 @@ resp_off();
     return mid2info[from].outmid2dir[to];
   }
   var reverse_dir=dir=>{var wms=dir2wms[dir];return mid2info[wms[1]].outmid2dir[wms[0]]};
-  var pay_fee=x=>x-x*0.0025;
 
   var wms_path_to_buydirs=arr=>{
     var out=[];
@@ -49,23 +48,15 @@ var d=s=>parseFloat(s.split(",").join("."));
 var div=(a,b)=>d(a)/d(b);
 var out_in=(out,e)=>{out['out/in']=div(e.amountout,e.amountin).toFixed(3)};
 var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
-//qp.json=1;
+//qp.json=1;qp.profit=1;
 //if(uri==='/eval')qp.profit=1;
-var white_list='Z,R,X,E,B,G';
-if(uri==='/eval'||'full' in qp){
-  //let dir2wms=JSON.parse(POST.data);
-  var dir2str=qap_foreach_key(dir2wms,(obj,k,v)=>{obj[k]=v.join('->');});//return txt(inspect(dir2str));
-}else{
-  var dir2str={
-    1:'WMZ->WMR',37:'WMR->WMX',34:'WMX->WMZ'//,50:'WMX->WMB',24:'WMB->WMR',29:'WMR->WMG',26:'WMG->WMZ'
-  };
-  mapkeys(dir2str).map(k=>k|0).map(k=>dir2str[k+(k%2==1?+1:-1)]=dir2str[k].split('->').reverse().join('->'));
-}
+var dir2str=qap_foreach_key(dir2wms,(obj,k,v)=>{obj[k]=v.join('->');});//return txt(inspect(dir2str));
 var ids=('profit' in qp)?mapkeys(dir2str).join(','):'1,2';
 if('ids' in qp){ids=qp.ids;}
 var ids_arr=ids.split(",");
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
 var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
+var pay_fee=x=>x-x*fee_koef;
 var tables={};
 var bef_ms=get_ms();
 var check_done=()=>{
@@ -84,18 +75,20 @@ var check_done=()=>{
       if(!t[k].length)bullshits.push(k);
     }
     if(bullshits.length)txt(inspect(bullshits));
-    var f=x=>x-x*fee_koef;
-    var rot=(arr,reverse)=>{return (reverse?arr.unshift(arr.pop()):arr.push(arr.shift())),arr};
-    var inp100=100;
-    var WM=0?'100':'0.39';var WM=pf(WM.split(",").join("."));
+    var WM='wm' in qp?'100':qp.wm;var WM=pf(WM.split(",").join("."));
+    var paths=[];
+    if('any' in qp){
+      WM=100;
+      mapkeys(mid2info)
+        .filter(e=>!'WMB'.split(',')
+        .includes(e))
+        .map(mid=>paths=paths.concat(gen_paths(mid,mid,4).map(e=>e.split('->'))));
+    }else{
+      var from='from' in qp?qp.from:'WML';
+      var to='to' in qp?qp.to:'WMZ';
+      paths=gen_paths(from,to,5).map(e=>e.split('->'));
+    }
     var out={WM:WM,load_time:load_time,fee_koef:fee_koef,paths_info:{},paths:[],};
-    
-    var paths=gen_paths('WMX','WMZ',5).map(e=>e.split('->'));
-    /*var paths=[];
-    mapkeys(mid2info)
-      .filter(e=>!'WMB'.split(',')
-      .includes(e))
-      .map(mid=>paths=paths.concat(gen_paths(mid,mid,4).map(e=>e.split('->'))));*/
     //var wmout=fs.createWriteStream('wmout.txt');
     //var path_index=0;
     paths.map(path=>{//path_index++;
@@ -109,11 +102,10 @@ var check_done=()=>{
       var arr=[];
       var add=inp=>{
         var cur_v=inp;
-        var log=buydirs.map((e,i)=>[dir2str[e],[rates[i],1/rates[i]],t[e][0],[cur_v,cur_v/rates[i],cur_v=f(cur_v)/rates[i]]]);
+        var log=buydirs.map((e,i)=>[dir2str[e],[rates[i],1.0/rates[i]],t[e][0],[cur_v,cur_v/rates[i],cur_v=pay_fee(cur_v)/rates[i]]]);
         arr.push({inp:inp,out:cur_v,log:log});
       }
       add(WM);
-      //add(inp100);
       out.paths.push({path:path.join("->"),arr:arr});
       /*if(path_index%130==0){
         qapsort(out.paths,e=>e.arr[0].out);
