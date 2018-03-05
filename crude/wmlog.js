@@ -2,7 +2,7 @@
 var r=response;
 resp_off();
 //---
-  var dir2wms=JSON.parse(POST.data);
+  var dir2wms=JSON.parse(fs.readFileSync('dir2wms.json')+'');
   var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
 
   var mid2info={};//money_id_to_info
