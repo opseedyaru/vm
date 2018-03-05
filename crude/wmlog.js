@@ -52,7 +52,7 @@ var in_out=(out,e)=>{out['in/out']=div(e.amountin,e.amountout).toFixed(3)};
 //if(uri==='/eval')qp.profit=1;
 var dir2str=qap_foreach_key(dir2wms,(obj,k,v)=>{obj[k]=v.join('->');});//return txt(inspect(dir2str));
 var ids=('profit' in qp)?mapkeys(dir2str).join(','):'1,2';
-if('ids' in qp){ids=qp.ids;}
+if('ids' in qp){ids=qp.ids;if(ids==='all')ids=mapkeys(dir2str).join(',');}
 var ids_arr=ids.split(",");
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
 var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
