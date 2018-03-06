@@ -88,7 +88,7 @@ var check_done=()=>{
       var to='to' in qp?qp.to:'WMZ';
       paths=gen_paths(from,to,5).map(e=>e.split('->'));
     }
-    var out={WM:WM,load_time:load_time,fee_koef:fee_koef,paths_info:{},paths:[],};
+    var out={datetime:getDateTime(),WM:WM,load_time:load_time,fee_koef:fee_koef,paths_info:{},paths:[],};
     //var wmout=fs.createWriteStream('wmout.txt');
     //var path_index=0;
     paths.map(path=>{//path_index++;
@@ -165,41 +165,7 @@ return;
 
 if(0)
 {  
-  var dir2wms=JSON.parse(POST.data);
-  var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
-
-  var mid2info={};//money_id_to_info
-  qap_foreach_key(dir2wms,(obj,k,v)=>getdef(mid2info,v[0],{mid:v[0],outmid2dir:{}}).outmid2dir[v[1]]=k);
-  
-  var dir_from_to=(from,to)=>mid2info[from].outmid2dir[to];
-  var reverse_dir=dir=>{var wms=dir2wms[dir];return mid2info[wms[1]].outmid2dir[wms[0]]};
-  var pay_fee=x=>x-x*0.0025;
-
-  var wms_path_to_buydirs=arr=>{
-    var out=[];
-    for(var i=1;i<arr.length;i++){
-      var prev=arr[i-1];
-      var cur=arr[i-0];
-      out.push(dir_from_to(cur,prev));// reverse direction because we need buydirs
-    }
-    return out;
-  };
-  var paths=[
-    'WMZ->WMR->WMX->WMZ',
-    'WMZ->WMX->WMR->WMZ',
-    'WMZ->WMX->WMB->WMZ',
-    'WMZ->WMB->WMX->WMZ',
-    'WMZ->WMX->WMU->WMZ',
-    'WMZ->WMU->WMX->WMZ',
-    'WMZ->WMX->WML->WMZ',
-    'WMZ->WML->WMX->WMZ',
-    'WMZ->WMX->WMH->WMZ',
-    'WMZ->WMH->WMX->WMZ',
-    'WMZ->WMR->WMG->WMZ',
-    'WMZ->WMG->WMR->WMZ',
-  ].map(e=>e.split('->')).map(arr=>wms_path_to_buydirs(arr));
-  return inspect(paths);
-  /*m=qap_unique(m);
+  /*
 
   t_world{
     mid;
