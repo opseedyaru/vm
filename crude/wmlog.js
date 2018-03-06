@@ -102,7 +102,19 @@ var check_done=()=>{
       var arr=[];
       var add=inp=>{
         var cur_v=inp;
-        var log=buydirs.map((e,i)=>[dir2str[e],[rates[i],1.0/rates[i]],t[e][0],[cur_v,cur_v/rates[i],cur_v=pay_fee(cur_v)/rates[i]]]);
+        var log=buydirs.map((e,i)=>{
+          var rate=rates[i];
+          return [
+            dir2str[e],
+            [rates[i],1.0/rate],
+            t[e][0],
+            [
+              cur_v,
+              cur_v/rate,
+              cur_v=pay_fee(cur_v)/rate
+            ]
+          ]
+        );
         arr.push({path:path.join("->"),inp:inp,out:cur_v,log:log});
       }
       add(WM);
