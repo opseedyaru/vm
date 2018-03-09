@@ -25,7 +25,7 @@ resp_off();
   };
   var gen_paths=(from,to,levels)=>{
     var clone=w=>w.slice();
-    var wm_arr=mapkeys(mid2info).filter(e=>!'WMB,WMV,WMG'.split(',').includes(e));
+    var wm_arr=mapkeys(mid2info).filter(e=>!'WMB'.split(',').includes(e));
     var out=[];
     var arr=wm_arr.filter(e=>e!=from);
     var way=[from];
@@ -59,6 +59,11 @@ var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
 var pay_fee=x=>x-x*fee_koef;
 var tables={};
 var bef_ms=get_ms();
+var unique_paths=arr=>{
+  var out={};
+  arr.map(e=>out[e.join("->")]=true);
+  return mapkeys(out).map(e=>e.split("->"));
+};
 var check_done=()=>{
   if(mapkeys(tables).length!=ids_arr.length)return;
   //return txt(inspect([mapkeys(tables).length,ids_arr.length,ids_arr,tables]));
@@ -78,9 +83,9 @@ var check_done=()=>{
     var WM='wm' in qp?qp.wm:'100';var WM=pf(WM.split(",").join("."));
     var paths=[];
     if('any' in qp){
-      WM=100;
+      WM='100';
       mapkeys(mid2info)
-        .filter(e=>!'WMB,WMV,WMG'.split(',')
+        .filter(e=>!'WMB'.split(',')
         .includes(e))
         .map(mid=>paths=paths.concat(gen_paths(mid,mid,4).map(e=>e.split('->'))));
     }else{
@@ -88,10 +93,25 @@ var check_done=()=>{
       var to='to' in qp?qp.to:'WMZ';
       paths=gen_paths(from,to,5).map(e=>e.split('->'));
     }
+    paths=unique_paths(paths);
     var out={datetime:getDateTime(),WM:WM,load_time:load_time,fee_koef:fee_koef,paths_info:{},paths:[],};
     //var wmout=fs.createWriteStream('wmout.txt');
     //var path_index=0;
     paths.map(path=>{//path_index++;
+      var bid2info={};
+      var safe_str2float=s=>"string"===typeof s?pf(s):s;
+      var get_bid_info=(dir)=>{
+        var bid=t[dir][0];
+        if(bid.id in bid2info){
+          var tmp=mapclone(bid);
+          'amountin,amountout'.split(',').map(k=>tmp[k]=safe_str2float(tmp[k]));
+          var rec=bid2info[bid.id];
+          tmp.amountin+=rec.dinp;
+          tmp.amountout=tmp.amountin*rec.rate;
+          return tmp;
+        }
+        return bid;
+      };
       var buydirs=wms_path_to_buydirs(path);
       buydirs.map(e=>{
         if(!(e in t))txt(inspect(["WTH?",path,e,buydirs,t]));
@@ -102,20 +122,33 @@ var check_done=()=>{
       var arr=[];
       var add=inp=>{
         var cur_v=inp;
+        var cur_part=1;
+        var fails=0;
         var log=buydirs.map((e,i)=>{
           var rate=rates[i];
-          return [
-            dir2str[e],
-            [rates[i],1.0/rate],
-            t[e][0],
-            [
-              cur_v,
-              cur_v/rate,
-              cur_v=pay_fee(cur_v)/rate
-            ]
-          ]
+          var bid=get_bid_info(e);
+          var bid_amountout_div_cur_v=bid.amountout*100/cur_v;
+          var fail=bid_amountout_div_cur_v<100;
+          if(fail)fails++;
+          var out={
+            dir:dir2str[e],
+            rate:[rates[i],1.0/rate],
+            bid:bid,
+            "bid.amountout/cur_v":bid_amountout_div_cur_v.toFixed(3)+" %",
+            status:fail?"FAIL":"OK",
+            inp:cur_v,
+            raw:cur_v/rate,
+            out:cur_v=pay_fee(cur_v)/rate,
+            out_truncated:cur_v=((cur_v*100)|0)*0.01,
+            fee:0,
+          };
+          out.fee=((out.out-out.out_truncated)*100/out.out).toFixed(3)+"%";
+          cur_part*=out.out_truncated/out.out;
+          var rec=getdef(bid2info,bid.id,{rate:rate,dout:0});
+          rec.dinp=-out.raw;
+          return out;
         });
-        arr.push({path:path.join("->"),inp:inp,out:cur_v,log:log});
+        arr.push({path:path.join("->"),inp:inp,out:cur_v,cur_part:FToS(cur_part*100),fails:fails,log:log});
       }
       add(WM);
       out.paths.push({path:path.join("->"),arr:arr});
@@ -130,9 +163,19 @@ var check_done=()=>{
     //wmout.end();
     //return;
     //qapsort(out.paths,e=>e.arr[0].out).slice(0,128).map(e=>out.paths_info[e.path]=e.arr[1].out+" %     // or out = "+e.arr[0].out);
-    qapsort(out.paths,e=>e.arr[0].out).slice(0,128).map(e=>out.paths_info[e.path]=e.arr[0].out);
+    out.paths.sort((a,b)=>{
+      var f=e=>e.arr[0];
+      var fa=f(a);var fb=f(b);
+      var fails_v=fb.fails-fa.fails;
+      if(-fails_v)return -fails_v;
+      var v=fb.out-fa.out;
+      if(v)return v;
+      return -(f(b).cur_part-f(a).cur_part);
+    });
+    //qapsort(out.paths,e=>e.arr[0].out);
+    out.paths.slice(0,128).map(e=>out.paths_info[e.path]=e.arr[0].out);
     out.paths=out.paths.slice(0,16).map(e=>e.arr.map(e=>{
-      e.log.map(e=>{e[2]=mapclone(e[2]);return e;});
+      e.log.map(e=>{e.bid=mapclone(e.bid);return e;});
       return e;
     }));
     var txtout=inspect(out);fs.writeFileSync("wm.txt",txtout);
