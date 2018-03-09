@@ -1,4 +1,28 @@
 (()=>{
+//-------------------------------------------dir2wms.json-----------------------------------------------------------
+var dir2wms=JSON.parse(fs.readFileSync('dir2wms.json')+'');
+var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
+var mid2info={};//money_id_to_info
+qap_foreach_key(dir2wms,(obj,k,v)=>getdef(mid2info,v[0],{mid:v[0],outmid2dir:{}}).outmid2dir[v[1]]=k);
+var dir_from_to=(from,to)=>{
+  if(!(from in mid2info))txt(qap_err("field 'from' - not found",new Error(inspect({from:from,to:to,mid2info}))));
+  return mid2info[from].outmid2dir[to];
+}
+var reverse_dir=dir=>{var wms=dir2wms[dir];return mid2info[wms[1]].outmid2dir[wms[0]]};
+//-------------------------------------------dir2wms.json-----------------------------------------------------------
+var wms_path_to_buydirs=arr=>{
+  var out=[];
+  for(var i=1;i<arr.length;i++){
+    var prev=arr[i-1];
+    var cur=arr[i-0];
+    out.push(dir_from_to(cur,prev));// reverse direction because we need buydirs
+  }
+  return out;
+};
+var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
+var pay_fee=x=>x-x*fee_koef;
+//-------------------------------------------MAIN CODE BELOW -----------------------------------------------------------
+
 let path='/wmlogs.all.txt.tgz';var c=g_conf_info;
 
 var need_make_tmp30txt=false;
@@ -29,6 +53,9 @@ var p=split_reader('wmlog.vm30.txt','\n',s=>{
     //WMZ->WMX->WMR->WMZ
     //34->37->1
     if(show_profit){
+      var buydirs=wms_path_to_buydirs(path);
+      var rates=buydirs.map(e=>g(t[e][0],0));
+      unsaved....
       var a=[34,37,1].map(e=>g(t[e][0],0));
       var b=[2,38,33].map(e=>g(t[e][0],0));
     }else{

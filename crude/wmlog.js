@@ -114,7 +114,7 @@ var check_done=()=>{
               cur_v=pay_fee(cur_v)/rate
             ]
           ]
-        );
+        });
         arr.push({path:path.join("->"),inp:inp,out:cur_v,log:log});
       }
       add(WM);
