@@ -308,10 +308,10 @@ var g_conf_info=((()=>{
     //"vm-vm.193b.starter-ca-central-1.openshiftapps.com":"ca",
     "vm50.herokuapp.com":"vm50",
     "vm51.herokuapp.com":"vm51",
-    "vm52.herokuapp.com":"vm52"/*,
-    "vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
-    "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
-    "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"*/
+    "vm52.herokuapp.com":"vm52",
+    //"vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
+    //"vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
+    //"vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
   var power={ae:5,vm50:5,vm51:0,vm52:0,ca:2,vm10:2,vm20:2,vm30:2,us:0,os3:0};
   var vh2host=mapswap(host2vh);
