@@ -25,7 +25,7 @@ resp_off();
   };
   var gen_paths=(from,to,levels)=>{
     var clone=w=>w.slice();
-    var wm_arr=mapkeys(mid2info).filter(e=>!'WMB,WMV'.split(',').includes(e));
+    var wm_arr=mapkeys(mid2info).filter(e=>!'WMB,WMV,WMG'.split(',').includes(e));
     var out=[];
     var arr=wm_arr.filter(e=>e!=from);
     var way=[from];
@@ -80,11 +80,11 @@ var check_done=()=>{
     if('any' in qp){
       WM=100;
       mapkeys(mid2info)
-        .filter(e=>!'WMB,WMV'.split(',')
+        .filter(e=>!'WMB,WMV,WMG'.split(',')
         .includes(e))
         .map(mid=>paths=paths.concat(gen_paths(mid,mid,4).map(e=>e.split('->'))));
     }else{
-      var from='from' in qp?qp.from:'WML';
+      var from='from' in qp?qp.from:'WMZ';
       var to='to' in qp?qp.to:'WMZ';
       paths=gen_paths(from,to,5).map(e=>e.split('->'));
     }
