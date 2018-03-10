@@ -202,10 +202,11 @@ var ee_logger_v2=(emitter,name,cb,events)=>{
   call_cb_on_err(emitter,cb,name);
 }
 
-var xhr_get=(url,ok,err)=>{
+var xhr_get=(URL,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
-  var req=(url.substr(0,"https".length)=="https"?https:http).get(url,(res)=>{
+  var secure=['https:','https'].includes(url.parse(URL).protocol);
+  var req=(secure?https:http).get(URL,(res)=>{
     var cb=ok;
     if(res.statusCode!==200){cb=(s,res)=>err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);}
     //res.setEncoding('utf8');
@@ -219,7 +220,7 @@ var xhr_get=(url,ok,err)=>{
 var xhr=(method,URL,data,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
-  var up=url.parse(URL);var secure=up.protocol=='https';
+  var up=url.parse(URL);var secure=['https:','https'].includes(up.protocol);
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
     headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
