@@ -310,7 +310,7 @@ var g_conf_info=((()=>{
     "vm50.herokuapp.com":"vm50",
     "vm51.herokuapp.com":"vm51",
     "vm52.herokuapp.com":"vm52",
-    "qpeya.herokuapp.com":"vm52",
+    "qpeya.herokuapp.com":"qpeya",
     //"vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
     //"vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
     //"vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
