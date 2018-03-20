@@ -341,7 +341,7 @@ g_conf_info.on_set_vhost=()=>{
   var mask_id_pos=0;var c=g_conf_info;
   var is_worker=(c.vhost in c.power)&&(c.power[c.vhost]>0);
   var pub=get_hosts_by_type('public')[0];
-  xhr_get("http://"+pub+'/put?fn=/vhosts/'+c.vhost+'&data='+os.hostname(),()=>{},()=>{});
+  xhr_get("https://"+pub+'/put?fn=/vhosts/'+c.vhost+'&data='+os.hostname(),()=>{},()=>{});
   if(c.last_request_host!==pub){
     var pub_lost=true;
     var connect_to_pub=()=>{
@@ -353,7 +353,7 @@ g_conf_info.on_set_vhost=()=>{
   }
   if(c.vhost in c.wm_ids_src){
     setTimeout(
-      ()=>xhr_get("http://"+c.last_request_host+'/c/run_logging.js?sure&json&ids='+c.wm_ids_src[c.vhost],()=>{},qap_log),
+      ()=>xhr_get("https://"+c.last_request_host+'/c/run_logging.js?sure&json&ids='+c.wm_ids_src[c.vhost],()=>{},qap_log),
       5*1000
     );
   }
@@ -387,7 +387,7 @@ var do_rollback_workers=()=>{
   var c=g_conf_info;
   c.arr.map((e,i)=>{
     if(!e.p)return;
-    setTimeout(()=>xhr_get('http://'+e.host+'/rollback',qap_log,qap_log),i*2000);
+    setTimeout(()=>xhr_get('https://'+e.host+'/rollback',qap_log,qap_log),i*2000);
   });
 };
 
@@ -868,7 +868,7 @@ var requestListener=(request,response)=>{
             }else txt('coop_fail:\n'+inspect(tasks));// but on some shadows server requests performed...
           });
           if(!tasks_n)cb(tasks,tmp);
-          shadows.map(e=>xhr_post_with_to('http://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on(e,'ok'),on(e,'fail'),1000*5));
+          shadows.map(e=>xhr_post_with_to('https://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on(e,'ok'),on(e,'fail'),1000*5));
           return;
         };
         var coop=collaboration;
@@ -959,7 +959,7 @@ var requestListener=(request,response)=>{
         if("/eval"==uri){
           if('nolog' in qp)return eval_impl();
           var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
-          var rec="http://"+master+'/put?fn=eval/rec['+getDateTime()+"]"+rnd+"_"+os.hostname()+".json";
+          var rec="https://"+master+'/put?fn=eval/rec['+getDateTime()+"]"+rnd+"_"+os.hostname()+".json";
           xhr_post(rec,{data:json({code:qp.code,data:qp.data})},eval_impl,err=>txt('rec_error:\n'+err));
           return;
         }
@@ -1007,7 +1007,7 @@ var requestListener=(request,response)=>{
             var ctc=get_tick_count();
             if(ctc-g_ping_base<=period+net_gap)return;
             g_ping_base=ctc;
-            xhr_post('http://'+master+'/ping?from='+os.hostname(),{},none,none);
+            xhr_post('https://'+master+'/ping?from='+os.hostname(),{},none,none);
           },1000);
         }
         var send_tick_to_shadows=()=>{
@@ -1020,7 +1020,7 @@ var requestListener=(request,response)=>{
         //now we need make list_of_ordered workers. some workers is 'public', but this is dynamic role.
         //better idea: shadows.map(server=>...); // if(fail){try_next();}else{use_response();
         //also think about consistency.
-        xhr_post('http://'+server+'/g_obj.json?from='+os.hostname(),{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
+        xhr_post('https://'+server+'/g_obj.json?from='+os.hostname(),{},s=>{g_obj=JSON.parse(s);req_handler();},s=>txt('coop_init_fail:\n'+s));
         return;
       }
       req_handler();
