@@ -311,11 +311,14 @@ var g_conf_info=((()=>{
     "vm51.herokuapp.com":"vm51",
     "vm52.herokuapp.com":"vm52",
     "qpeya.herokuapp.com":"qpeya",
+    "zeitvm02.now.sh":"zvm02",
+    "zeitvm02.now.sh":"zvm01",
+    "zeitvm01.now.sh":"zvm00",
     //"vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
     //"vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
     //"vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
   };
-  var power={ae:5,vm50:5,vm51:0,vm52:0,ca:2,vm10:2,vm20:2,vm30:2,us:0,os3:0,qpeya:5};
+  var power={ae:5,vm50:5,vm51:0,vm52:0,ca:2,vm10:2,vm20:2,vm30:2,us:0,os3:0,qpeya:5,zvm02:1,zvm01:1,zvm00:1};
   var vh2host=mapswap(host2vh);
   var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host,last_request_host:"empty"};
   out.wm_ids_src={};//{"os3":"all","vm10":"34,33","vm20":"37,38","vm30":"1,2,33,34,37,38"};
