@@ -312,8 +312,8 @@ var g_conf_info=((()=>{
     "vm52.herokuapp.com":"vm52",
     "qpeya.herokuapp.com":"qpeya",
     "zeitvm02.now.sh":"zvm02",
-    "zeitvm02.now.sh":"zvm01",
-    "zeitvm01.now.sh":"zvm00",
+    "zeitvm01.now.sh":"zvm01",
+    "zeitvm00.now.sh":"zvm00",
     //"vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
     //"vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
     //"vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30"
