@@ -1011,7 +1011,8 @@ var requestListener=(request,response)=>{
           },1000);
         }
         var send_tick_to_shadows=()=>{
-          get_hosts_by_type('shadow').map(e=>xhr_post('http://'+e+'/tick?from='+os.hostname(),{},none,none));
+          var with_http=e=>(e.includes('.now.sh')?'https://':'http://')+e;
+          get_hosts_by_type('shadow').map(e=>xhr_post(with_http(e)+'/tick?from='+os.hostname(),{},none,none));
         };
         if(pub)g_interval=setInterval(send_tick_to_shadows,period);
         var server=pub?shadow:master;
