@@ -324,6 +324,9 @@ var g_conf_info=((()=>{
   out.wm_ids_src={};//{"os3":"all","vm10":"34,33","vm20":"37,38","vm30":"1,2,33,34,37,38"};
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
   out.set_vhost_from_host=host=>{
+    if(!(host in host2vh)){
+      qap_log("hm... unk host = "+host);
+    }
     out.vhost=host2vh[host];
     qap_log("vhost = "+out.vhost);
     g_conf_info.on_set_vhost();
