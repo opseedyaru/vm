@@ -758,7 +758,7 @@ var requestListener=(request,response)=>{
                 map(e=>({fn:e,log_size:f[e].log.length,code:null,data:JSON.parse(f[e].data)})).
                 filter(e=>data_filter(e.data.data)).
                 map(e=>mapaddfront({code:e.data.code,data:data_filter(e.data.data)},e)).
-                map(e=>({cmd:"http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/del?fn="+e.fn})).
+                map(e=>({cmd:"https://"+master+"/del?fn="+e.fn})).
                 map(e=>xhr_get(e.cmd,none,none)+"  "+e.cmd).join("\n")
             );
           }
@@ -771,7 +771,7 @@ var requestListener=(request,response)=>{
                 map(e=>({fn:e,log_size:f[e].log.length,code:null,data:JSON.parse(f[e].data)})).
                 filter(e=>algo(e.data.code)).
                 map(e=>mapaddfront({code:e.data.code,data:data_filter(e.data.data)},e)).
-                map(e=>({cmd:"http://vm-vm.1d35.starter-us-east-1.openshiftapps.com/del?fn="+e.fn})).
+                map(e=>({cmd:"https://"+master+"/del?fn="+e.fn})).
                 map(e=>xhr_get(e.cmd,none,none)+"  "+e.cmd).join("\n") //*/
             );
           }
