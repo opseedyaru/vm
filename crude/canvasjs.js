@@ -1,5 +1,4 @@
 //ee_logger_v2(stdout,'stdout',qap_log,'readable,data,end,abort,aborted,connect,continue,response,upgrade,drain,error,pipe,finish,unpipe,close');
-exec_with_stream('ls -l ./wmlogs;exit;wget http://vm-os3.7e14.starter-us-west-2.openshiftapps.com/wmlogs.tgz;tar -xvf wmlogs.tgz;',response);
 return resp_off();
 var limit = 100+0*10000;
 var y = 0;var f=0;
