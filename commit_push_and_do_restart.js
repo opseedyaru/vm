@@ -76,11 +76,7 @@ var xhr_get=(url,ok,err)=>{
   return req;
 }
 
-var hosts=[
-  "http://vm-vm.1d35.starter-us-east-1.openshiftapps.com",
-  "http://agile-eyrie-44522.herokuapp.com",
-  "http://vm-vm.193b.starter-ca-central-1.openshiftapps.com"
-];
+var hosts=[];
 
 var sh=spawn('sh.exe',['-c',"git commit -am 'upd'\ngit push"],{stdio:[0,1,2]});
 var ee_logger=(emitter,name,events)=>{
