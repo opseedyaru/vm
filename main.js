@@ -1003,7 +1003,11 @@ var requestListener=(request,response)=>{
         if(g_interval){clearInterval(g_interval);g_interval=false;}
         var period=1000*30;var net_gap=1000*10;
         if(!pub){
-          g_interval=setInterval(()=>{
+          set_interval(()=>{
+            if(g_conf_info.vh2host[g_conf_info.vhost]!=shadow)return;
+            xhr_post('https://'+master+'/ping?shadow&from='+os.hostname(),{},none,none);
+          },period);
+          g_interval=set_interval(()=>{
             var ctc=get_tick_count();
             if(ctc-g_ping_base<=period+net_gap)return;
             g_ping_base=ctc;
@@ -1014,7 +1018,7 @@ var requestListener=(request,response)=>{
           var with_http=e=>(e.includes('.now.sh')?'https://':'http://')+e;
           get_hosts_by_type('shadow').map(e=>xhr_post(with_http(e)+'/tick?from='+os.hostname(),{},none,none));
         };
-        if(pub)g_interval=setInterval(send_tick_to_shadows,period);
+        if(pub)g_interval=set_interval(send_tick_to_shadows,period);
         var server=pub?shadow:master;
         //variable 'shadow' and 'public' must be deleted!
         //now we need make list_of_ordered workers. some workers is 'public', but this is dynamic role.
