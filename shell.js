@@ -95,7 +95,19 @@ var stream_write_encoder=(stream,z)=>data=>{
   ]));
 };
 
-var dns2h={};
+var dns2h={
+  "vm-vm.1d35.starter-us-east-1.openshiftapps.com":"us",
+  "agile-eyrie-44522.herokuapp.com":"ae",
+  "vm-vm.193b.starter-ca-central-1.openshiftapps.com":"ca",
+  "vm50.herokuapp.com":"vm50",
+  "vm51.herokuapp.com":"vm51",
+  "vm52.herokuapp.com":"vm52",
+  "vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
+  "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
+  "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30",
+  "zeitvm02.now.sh":"zvm02"
+};
+
 var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
 
 var ps1=(()=>{
@@ -150,13 +162,15 @@ var xhr_blob_upload=(method,URL,ok,err,fn)=>{
 }
 
 var qap_http_request_decoder=(method,URL,fromR,on_end)=>{
-  var up=url.parse(URL);var secure=up.protocol=='https';
+  qap_log("qap_http_request_decoder.url = "+URL);
+  var up=url.parse(URL);var secure=up.protocol=='https:';
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
     headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
   };
   var req=(secure?https:http).request(options,(res)=>
   {
+    qap_log("qap_http_request_decoder.request.res = "+URL);
     var statusCode=res.statusCode;
     if(res.statusCode!==200){qap_log('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
     ee_logger_v2(res,'qhrd.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
@@ -215,16 +229,17 @@ var json=JSON.stringify;
 var xhr=(method,URL,data,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
   if((typeof err)!="function")err=()=>{};
-  var up=url.parse(URL);var secure=up.protocol=='https';
+  var up=url.parse(URL);var secure=['https:','https'].includes(up.protocol);
   var options={
     hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
     headers:{'Content-Type':'application/x-www-form-urlencoded','Content-Length':Buffer.byteLength(data)}
   };
   var req=(secure?https:http).request(options,(res)=>{
-    if(res.statusCode!==200){err('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+    var cb=ok;
+    if(res.statusCode!==200){cb=(s,res)=>err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);}
     //res.setEncoding('utf8');
     var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
-    res.on('end',()=>{try{ok(rawData,res);}catch(e){err(e.message,res);}});
+    res.on('end',()=>{try{cb(rawData,res);}catch(e){err(qap_err('xhr.mega_huge_error',e),res);}});
   });
   call_cb_on_err(req,qap_log,'xhr');
   req.end(data);
@@ -252,7 +267,7 @@ var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
       var link=getmap(g_links,link_id);
       link.sh=sh;
       link.on_up(sh,on_exit);
-      on_exit_funcs.push(()=>{delete g_links[msg];});
+      on_exit_funcs.push(()=>{delete g_links[link_id];});
     }).toString().split("\n").slice(1,-1).join("\n")
   );
   var inp=toR("inp");
@@ -268,6 +283,133 @@ var xhr_shell_writer=(method,URL,ok,err,link_id)=>{
   inp("echo welcome\n");
   process.stdin.resume();
   return req;
+}
+/*
+var xhr_proxy_shell_writer_concept=(method,PROXY_URL,URL,ok,err,link_id)=>{
+  var desktop=[process.stdin];
+  var proxy_link_id=desktop.wget(PROXY_URL,'gen_link_id();');
+  // this already work
+  var link_id=desktop.wget(URL,'gen_link_id();');
+  desktop.read_from(URL).as_stream().also(link_id,'env.link_id.sh=spawn_sh();env.link_id.sh.stdout.pipe(remote_side)');
+  // this need implement
+  desktop.write_to(PROXY_URL).also(proxy_link_id,'env.proxy_link_id.stream=new_read_stream(remote_side);').as_stream().pipe_from(stdin);
+  desktop.wget(URL,'/eval','this_node.wget(POST.proxy,"/rt_sh",);',{proxy:PROXY_URL,proxy_link_id:proxy_link_id,link_id:link_id});
+                       this_zeit_node.read_from(POST.proxy,"/rt_sh").also(POST.proxy_link_id,"env.proxy_link_id.stream.pipe(remote_side);").as_stream().pipe(env.link_id.sh.stdin);
+}*/
+
+var xhr_proxy_shell_writer_impl=(method,URL,ok,err,proxy_link_id,HOST_URL)=>{
+  var fromR=(z,msg)=>{}
+  var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("writer end");process.exit();});
+  var toR=z=>stream_write_encoder(req,z);
+  toR("eval")(
+    "var proxy_link_id="+json(proxy_link_id)+";\n"+
+    (()=>{
+      // this_proxy
+      var link=getmap(g_links,proxy_link_id);
+      if(!('proxy' in link)){
+        link.proxy={buff:[]};
+        link.proxy.toR_v2=(z,msg)=>link.proxy.buff.push([z,msg]);
+      }
+      z2func.zmsg=zmsg=>{var t=JSON.parse(zmsg);link.proxy.toR_v2(t[0],t[1]);}
+    }).toString().split("\n").slice(1,-1).join("\n")
+  );
+  var inp=msg=>toR("zmsg")(json(['inp',msg]));
+  var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
+  var set_raw_mode=s=>{if('setRawMode' in s)s.setRawMode(true);}
+  set_raw_mode(process.stdin);
+  process.stdin.setEncoding('utf8');
+  process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
+  inp([
+    (press_insert_key),
+    (ps1+"\n").split('\n').filter(e=>!e.includes('PS1')&&!e.includes("grep")).join('\n'),
+    ('export PS1="$STARTCOLOR[\$(date)] \$(pwd) |\$?> $ENDCOLOR"\n'),
+    ("echo proxy URL = "+json(URL)+"\n"),
+    ("echo host URL = "+json(HOST_URL)+"\n"),
+    ("echo welcome\n"),
+    ('ps|grep -v cpulimit|grep -v "now-report";ll;\n'),
+  ].join(""));
+  process.stdin.resume();
+  return req;
+}
+
+//URL without /rt_sh
+var xhr_proxy_shell_writer=(method,PROXY_URL,URL,ok,err,link_id)=>{
+  //var desktop=[process.stdin];
+  var with_proxy_link_id=proxy_link_id=>
+  {
+    var ok_run_writer=s=>{
+      qap_log('ok_run_writer: s = '+s);
+      xhr_proxy_shell_writer_impl(method,PROXY_URL+'/rt_sh',ok,err,proxy_link_id,URL);
+    }
+    var code=(()=>{
+      // this_zeit
+      var qap_http_request_decoder=(method,URL,fromR,on_end)=>{
+        qap_log("qap_http_request_decoder.url = "+URL);
+        var up=url.parse(URL);var secure=up.protocol=='https:';
+        var options={
+          hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
+          headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
+        };
+        var req=(secure?https:http).request(options,(res)=>
+        {
+          qap_log("qap_http_request_decoder.request.res = "+URL);
+          var statusCode=res.statusCode;
+          if(res.statusCode!==200){qap_log('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+          ee_logger_v2(res,'qhrd.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
+          emitter_on_data_decoder(res,fromR);
+          res.on('end',on_end);
+        });
+        ee_logger_v2(req,'qhrd.req',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
+        req.setNoDelay();
+        return req;
+      };
+      var xhr_shell_reader_but_to_stdin=(method,URL,ok,err,link_id,proxy_link_id)=>{
+        // this_zeit
+        var sh=spawn('bash',['-i'],{detached:true});
+        call_cb_on_err(sh,qap_log,'sh');
+        var link=getmap(g_links,link_id);
+        link.sh=sh;
+        link.on_up(sh,/*on_exit*/()=>{sh.kill('SIGHUP');delete z2func['inp'];delete g_links[link_id];});
+        // this_zeit
+        var fromR=(z,msg)=>{/*qap_log("\n"+json({z:z,msg:msg}));*/if(z in z2func)z2func[z](msg);};
+        var z2func={inp:msg=>sh.stdin.write(msg)};
+        var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("wtf? reader end? usally i call 'process.exit()' there, but not now; // url = "+URL);});
+        var toR=z=>stream_write_encoder(req,z);
+        toR("eval")(
+          "var proxy_link_id="+json(proxy_link_id)+";"+
+          (()=>{
+            // this_proxy
+            var stream_write_encoder_v2=(stream,z,data)=>{
+              var sep=Buffer.from([0]);
+              stream.write(Buffer.concat([
+                Buffer.from(!data?"0":(data.length+""),"binary"),sep,
+                Buffer.from(z,"binary"),sep,
+                Buffer.from(data?data:"","binary")
+              ]));
+            };
+            var toR_v2_impl=(z,msg)=>stream_write_encoder_v2(response,z,msg);
+            var link=getmap(g_links,proxy_link_id);
+            if('proxy' in link){
+              link.proxy.buff.map(e=>toR_v2_impl(e[0],e[1]));link.proxy.buff=[];
+              link.proxy.toR_v2=toR_v2_impl;
+            }else{
+              link.proxy={};
+            }
+            link.proxy.toR_v2=toR_v2_impl;
+            //z2func.zmsg=zmsg=>{var t=JSON.parse(zmsg);link.proxy.toR_v2(t[0],t[1]);}
+          }).toString().split("\n").slice(1,-1).join("\n")
+        );
+        req.end();
+        return req;
+      }
+      xhr_shell_reader_but_to_stdin('post',qp.proxy+'/rt_sh',qap_log,qap_log,qp.link_id,qp.proxy_link_id);
+      return 'done';
+    }).toString().split("\n").slice(1,-1).join("\n");
+    var post_params={code:code,proxy:PROXY_URL,proxy_link_id:proxy_link_id,link_id:link_id};
+    fs.writeFileSync('dbg.json','post_params = '+json(post_params));
+    xhr_post(URL+"/eval?nolog",post_params,ok_run_writer,s=>qap_log("xhr_proxy_shell_writer.xhr_evalno_log.url fails: "+s));
+  }
+  xhr_post(PROXY_URL+"/eval?nolog",{code:'return new_link().id;'},with_proxy_link_id,s=>qap_log("xhr_proxy_shell_writer.xhr_evalno_log.proxy fails: "+s));
 }
 
 var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
@@ -304,24 +446,38 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 var fn="mask_basepix_log.txt";
-var api="duplex";var host=h2dns["ae"];
+var api="duplex";var host=h2dns["ae"];var proxy=h2dns["ae"];
 var with_protocol=host=>{
   var a=['http://','https://'];
   var out=host;
   var tmp=a.map(p=>host.substr(0,p.length)===p).filter(e=>e);
-  if(!tmp.length)return a[0]+host;
+  if(!tmp.length)return a[1]+host;
   return host;
 }; 
 var f=(key,val)=>{
   if(key==="api"){api=val;}
   if(key==="fn"){fn=val;}
-  if(key==="host"){if(val in h2dns){host="http://"+h2dns[val];}else{host=with_protocol(val);}}
+  if(key==="host"){if(val in h2dns){host="https://"+h2dns[val];}else{host=with_protocol(val);}}
+  if(key==="proxy"){if(val in h2dns){proxy="https://"+h2dns[val];}else{proxy=with_protocol(val);}}
 };
 process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
+
+qap_log("host = "+host);
 
 if(api=="inspect")qap_log(inspect(process.argv));
 if(api=="shell")xhr_shell("post",host+"/rt_sh",qap_log,qap_log);
 if(api=="upload")xhr_blob_upload("post",host+"/rt_sh",qap_log,qap_log,fn);
+if(api=="proxy"){
+  var with_link_id=link_id=>{
+    var ok=s=>{
+      xhr_proxy_shell_writer("post",proxy,host,qap_log,qap_log,link_id);
+    }
+    xhr_shell_reader("post",host+"/rt_sh",ok,qap_log,link_id);
+  }
+
+  var code=`return new_link().id;`;
+  xhr_post(host+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
+}
 if(api=="duplex"||api=="dup"){
   var with_link_id=link_id=>{
     var ok=s=>{
