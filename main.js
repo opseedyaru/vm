@@ -938,6 +938,11 @@ var requestListener=(request,response)=>{
           );
           return;
         }
+        if("/grep_put"==uri){
+          var r=response;resp_off();
+          split_reader("mainloop.log","\n",s=>{if(s.includes("/put?fn"))r.write(s+"\n");},()=>r.end());
+          return;
+        }
         if("/tick"==uri){g_ping_base=get_tick_count();return txt("tick = "+inc(g_obj,'tick'));}
         if("/ping"==uri){g_ping_base=get_tick_count();return txt(getDateTime());}
         var eval_impl=()=>{
