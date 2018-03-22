@@ -369,10 +369,13 @@ var xhr_proxy_shell_writer=(method,PROXY_URL,URL,ok,err,link_id)=>{
         call_cb_on_err(sh,qap_log,'sh');
         var link=getmap(g_links,link_id);
         link.sh=sh;
-        link.on_up(sh,/*on_exit*/()=>{sh.kill('SIGHUP');delete z2func['inp'];delete g_links[link_id];});
+        link.on_up(sh,/*on_exit*/()=>{
+          qap_log("xhr_shell_reader_but_to_stdin.link.on_up.on_exit: req.abort();");req.abort();
+          sh.kill('SIGHUP');delete z2func['inp'];delete g_links[link_id];
+        });
         // this_zeit
         var fromR=(z,msg)=>{/*qap_log("\n"+json({z:z,msg:msg}));*/if(z in z2func)z2func[z](msg);};
-        var z2func={inp:msg=>sh.stdin.write(msg)};
+        var z2func={inp:msg=>sh.stdin.write(msg),exit:()=>{qap_log("xhr_shell_reader_but_to_stdin.zfunc.exit: got it");}};
         var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("wtf? reader end? usally i call 'process.exit()' there, but not now; // url = "+URL);});
         var toR=z=>stream_write_encoder(req,z);
         toR("eval")(
