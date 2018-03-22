@@ -352,9 +352,17 @@ var xhr_proxy_shell_writer=(method,PROXY_URL,URL,ok,err,link_id)=>{
         };
         var req=(secure?https:http).request(options,(res)=>
         {
+          var cb=on_end;var err=qap_log;
           qap_log("qap_http_request_decoder.request.res = "+URL);
-          var statusCode=res.statusCode;
-          if(res.statusCode!==200){qap_log('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+          if(res.statusCode!==200){
+            cb=(s,res)=>{
+              err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);
+              res.destroy();req.destroy();
+            }
+            var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
+            res.on('end',()=>{try{cb(rawData,res);}catch(e){err(qap_err('qap_http_request_decoder.mega_huge_error',e),res);}});
+            return;
+          }
           ee_logger_v2(res,'qhrd.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
           emitter_on_data_decoder(res,fromR);
           res.on('end',on_end);
@@ -395,6 +403,7 @@ var xhr_proxy_shell_writer=(method,PROXY_URL,URL,ok,err,link_id)=>{
             if('proxy' in link){
               link.proxy.buff.map(e=>toR_v2_impl(e[0],e[1]));link.proxy.buff=[];
               link.proxy.toR_v2=toR_v2_impl;
+              qap_log("link.proxy.buff used :)");
             }else{
               link.proxy={};
             }
