@@ -1001,7 +1001,7 @@ var requestListener=(request,response)=>{
           fs.stat(fn,(err,stat)=>{
             if(err){throw err;}
             POST.code='';
-            fs.createReadStream(fn).on('data',s=>POST.code+=s).on('end',eval_impl);
+            fs.createReadStream(fn).on('data',s=>POST.code+=s).on('end',fn.slice(-3)==".js"?eval_impl:txt});
           });
           return;
         }
