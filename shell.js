@@ -171,8 +171,17 @@ var qap_http_request_decoder=(method,URL,fromR,on_end)=>{
   var req=(secure?https:http).request(options,(res)=>
   {
     qap_log("qap_http_request_decoder.request.res = "+URL);
-    var statusCode=res.statusCode;
-    if(res.statusCode!==200){qap_log('Request Failed.\nStatus Code: '+res.statusCode);res.destroy();req.destroy();return;}
+    if(res.statusCode!==200)
+    {
+      var err=qap_log;
+      var cb=(s,res)=>{
+        err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);
+        res.destroy();req.destroy();
+      }
+      var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
+      res.on('end',()=>{try{cb(rawData,res);}catch(e){err(qap_err('qap_http_request_decoder.mega_huge_error',e),res);}});
+      return;
+    }
     ee_logger_v2(res,'qhrd.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
     emitter_on_data_decoder(res,fromR);
     res.on('end',on_end);
@@ -341,36 +350,10 @@ var xhr_proxy_shell_writer=(method,PROXY_URL,URL,ok,err,link_id)=>{
       qap_log('ok_run_writer: s = '+s);
       xhr_proxy_shell_writer_impl(method,PROXY_URL+'/rt_sh',ok,err,proxy_link_id,URL);
     }
-    var code=(()=>{
+    // this_shell_js
+    var func_to_var_decl=func=>"var "+func+"="+eval("("+func+").toString()")+";\n";
+    var code=func_to_var_decl('qap_http_request_decoder')+(()=>{
       // this_zeit
-      var qap_http_request_decoder=(method,URL,fromR,on_end)=>{
-        qap_log("qap_http_request_decoder.url = "+URL);
-        var up=url.parse(URL);var secure=up.protocol=='https:';
-        var options={
-          hostname:up.hostname,port:up.port?up.port:(secure?443:80),path:up.path,method:method.toUpperCase(),
-          headers:{'qap_type':'rt_sh','Transfer-Encoding':'chunked'}
-        };
-        var req=(secure?https:http).request(options,(res)=>
-        {
-          var cb=on_end;var err=qap_log;
-          qap_log("qap_http_request_decoder.request.res = "+URL);
-          if(res.statusCode!==200){
-            cb=(s,res)=>{
-              err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);
-              res.destroy();req.destroy();
-            }
-            var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
-            res.on('end',()=>{try{cb(rawData,res);}catch(e){err(qap_err('qap_http_request_decoder.mega_huge_error',e),res);}});
-            return;
-          }
-          ee_logger_v2(res,'qhrd.res',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
-          emitter_on_data_decoder(res,fromR);
-          res.on('end',on_end);
-        });
-        ee_logger_v2(req,'qhrd.req',qap_log,'end,abort,aborted,connect,continue,response,upgrade');
-        req.setNoDelay();
-        return req;
-      };
       var xhr_shell_reader_but_to_stdin=(method,URL,ok,err,link_id,proxy_link_id)=>{
         // this_zeit
         var sh=spawn('bash',['-i'],{detached:true});
