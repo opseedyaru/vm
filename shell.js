@@ -474,15 +474,6 @@ var with_protocol=host=>{
   return host;
 }; 
 
-/*var dns2h={
-  "agile-eyrie-44522.herokuapp.com":"ae",
-  "vm50.herokuapp.com":"vm50",
-  "vm51.herokuapp.com":"vm51",
-  "vm52.herokuapp.com":"vm52",
-  "zeitvm02.now.sh":"zvm02"
-};
-var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
-*/
 var main=(h2dns)=>{
   var fn="mask_basepix_log.txt";
   var api="duplex";var host=h2dns["ae"];var proxy=h2dns["ae"];
