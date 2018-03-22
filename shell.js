@@ -21,6 +21,31 @@ var qap_log=s=>console.log("["+getDateTime()+"] "+s);
 var qap_err=(context,err)=>context+" :: err = "+inspect(err)+" //"+err.stack.toString();
 var log_err=(context,err)=>qap_log(qap_err(context,err));
 
+var json=JSON.stringify;
+var mapkeys=Object.keys;var mapvals=(m)=>mapkeys(m).map(k=>m[k]);
+var inc=(m,k)=>{if(!(k in m))m[k]=0;m[k]++;return m[k];};
+
+var FToS=n=>(n+0).toFixed(2);
+var mapswap=(k2v)=>{var v2k={};for(var k in k2v){v2k[k2v[k]]=k;}return v2k;}
+var qapavg=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.length?arr.reduce((pv,ex)=>pv+cb(ex),0)/arr.length:0;}
+var qapsum=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.reduce((pv,ex)=>pv+cb(ex),0);}
+var qapmin=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;var out;var i=0;for(var k in arr){var v=cb(arr[k]);if(!i){out=v;}i++;out=Math.min(out,v);}return out;}
+var qapmax=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;var out;var i=0;for(var k in arr){var v=cb(arr[k]);if(!i){out=v;}i++;out=Math.max(out,v);}return out;}
+var qapsort=(arr,cb)=>{if(typeof cb=='undefined')cb=e=>e;return arr.sort((a,b)=>cb(b)-cb(a));}
+var mapdrop=(e,arr,n)=>{var out=n||{};Object.keys(e).map(k=>arr.indexOf(k)<0?out[k]=e[k]:0);return out;}
+var mapsort=(arr,cb)=>{if(typeof cb=='undefined')cb=(k,v)=>v;var out={};var tmp=qapsort(mapkeys(arr),k=>cb(k,arr[k]));for(var k in tmp)out[tmp[k]]=arr[tmp[k]];return out;}
+
+var qap_unique=arr=>{var tmp={};arr.map(e=>tmp[e]=1);return mapkeys(tmp);};var unique_arr=qap_unique;
+
+var mapaddfront=(obj,n)=>{for(var k in obj)n[k]=obj[k];return n;}
+var mapclone=obj=>mapaddfront(obj,{});
+
+var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
+var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
+var getdef=(m,k,def)=>{if(!(k in m))m[k]=def;return m[k];};
+
+var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
+
 process.on('uncaughtException',err=>log_err('uncaughtException',err));
 
 function getDateTime() {
@@ -94,21 +119,6 @@ var stream_write_encoder=(stream,z)=>data=>{
     Buffer.from(data?data:"","binary")
   ]));
 };
-
-var dns2h={
-  "vm-vm.1d35.starter-us-east-1.openshiftapps.com":"us",
-  "agile-eyrie-44522.herokuapp.com":"ae",
-  "vm-vm.193b.starter-ca-central-1.openshiftapps.com":"ca",
-  "vm50.herokuapp.com":"vm50",
-  "vm51.herokuapp.com":"vm51",
-  "vm52.herokuapp.com":"vm52",
-  "vm10-vm10.1d35.starter-us-east-1.openshiftapps.com":"vm10",
-  "vm20-vm20.1d35.starter-us-east-1.openshiftapps.com":"vm20",
-  "vm30-vm30.193b.starter-ca-central-1.openshiftapps.com":"vm30",
-  "zeitvm02.now.sh":"zvm02"
-};
-
-var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
 
 var ps1=(()=>{
   //COLUMNS=180;
@@ -234,6 +244,21 @@ var xhr_shell=(method,URL,ok,err)=>{
 }
 
 var json=JSON.stringify;
+
+var xhr_get=(URL,ok,err)=>{
+  if((typeof ok)!="function")ok=()=>{};
+  if((typeof err)!="function")err=()=>{};
+  var secure=['https:','https'].includes(url.parse(URL).protocol);
+  var req=(secure?https:http).get(URL,(res)=>{
+    var cb=ok;
+    if(res.statusCode!==200){cb=(s,res)=>err('Request Failed.\nStatus Code: '+res.statusCode+'\n'+s);}
+    //res.setEncoding('utf8');
+    var rawData='';res.on('data',(chunk)=>rawData+=chunk.toString("binary"));
+    res.on('end',()=>{try{cb(rawData,res);}catch(e){err(qap_err('xhr_get.mega_huge_error',e),res);}});
+  });
+  call_cb_on_err(req,qap_log,'xhr_get');
+  return req;
+}
 
 var xhr=(method,URL,data,ok,err)=>{
   if((typeof ok)!="function")ok=()=>{};
@@ -416,7 +441,7 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
     exit:msg=>process.exit(),
     ok:msg=>ok(msg)
   };
-  var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("wtf? reader end?");process.exit();});
+  var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("qap_http_request_decoder.on_end: process.exit();");process.exit();});
   var toR=z=>stream_write_encoder(req,z);
   toR("eval")(
     "var link_id="+json(link_id)+";"+
@@ -440,8 +465,7 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   req.end();
   return req;
 }
-var fn="mask_basepix_log.txt";
-var api="duplex";var host=h2dns["ae"];var proxy=h2dns["ae"];
+
 var with_protocol=host=>{
   var a=['http://','https://'];
   var out=host;
@@ -449,38 +473,78 @@ var with_protocol=host=>{
   if(!tmp.length)return a[1]+host;
   return host;
 }; 
-var f=(key,val)=>{
-  if(key==="api"){api=val;}
-  if(key==="fn"){fn=val;}
-  if(key==="host"){if(val in h2dns){host="https://"+h2dns[val];}else{host=with_protocol(val);}}
-  if(key==="proxy"){if(val in h2dns){proxy="https://"+h2dns[val];}else{proxy=with_protocol(val);}}
+
+/*var dns2h={
+  "agile-eyrie-44522.herokuapp.com":"ae",
+  "vm50.herokuapp.com":"vm50",
+  "vm51.herokuapp.com":"vm51",
+  "vm52.herokuapp.com":"vm52",
+  "zeitvm02.now.sh":"zvm02"
 };
-process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
+var h2dns={};for(var dns in dns2h){h2dns[dns2h[dns]]=dns;}
+*/
+var main=(h2dns)=>{
+  var fn="mask_basepix_log.txt";
+  var api="duplex";var host=h2dns["ae"];var proxy=h2dns["ae"];
+  
+  var f=(key,val)=>{
+    if(key==="api"){api=val;}
+    if(key==="fn"){fn=val;}
+    if(key==="host"){if(val in h2dns){host="https://"+h2dns[val];}else{host=with_protocol(val);}}
+    if(key==="proxy"){if(val in h2dns){proxy="https://"+h2dns[val];}else{proxy=with_protocol(val);}}
+  };
 
-qap_log("host = "+host);
+  process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
 
-if(api=="inspect")qap_log(inspect(process.argv));
-if(api=="shell")xhr_shell("post",host+"/rt_sh",qap_log,qap_log);
-if(api=="upload")xhr_blob_upload("post",host+"/rt_sh",qap_log,qap_log,fn);
-if(api=="proxy"){
-  var with_link_id=link_id=>{
-    var ok=s=>{
-      xhr_proxy_shell_writer("post",proxy,host,qap_log,qap_log,link_id);
+  qap_log("host = "+host);
+
+  if(api=="inspect")qap_log(inspect(process.argv));
+  if(api=="shell")xhr_shell("post",host+"/rt_sh",qap_log,qap_log);
+  if(api=="upload")xhr_blob_upload("post",host+"/rt_sh",qap_log,qap_log,fn);
+  if(api=="proxy"){
+    var with_link_id=link_id=>{
+      var ok=s=>{
+        xhr_proxy_shell_writer("post",proxy,host,qap_log,qap_log,link_id);
+      }
+      xhr_shell_reader("post",host+"/rt_sh",ok,qap_log,link_id);
     }
-    xhr_shell_reader("post",host+"/rt_sh",ok,qap_log,link_id);
-  }
 
-  var code=`return new_link().id;`;
-  xhr_post(host+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
-}
-if(api=="duplex"||api=="dup"){
-  var with_link_id=link_id=>{
-    var ok=s=>{
-      xhr_shell_writer("post",host+"/rt_sh",qap_log,qap_log,link_id);
+    var code=`return new_link().id;`;
+    xhr_post(host+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
+  }
+  if(api=="duplex"||api=="dup"){
+    var with_link_id=link_id=>{
+      var ok=s=>{
+        xhr_shell_writer("post",host+"/rt_sh",qap_log,qap_log,link_id);
+      }
+      xhr_shell_reader("post",host+"/rt_sh",ok,qap_log,link_id);
     }
-    xhr_shell_reader("post",host+"/rt_sh",ok,qap_log,link_id);
-  }
 
-  var code=`return new_link().id;`;
-  xhr_post(host+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
+    var code=`return new_link().id;`;
+    xhr_post(host+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
+  }
 }
+
+var hosts={};var hosts_err_msg='';var need_coop_init=true;
+
+var hosts_update=hosts=>{
+  var conv=x=>{
+    var out={power:{},host2vh:{},public:[]};
+    for(var host in x.host2str){var a=x.host2str[host].split("|");out.host2vh[host]=a[0];out.power[a[0]]=a[1];}
+    out.public=x.public.split("|").map(e=>mapswap(out.host2vh)[e]);
+    mapkeys(x.host2str).map(k=>{if(out.public.includes(k))return;out.public.push(k);});
+    return out;
+  };
+  hosts.main_out=conv(hosts.main);
+  main(mapswap(hosts.main_out.host2vh));
+  return hosts;
+};
+
+var hosts_sync=(cb)=>{
+  if((typeof cb)!="function")cb=()=>{};
+  xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
+    s=>{try{hosts=JSON.parse(s);hosts=hosts_update(hosts);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);}cb(s);},
+    s=>{hosts_err_msg=s;cb(s);}
+  );
+};
+hosts_sync(qap_log);
