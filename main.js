@@ -490,7 +490,14 @@ var requestListener=(request,response)=>{
   
   if("/rt_sh"==uri)
   {
-    response.writeHead(200,{"Content-Type":"text/plain",'Transfer-Encoding':'chunked','X-Content-Type-Options':'nosniff'});
+    if(!('no_head' in qp)){
+      response.writeHead(200,{
+        "Content-Type":"text/plain",
+        'Transfer-Encoding':'chunked',
+        'X-Content-Type-Options':'nosniff',
+        'Cache-Control':'no-transform'
+      });
+    }
     var toR=z=>stream_write_encoder(response,z);
     var ping=toR("ping");var iter=0;var ping_interval=set_interval(()=>ping(""+(iter++)),500);
     //toR("log")("["+getDateTime()+"] :: hi");
