@@ -7,7 +7,7 @@ var drop_slash_r=s=>s.split("\r").join("");
 fs.writeFileSync("/etc/rc.d/vm.sh",drop_slash_r(`#!/bin/bash
 export PORT=80
 pushd /root/vm
-node mainloop.js 2>&1 | tee mainloop.log&
+nohup npm start&
 popd
 
 exit 0
