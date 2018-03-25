@@ -324,7 +324,7 @@ var on_start_sync=()=>{
   );
 };
 
-on_start_sync();
+if(!process.argv.includes("no_sync"))on_start_sync();
 
 var update_g_conf=()=>
 {
