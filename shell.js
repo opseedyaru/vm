@@ -446,16 +446,42 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   toR("eval")(
     "var link_id="+json(link_id)+";"+
     (()=>{
+      /*response.writeHead(200,{
+        "Content-Type":"text/plain",
+        'Transfer-Encoding':'chunked',
+        'X-Content-Type-Options':'nosniff',
+        'Cache-Control':'no-transform',
+        'content-encoding':'br'
+      });
+      toR('qap_log')("inspect(request) = "+inspect(request));
+      response.end();
+      */
+      response.socket.setNoDelay()
       var q=a=>toR("qap_log")("["+getDateTime()+"] :: "+a);
       var finish=msg=>{
         q(msg);
         toR("exit")();
         on_exit();
       }
+      var stream_write_encoder_v2=(stream,z,data)=>{
+        var sep=Buffer.from([0]);
+        stream.write(Buffer.concat([
+          Buffer.from(!data?"0":(data.length+""),"binary"),sep,
+          Buffer.from(z,"binary"),sep,
+          Buffer.from(data?data:"","binary")
+        ]));
+      };
+      var toR_v3=z=>msg=>{
+        //response.socket.cork();
+        stream_write_encoder_v2(response,z,msg);
+        //stream_write_encoder_v2(response,'toR_v3::dev_test','\r\n\0');
+        //response.socket.uncork();
+        //need use HTTP/2
+      }
       getmap(g_links,link_id).on_up=(sh,onexit)=>{
         on_exit_funcs.push(onexit);
-        sh.stderr.on("data",toR("err")).on('end',()=>q("end of bash stderr"));
-        sh.stdout.on("data",toR("out")).on('end',()=>q("end of bash stdout"));
+        sh.stderr.on("data",toR_v3("err")).on('end',()=>q("end of bash stderr"));
+        sh.stdout.on("data",toR_v3("out")).on('end',()=>q("end of bash stdout"));
         sh.on('close',code=>finish("bash exited with code "+code));
       }
       q("begin");
@@ -466,23 +492,26 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 
+var force_http=false;
+
 var with_protocol=host=>{
   var a=['http://','https://'];
   var out=host;
   var tmp=a.map(p=>host.substr(0,p.length)===p).filter(e=>e);
-  if(!tmp.length)return a[1]+host;
+  if(!tmp.length)return a[host.includes("open"+"sh"+"ift"+"apps")||force_http?0:1]+host;
   return host;
 }; 
 
 var main=(h2dns)=>{
   var fn="mask_basepix_log.txt";
-  var api="duplex";var host=h2dns["ae"];var proxy=h2dns["ae"];
+  var api="duplex";var host=with_protocol(h2dns["ae"]);var proxy=with_protocol(h2dns["ae"]);
   
   var f=(key,val)=>{
+    if(key==="http"){force_http=true;}
     if(key==="api"){api=val;}
     if(key==="fn"){fn=val;}
-    if(key==="host"){if(val in h2dns){host="https://"+h2dns[val];}else{host=with_protocol(val);}}
-    if(key==="proxy"){if(val in h2dns){proxy="https://"+h2dns[val];}else{proxy=with_protocol(val);}}
+    if(key==="host"){if(val in h2dns){host=with_protocol(h2dns[val]);}else{host=with_protocol(val);}}
+    if(key==="proxy"){if(val in h2dns){proxy=with_protocol(h2dns[val]);}else{proxy=with_protocol(val);}}
   };
 
   process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
