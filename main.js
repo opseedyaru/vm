@@ -334,6 +334,7 @@ var update_g_conf=()=>
 };
 
 var g_conf_info={vhost:null,need_init:true,power:{},host2vh:{},vh2host:{},last_request_host:"empty",wm_ids_src:{}};
+var g_conf=g_conf_info;
 
 g_conf_info.set_vhost_from_host=host=>{
   var c=g_conf_info;
