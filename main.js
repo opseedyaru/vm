@@ -286,6 +286,7 @@ var split_stream=(stream,sep,cb,end)=>{
     var arr=(buff+s).split(sep);buff=arr.pop();arr.map(cb);
   }).on('end',s=>{if(buff.length)cb(buff);end();})
 }
+
 var split_reader=(fn,sep,cb,end)=>split_stream(fs.createReadStream(fn,'binary'),sep,cb,end);
 
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
@@ -332,7 +333,7 @@ var update_g_conf=()=>
   out.update_pos();
 };
 
-var g_conf_info={vhost:null,need_init:true,power:power,host2vh:{},vh2host:{},last_request_host:"empty",wm_ids_src:{}};
+var g_conf_info={vhost:null,need_init:true,power:{},host2vh:{},vh2host:{},last_request_host:"empty",wm_ids_src:{}};
 
 g_conf_info.set_vhost_from_host=host=>{
   if(!(host in host2vh)){
