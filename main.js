@@ -337,10 +337,10 @@ var g_conf_info={vhost:null,need_init:true,power:{},host2vh:{},vh2host:{},last_r
 
 g_conf_info.set_vhost_from_host=host=>{
   var c=g_conf_info;
-  if(!(host in host2vh)){
+  if(!(host in c.host2vh)){
     qap_log("hm... unk host = "+host);
   }
-  c.vhost=host2vh[host];
+  c.vhost=c.host2vh[host];
   qap_log("vhost = "+c.vhost);
   c.on_set_vhost();
 }
