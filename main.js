@@ -299,6 +299,9 @@ var hosts_update=hosts=>{
     return out;
   };
   hosts.main_out=conv(hosts.main);
+  var src=host.main_out;
+  mapkeys(src).map(key=>g_conf_info[key]=src[key]);
+  update_g_conf(host2vh,power);
   return hosts;
 };
 
@@ -322,41 +325,32 @@ var on_start_sync=()=>{
 
 on_start_sync();
 
-var g_conf_info=((()=>{
-  var host2vh={
-    "agile-eyrie-44522.herokuapp.com":"ae",
-    "vm50.herokuapp.com":"vm50",
-    "vm51.herokuapp.com":"vm51",
-    "vm52.herokuapp.com":"vm52",
-    "qpeya.herokuapp.com":"qpeya",
-    "zeitvm02.now.sh":"zvm02",
-    "zeitvm01.now.sh":"zvm01",
-    "zeitvm00.now.sh":"zvm00",
-    "qpenar.herokuapp.com":"qpenar",
-  };
-  var power={ae:5,vm50:5,vm51:5,vm52:5,qpeya:5,qpenar:5,zvm02:1,zvm01:1,zvm00:1};
-  var vh2host=mapswap(host2vh);
-  var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host,last_request_host:"empty"};
-  out.wm_ids_src={};//{"os3":"all","vm10":"34,33","vm20":"37,38","vm30":"1,2,33,34,37,38"};
+var update_g_conf=()=>
+{
+  var out=g_conf_info;
   out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
-  out.set_vhost_from_host=host=>{
-    if(!(host in host2vh)){
-      qap_log("hm... unk host = "+host);
-    }
-    out.vhost=host2vh[host];
-    qap_log("vhost = "+out.vhost);
-    g_conf_info.on_set_vhost();
-  };
-  out.update_pos=()=>{
-    var tot=0;for(var vh in power)tot+=power[vh];
-    var vh2pos={};var pos=0;for(var vh in power){vh2pos[vh]=pos;pos+=power[vh]/tot;}
-    out.tot=tot;
-    out.vh2pos=vh2pos;
-    out.arr.map(e=>e.pos=vh2pos[e.vh]);
-  }
   out.update_pos();
-  return out;
-})());
+};
+
+var g_conf_info={vhost:null,need_init:true,power:power,host2vh:{},vh2host:{},last_request_host:"empty",wm_ids_src:{}};
+
+g_conf_info.set_vhost_from_host=host=>{
+  if(!(host in host2vh)){
+    qap_log("hm... unk host = "+host);
+  }
+  out.vhost=host2vh[host];
+  qap_log("vhost = "+out.vhost);
+  g_conf_info.on_set_vhost();
+}
+
+g_conf_info.update_pos=()=>{
+  var c=g_conf_info;
+  var tot=0;for(var vh in c.power)tot+=c.power[vh];
+  var vh2pos={};var pos=0;for(var vh in c.power){vh2pos[vh]=pos;pos+=c.power[vh]/tot;}
+  c.tot=tot;
+  c.vh2pos=vh2pos;
+  c.arr.map(e=>e.pos=vh2pos[e.vh]);
+}
 
 g_conf_info.on_set_vhost=()=>{
   var mask_id_pos=0;var c=g_conf_info;
