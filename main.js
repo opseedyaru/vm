@@ -286,6 +286,7 @@ var split_stream=(stream,sep,cb,end)=>{
     var arr=(buff+s).split(sep);buff=arr.pop();arr.map(cb);
   }).on('end',s=>{if(buff.length)cb(buff);end();})
 }
+
 var split_reader=(fn,sep,cb,end)=>split_stream(fs.createReadStream(fn,'binary'),sep,cb,end);
 
 var hosts={};var hosts_err_msg='';var need_coop_init=true;
@@ -299,13 +300,17 @@ var hosts_update=hosts=>{
     return out;
   };
   hosts.main_out=conv(hosts.main);
+  var src=hosts.main_out;
+  mapkeys(src).map(key=>g_conf[key]=src[key]);
+  update_g_conf();
+  qap_log("mapkeys(g_conf.power) = "+mapkeys(g_conf.power).join(","));
   return hosts;
 };
 
 var hosts_sync=(cb)=>{
   if((typeof cb)!="function")cb=()=>{};
   xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
-    s=>{try{hosts=JSON.parse(s);hosts=hosts_update(hosts);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);}cb(s);},
+    s=>{try{hosts=JSON.parse(s);hosts=hosts_update(hosts);}catch(e){cb(qap_err('hosts_sync',e)+'\n\n'+s);}cb(s);},
     s=>{hosts_err_msg=s;cb(s);}
   );
 };
@@ -320,43 +325,38 @@ var on_start_sync=()=>{
   );
 };
 
-on_start_sync();
+if(!process.argv.includes("no_sync"))on_start_sync();
 
-var g_conf_info=((()=>{
-  var host2vh={
-    "agile-eyrie-44522.herokuapp.com":"ae",
-    "vm50.herokuapp.com":"vm50",
-    "vm51.herokuapp.com":"vm51",
-    "vm52.herokuapp.com":"vm52",
-    "qpeya.herokuapp.com":"qpeya",
-    "zeitvm02.now.sh":"zvm02",
-    "zeitvm01.now.sh":"zvm01",
-    "zeitvm00.now.sh":"zvm00",
-    "qpenar.herokuapp.com":"qpenar",
-  };
-  var power={ae:5,vm50:5,vm51:5,vm52:5,qpeya:5,qpenar:5,zvm02:1,zvm01:1,zvm00:1};
-  var vh2host=mapswap(host2vh);
-  var out={vhost:"",need_init:true,power:power,host2vh:host2vh,vh2host:vh2host,last_request_host:"empty"};
-  out.wm_ids_src={};//{"os3":"all","vm10":"34,33","vm20":"37,38","vm30":"1,2,33,34,37,38"};
-  out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
-  out.set_vhost_from_host=host=>{
-    if(!(host in host2vh)){
-      qap_log("hm... unk host = "+host);
-    }
-    out.vhost=host2vh[host];
-    qap_log("vhost = "+out.vhost);
-    g_conf_info.on_set_vhost();
-  };
-  out.update_pos=()=>{
-    var tot=0;for(var vh in power)tot+=power[vh];
-    var vh2pos={};var pos=0;for(var vh in power){vh2pos[vh]=pos;pos+=power[vh]/tot;}
-    out.tot=tot;
-    out.vh2pos=vh2pos;
-    out.arr.map(e=>e.pos=vh2pos[e.vh]);
+var update_g_conf=()=>
+{
+  var c=g_conf;
+  c.arr=mapkeys(c.host2vh).map(e=>{var vh=c.host2vh[e];return {host:e,vh:vh,p:c.power[vh]};});
+  c.update_pos();
+};
+
+var g_conf_info={vhost:null,need_init:true,power:{},host2vh:{},vh2host:{},last_request_host:"empty",wm_ids_src:{}};
+var g_conf=g_conf_info;
+
+g_conf_info.set_vhost_from_host=host=>{
+  var c=g_conf_info;
+  if(!(host in c.host2vh)){
+    qap_log("hm... unk host = "+host);
   }
-  out.update_pos();
-  return out;
-})());
+  c.vhost=c.host2vh[host];
+  qap_log("vhost = "+c.vhost);
+  c.on_set_vhost();
+}
+
+g_conf_info.update_pos=()=>{
+  var c=g_conf_info;
+  var tot=0;for(var vh in c.power)tot+=c.power[vh]|0;
+  var vh2pos={};
+  var pos=0;
+  for(var vh in c.power){vh2pos[vh]=pos;pos+=c.power[vh]/tot;}
+  c.tot=tot;
+  c.vh2pos=vh2pos;
+  c.arr.map(e=>e.pos=vh2pos[e.vh]);
+}
 
 g_conf_info.on_set_vhost=()=>{
   var mask_id_pos=0;var c=g_conf_info;
@@ -693,6 +693,7 @@ var requestListener=(request,response)=>{
         }
         if("/hosts.json"==uri){
           hosts_sync(s=>txt(s));
+          if('set' in qp)g_conf.set_vhost_from_host(request.headers.host);
           return;
         }
         if("/e"==uri){
