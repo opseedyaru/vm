@@ -303,6 +303,7 @@ var hosts_update=hosts=>{
   var src=hosts.main_out;
   mapkeys(src).map(key=>g_conf[key]=src[key]);
   update_g_conf();
+  qap_log("mapkeys(g_conf.power) = "+mapkeys(g_conf.power).join(","));
   return hosts;
 };
 
@@ -328,7 +329,7 @@ if(!process.argv.includes("no_sync"))on_start_sync();
 
 var update_g_conf=()=>
 {
-  var c=g_conf_info;
+  var c=g_conf;
   c.arr=mapkeys(c.host2vh).map(e=>{var vh=c.host2vh[e];return {host:e,vh:vh,p:c.power[vh]};});
   c.update_pos();
 };
@@ -348,7 +349,7 @@ g_conf_info.set_vhost_from_host=host=>{
 
 g_conf_info.update_pos=()=>{
   var c=g_conf_info;
-  var tot=0;for(var vh in c.power)tot+=c.power[vh];
+  var tot=0;for(var vh in c.power)tot+=c.power[vh]|0;
   var vh2pos={};
   var pos=0;
   for(var vh in c.power){vh2pos[vh]=pos;pos+=c.power[vh]/tot;}
@@ -692,6 +693,7 @@ var requestListener=(request,response)=>{
         }
         if("/hosts.json"==uri){
           hosts_sync(s=>txt(s));
+          if('set' in qp)g_conf.set_vhost_from_host(request.headers.host);
           return;
         }
         if("/e"==uri){
