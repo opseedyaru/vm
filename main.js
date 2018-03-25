@@ -328,26 +328,29 @@ if(!process.argv.includes("no_sync"))on_start_sync();
 
 var update_g_conf=()=>
 {
-  var out=g_conf_info;
-  out.arr=mapkeys(host2vh).map(e=>{var vh=host2vh[e];return {host:e,vh:vh,p:power[vh]};});
-  out.update_pos();
+  var c=g_conf_info;
+  c.arr=mapkeys(c.host2vh).map(e=>{var vh=c.host2vh[e];return {host:e,vh:vh,p:c.power[vh]};});
+  c.update_pos();
 };
 
 var g_conf_info={vhost:null,need_init:true,power:{},host2vh:{},vh2host:{},last_request_host:"empty",wm_ids_src:{}};
 
 g_conf_info.set_vhost_from_host=host=>{
+  var c=g_conf_info;
   if(!(host in host2vh)){
     qap_log("hm... unk host = "+host);
   }
-  out.vhost=host2vh[host];
-  qap_log("vhost = "+out.vhost);
-  g_conf_info.on_set_vhost();
+  c.vhost=host2vh[host];
+  qap_log("vhost = "+c.vhost);
+  c.on_set_vhost();
 }
 
 g_conf_info.update_pos=()=>{
   var c=g_conf_info;
   var tot=0;for(var vh in c.power)tot+=c.power[vh];
-  var vh2pos={};var pos=0;for(var vh in c.power){vh2pos[vh]=pos;pos+=c.power[vh]/tot;}
+  var vh2pos={};
+  var pos=0;
+  for(var vh in c.power){vh2pos[vh]=pos;pos+=c.power[vh]/tot;}
   c.tot=tot;
   c.vh2pos=vh2pos;
   c.arr.map(e=>e.pos=vh2pos[e.vh]);
