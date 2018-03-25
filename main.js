@@ -300,16 +300,16 @@ var hosts_update=hosts=>{
     return out;
   };
   hosts.main_out=conv(hosts.main);
-  var src=host.main_out;
-  mapkeys(src).map(key=>g_conf_info[key]=src[key]);
-  update_g_conf(host2vh,power);
+  var src=hosts.main_out;
+  mapkeys(src).map(key=>g_conf[key]=src[key]);
+  update_g_conf();
   return hosts;
 };
 
 var hosts_sync=(cb)=>{
   if((typeof cb)!="function")cb=()=>{};
   xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
-    s=>{try{hosts=JSON.parse(s);hosts=hosts_update(hosts);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);}cb(s);},
+    s=>{try{hosts=JSON.parse(s);hosts=hosts_update(hosts);}catch(e){cb(qap_err('hosts_sync',e)+'\n\n'+s);}cb(s);},
     s=>{hosts_err_msg=s;cb(s);}
   );
 };
