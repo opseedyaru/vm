@@ -164,7 +164,7 @@ var xhr_blob_upload=(method,URL,ok,err,fn)=>{
   );
   var f=fn=>{
     toR("fn")(fn);
-    fs.createReadStream("../../Release/"+fn).on('data',toR("data")).on('end',()=>{toR("end")();});
+    fs.createReadStream(""+fn).on('data',toR("data")).on('end',()=>{toR("end")();});
   }
   f(fn);
   var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
