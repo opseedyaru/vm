@@ -709,6 +709,10 @@ var requestListener=(request,response)=>{
         }
         var txt_conf_exec=cmd=>txt("conf = "+g_conf_info.vhost+"\n"+execSync(cmd));
         if("/ll"==uri){return txt_conf_exec("ls -l");}
+        if("/os"==uri)
+        {
+          return exec_with_stream("cat /etc/os-release|grep PRETTY_NAME;cat /etc/os-release|grep 'VERSION='",response);
+        }
         if("/sysinfo"==uri)
         {
           var f=cmd=>execSync(cmd)+"";
