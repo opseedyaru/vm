@@ -307,6 +307,7 @@ var hosts_update=hosts=>{
   var src=hosts.main_out;
   src.inp=hosts.main;
   mapkeys(src).map(key=>g_conf[key]=src[key]);
+  g_conf.vh2host=mapswap(src.host2vh);
   update_g_conf();
   qap_log("mapkeys(g_conf.power) = "+mapkeys(g_conf.power).join(","));
   return hosts;
