@@ -918,7 +918,7 @@ var requestListener=(request,response)=>{
             }else txt('coop_fail:\n'+inspect(tasks));// but on some shadows server requests performed...
           });
           if(!tasks_n)cb(tasks,tmp);
-          shadows.map(e=>xhr_post_with_to('https://'+e+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on(e,'ok'),on(e,'fail'),1000*5));
+          shadows.map(e=>xhr_post_with_to(with_protocol(e)+'/internal?from='+os.hostname()+'&url='+uri,f(qp),on(e,'ok'),on(e,'fail'),1000*5));
           return;
         };
         var coop=collaboration;
@@ -981,13 +981,6 @@ var requestListener=(request,response)=>{
         if("/rollback"==uri){fs.unlinkSync("fast_unsafe_auto_restart_enabled.txt");quit();}
         if("/close"==uri||"/quit"==uri||"/exit"==uri)quit();
         if("/"==uri)return txt("count = "+inc(g_obj,'counter'));
-        if("/yt.title"==uri){
-          response.off();
-          xhr("GET","https://www.youtube.com/get_video_info?video_id="+qp.v,"",
-            yt_title,s=>txt("yt.title('failed')\n"+s)
-          );
-          return;
-        }
         if("/grep_put"==uri){
           var r=response;resp_off();
           split_reader("mainloop.log","\n",s=>{if(s.includes('/put?fn'))r.write(s+"\n");},()=>r.end());
@@ -1014,7 +1007,7 @@ var requestListener=(request,response)=>{
         if("/eval"==uri){
           if('nolog' in qp)return eval_impl();
           var rnd=rand()+"";rnd="00000".substr(rnd.length)+rnd;
-          var rec="https://"+master+'/put?fn=eval/rec['+getDateTime()+"]"+rnd+"_"+os.hostname()+".json";
+          var rec=with_protocol(master)+'/put?fn=eval/rec['+getDateTime()+"]"+rnd+"_"+os.hostname()+".json";
           xhr_post(rec,{data:json({code:qp.code,data:qp.data})},eval_impl,err=>txt('rec_error:\n'+err));
           return;
         }
@@ -1060,7 +1053,7 @@ var requestListener=(request,response)=>{
         if(!pub){
           set_interval(()=>{
             if(g_conf_info.vh2host[g_conf_info.vhost]!=shadow)return;
-            xhr_post('https://'+master+'/ping?shadow&from='+os.hostname(),{},none,none);
+            xhr_post(with_protocol(master)+'/ping?shadow&from='+os.hostname(),{},none,none);
           },period);
           g_interval=set_interval(()=>{
             var ctc=get_tick_count();
