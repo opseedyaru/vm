@@ -168,7 +168,10 @@ var get_backup=()=>{
 
 var get_hosts_by_type=type=>mapkeys(hosts).filter(e=>hosts[e]==type);
 
-var send_backup=()=>{
+var send_backup=(force)=>{
+  if('inp' in g_conf){
+    if(!force&&g_conf.inp.without_backup.split("|").includes(g_conf.vhost))return;
+  }
   var nope=()=>{};
   var fn=crypto.createHash('sha1').update(os.hostname()).digest('hex')+".json";
   var backup_servers=get_hosts_by_type('backup');
@@ -301,6 +304,7 @@ var hosts_update=hosts=>{
   };
   hosts.main_out=conv(hosts.main);
   var src=hosts.main_out;
+  src.inp=hosts.main;
   mapkeys(src).map(key=>g_conf[key]=src[key]);
   update_g_conf();
   qap_log("mapkeys(g_conf.power) = "+mapkeys(g_conf.power).join(","));
@@ -758,6 +762,8 @@ var requestListener=(request,response)=>{
         }
         if("/cpuinfo"==uri){return txt_conf_exec("cat /proc/cpuinfo");}
         if("/meminfo"==uri){return txt_conf_exec("cat /proc/meminfo");}
+        if("/top_bn1"==uri){return txt_conf_exec('top -bn1');}
+        if("/ps"==uri){return txt_conf_exec('ps');}
         if("/ps_aux"==uri){return txt_conf_exec('ps -aux|grep -v "<defunct>"');}
         if("/ps_aux_ll"==uri){return txt_conf_exec('ps -aux|grep -v "<defunct>"\nls -l');}
         if("/top"==uri){
