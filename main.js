@@ -1,5 +1,6 @@
 const util = require('util');
 const vm = require('vm');
+const assert=require('assert');
 
 var child_process=require('child_process');
 var execSync=child_process.execSync;var exec=child_process.exec;
@@ -446,6 +447,15 @@ var run_app_server=()=>{
 
 var is_public=host=>hosts[host]=='public';
 var is_shadow=host=>hosts[host]=='shadow';
+
+var with_protocol=host=>{
+  assert(!url.parse(host).protocol);
+  var c=g_conf;
+  if(!(host in c.host2vh))return host;
+  var vh=c.host2vh[host];
+  var a=['http://','https://'];
+  return a[c.inp.without_https.includes(vh)?0:1]+host;
+}; 
 
 var request_to_log_object=request=>{
   var h=request.headers;
