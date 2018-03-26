@@ -99,4 +99,14 @@ sudo update-rc.d gitseo_vm enable
 unlink /etc/rc.d/vm.sh
 unlink /etc/init.d/gitseo_vm
 pkill -f "node"
+
+
+SWAP=/tmp/swap
+dd if=/dev/zero of=$SWAP bs=1M count=1024
+mkswap $SWAP
+sudo swapon $SWAP
+
+
+sudo swapoff $SWAP
+rm /tmp/swap
 */

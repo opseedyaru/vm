@@ -113,6 +113,12 @@ var emitter_on_data_decoder=(emitter,cb)=>{
 
 var stream_write_encoder=(stream,z)=>data=>{
   var sep=Buffer.from([0]);
+  /*var wtf=Buffer.concat([
+    Buffer.from(!data?"0":(data.length+""),"binary"),sep,
+    Buffer.from(z,"binary"),sep,
+    Buffer.from(data?data:"","binary")
+  ]);
+  qap_log("swe : "+json(wtf)+"// "+json(wtf.toString("binary")));*/
   stream.write(Buffer.concat([
     Buffer.from(!data?"0":(data.length+""),"binary"),sep,
     Buffer.from(z,"binary"),sep,
