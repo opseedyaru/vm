@@ -9,6 +9,7 @@ var http = require("http"),
     fs = require("fs"),
     os = require("os"),
 crypto = require('crypto');
+const assert=require('assert');
 
 var call_cb_on_err=(emitter,cb,...args)=>{
   emitter.on('error',err=>{
@@ -113,12 +114,6 @@ var emitter_on_data_decoder=(emitter,cb)=>{
 
 var stream_write_encoder=(stream,z)=>data=>{
   var sep=Buffer.from([0]);
-  /*var wtf=Buffer.concat([
-    Buffer.from(!data?"0":(data.length+""),"binary"),sep,
-    Buffer.from(z,"binary"),sep,
-    Buffer.from(data?data:"","binary")
-  ]);
-  qap_log("swe : "+json(wtf)+"// "+json(wtf.toString("binary")));*/
   stream.write(Buffer.concat([
     Buffer.from(!data?"0":(data.length+""),"binary"),sep,
     Buffer.from(z,"binary"),sep,
@@ -499,14 +494,15 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
 }
 
 var force_http=false;
-
+var g_conf={};
 var with_protocol=host=>{
+  assert(!url.parse(host).protocol);
+  var c=g_conf;
+  if(!(host in c.host2vh))return host;
+  var vh=c.host2vh[host];
   var a=['http://','https://'];
-  var out=host;
-  var tmp=a.map(p=>host.substr(0,p.length)===p).filter(e=>e);
-  if(!tmp.length)return a[host.includes("open"+"sh"+"ift"+"apps")||force_http?0:1]+host;
-  return host;
-}; 
+  return a[c.inp.without_https.includes(vh)?0:1]+host;
+};
 
 var main=(h2dns)=>{
   var fn="mask_basepix_log.txt";
@@ -562,6 +558,11 @@ var hosts_update=hosts=>{
     return out;
   };
   hosts.main_out=conv(hosts.main);
+  var src=hosts.main_out;
+  src.inp=hosts.main;
+  mapkeys(src).map(key=>g_conf[key]=src[key]);
+  g_conf.vh2host=mapswap(src.host2vh);
+  qap_log("mapkeys(g_conf.power) = "+mapkeys(g_conf.power).join(","));
   main(mapswap(hosts.main_out.host2vh));
   return hosts;
 };

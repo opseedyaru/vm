@@ -102,11 +102,11 @@ pkill -f "node"
 
 
 SWAP=/tmp/swap
-dd if=/dev/zero of=$SWAP bs=1M count=1024
+dd if=/dev/zero of=$SWAP bs=1M count=2048
 mkswap $SWAP
 sudo swapon $SWAP
 
 
 sudo swapoff $SWAP
-rm /tmp/swap
+rm $SWAP
 */
