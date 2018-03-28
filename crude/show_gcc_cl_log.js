@@ -76,7 +76,7 @@ var body2html=s=>`
 </style></head>
 <body>$$$</body></html>`.split("$$$").join("\n"+s+"\n");
 
-var dest_dir="test2/";
+var dest_dir='dest_dir' in qp?qp.dest_dir:"test2/";
 var app=""+fs.readFileSync(0?"/usr/local/include/c++/7.3.0/bits/allocated_ptr.h":dest_dir+"app.cpp");
 var cl=""+fs.readFileSync(dest_dir+"cl_log.txt");
 var out=app.split("\n").map((e,i)=>({i:"app.cpp:"+(i+1)+":.",line:e}));
