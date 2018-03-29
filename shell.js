@@ -506,7 +506,7 @@ var with_protocol=host=>{
 
 var main=(h2dns)=>{
   var fn="mask_basepix_log.txt";
-  var api="duplex";var host=with_protocol(h2dns["ae"]);var proxy=with_protocol(h2dns["ae"]);
+  var api="duplex";var host=with_protocol(h2dns["vm52"]);var proxy=with_protocol(h2dns["vm52"]);
   
   var f=(key,val)=>{
     if(key==="http"){force_http=true;}
@@ -570,7 +570,11 @@ var hosts_update=hosts=>{
 var hosts_sync=(cb)=>{
   if((typeof cb)!="function")cb=()=>{};
   xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
-    s=>{try{hosts=JSON.parse(s);hosts=hosts_update(hosts);}catch(e){cb('JSON.parse error:\n'+e+'\n\n'+s);}cb(s);},
+    s=>{
+      try{hosts=JSON.parse(s);}catch(e){cb(qap_err('hosts_sync.JSON.parse.hosts',e)+'\n\n'+s);return;}
+      try{hosts=hosts_update(hosts);}catch(e){cb(qap_err('hosts_sync.hosts_update',e)+'\n\n'+s);return;}
+      cb(s);
+    },
     s=>{hosts_err_msg=s;cb(s);}
   );
 };
