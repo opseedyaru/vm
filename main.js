@@ -1027,7 +1027,7 @@ var requestListener=(request,response)=>{
           fs.stat(fn,(err,stat)=>{
             if(err){throw err;}
             POST.code='';
-            fs.createReadStream(fn).on('data',s=>POST.code+=s).on('end',fn.slice(-3)==".js"?eval_impl:()=>txt(POST.code));
+            fs.createReadStream(fn).on('data',s=>POST.code+=s).on('end',fn.slice(-3)==".js"&&!('!!!' in qp)?eval_impl:()=>txt(POST.code));
           });
           return;
         }
