@@ -88,8 +88,8 @@ var json_once=(obj,replacer,indent,limit)=>{
 var json_once_v2=(e,v,lim)=>json_once(e,v,2,lim);
 var inspect=json_once_v2;
 
-function getDateTime() {
-  var now     = new Date(); 
+var getDateTime=t=>{
+  var now     = typeof t==='number'?new Date(t):new Date();
   var year    = now.getFullYear();
   var f=v=>(v.toString().length==1?'0':'')+v;
   var month   = f(now.getMonth()+1); 
@@ -100,6 +100,10 @@ function getDateTime() {
   var dateTime = year+'.'+month+'.'+day+' '+hour+':'+minute+':'+second;   
   return dateTime;
 }
+
+var toHHMMSS=s=>[s/3600,s/60,s].map(x=>x|0).map((x,i)=>x%(i?24:60)).map(v=>v<10?"0"+v:v).filter((v,i)=>v!=="00"||i>0).join(":");
+
+var func_to_var_decl=func=>"var "+func+"="+eval("("+func+").toString()")+";\n";
 
 var parse_wmdatetime=s=>{
   var t=s.split(' ');var ymd=t[0].split('.').reverse();var hms=t[1].split(':');
