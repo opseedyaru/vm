@@ -101,7 +101,7 @@ var getDateTime=t=>{
   return dateTime;
 }
 
-var toHHMMSS=s=>[s/3600,s/60,s].map(x=>x|0).map((x,i)=>x%(i?24:60)).map(v=>v<10?"0"+v:v).filter((v,i)=>v!=="00"||i>0).join(":");
+var toHHHMMSS=s=>[s/3600,s/60,s].map(x=>x|0).map((x,i)=>i?x%60:x)).map(v=>v<10?"0"+v:v).filter((v,i)=>v!=="00"||i>0).join(":");
 
 var func_to_var_decl=func=>"var "+func+"="+eval("("+func+").toString()")+";\n";
 
