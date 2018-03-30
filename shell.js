@@ -506,7 +506,7 @@ var with_protocol=host=>{
 
 var main=(h2dns)=>{
   var fn="mask_basepix_log.txt";
-  var api="duplex";var host=with_protocol(h2dns["vm52"]);var proxy=with_protocol(h2dns["vm52"]);
+  var api="duplex";var host="";var proxy="";
   
   var f=(key,val)=>{
     if(key==="http"){force_http=true;}
@@ -515,9 +515,9 @@ var main=(h2dns)=>{
     if(key==="host"){if(val in h2dns){host=with_protocol(h2dns[val]);}else{host=with_protocol(val);}}
     if(key==="proxy"){if(val in h2dns){proxy=with_protocol(h2dns[val]);}else{proxy=with_protocol(val);}}
   };
-
+  
   process.argv.map(e=>{var t=e.split("=");if(t.length!=2)return;f(t[0],t[1]);});
-
+  if(!host.length)return qap_log("no way // host.length == 0");
   qap_log("host = "+host);
 
   if(api=="inspect")qap_log(inspect(process.argv));
@@ -567,13 +567,15 @@ var hosts_update=hosts=>{
   return hosts;
 };
 
-var hosts_sync=(cb)=>{
-  if((typeof cb)!="function")cb=()=>{};
+var hosts_sync=(bef,aft)=>{
+  if((typeof bef)!="function")bef=()=>{};
+  if((typeof aft)!="function")aft=()=>{};
   xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
     s=>{
+      bef(s);
       try{hosts=JSON.parse(s);}catch(e){cb(qap_err('hosts_sync.JSON.parse.hosts',e)+'\n\n'+s);return;}
       try{hosts=hosts_update(hosts);}catch(e){cb(qap_err('hosts_sync.hosts_update',e)+'\n\n'+s);return;}
-      cb(s);
+      aft(s);
     },
     s=>{hosts_err_msg=s;cb(s);}
   );
