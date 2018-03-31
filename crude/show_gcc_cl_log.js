@@ -1,19 +1,3 @@
-/*var bs=`
-#include <iostream>
-
-int main(){
-        #if __cplusplus==201402L
-        std::cout << "C++14" << std::endl;
-        #elif __cplusplus==201103L
-        std::cout << "C++11" << std::endl;
-        #else
-        std::cout << "C++" << std::endl;
-        #endif
-std::cout << "__cplusplus"<<__cplusplus << std::endl;
-        return 0;
-}`;
-fs.writeFileSync("test2/bs.cpp",bs);*/
-
 function escapeHtml(text)
   {
     if("string"!=(typeof text)){return text;}
@@ -76,10 +60,11 @@ var body2html=s=>`
 </style></head>
 <body>$$$</body></html>`.split("$$$").join("\n"+s+"\n");
 
-var dest_dir='dest_dir' in qp?qp.dest_dir:"test2/";
-var app=""+fs.readFileSync(0?"/usr/local/include/c++/7.3.0/bits/allocated_ptr.h":dest_dir+"app.cpp");
-var cl=""+fs.readFileSync(dest_dir+"cl_log.txt");
-var out=app.split("\n").map((e,i)=>({i:"app.cpp:"+(i+1)+":.",line:e}));
+var dir='dir' in qp?qp.dir:"rt/psaux/procps/tt/";
+var fn='fn' in qp?qp.fn:"main.c";
+var app=""+fs.readFileSync(dir+fn);
+var cl=""+fs.readFileSync(dir+"cl_log.txt");
+var out=app.split("\n").map((e,i)=>({i:fn+":"+(i+1)+":.",line:e}));
 out=PrintMyTable(out);
 var colorize=s=>{
   var kw={error:"#A00",warning:"#880",note:"#555"};
