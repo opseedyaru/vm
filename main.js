@@ -608,7 +608,7 @@ var requestListener=(request,response)=>{
       var html_utf8=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html; charset=UTF-8"});r.end(s);}})(response);
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
-      var exec_post_data=()={
+      var exec_post_data=()=>{
         var r=response;resp_off();exec_with_stream(POST.data.split("\r").join(""),r);
       }
       var async_cl_and_exec_cpp=(code,flags)=>{
