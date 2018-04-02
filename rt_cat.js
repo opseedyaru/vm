@@ -325,3 +325,8 @@ if('vultr_hub'==mode){
 // vultr_ip > nohup node rt_cat.js mode=ray2hub hub=127.0.0.1:45600 ray=127.0.0.1:45631 show=false 2>&1 > ray2hub.log &
 // vultr_ip > nohup node rt_cat.js mode=hub hub=127.0.0.1:45600 2>&1 > hub.log &
 // vm51 > nohup node ./rt_cat.js mode=ray2hub 2>&1 >ray2hub.log &
+
+/*
+vultr_ip > nohup ./app.out raymaps_limit=128 2>&1 >app.run.log&
+vultr_ip > nohup node rt_cat.js mode=vultr_hub 2>&1 >vhub.log &
+*/
