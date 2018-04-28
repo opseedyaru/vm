@@ -16,4 +16,17 @@
     echo "done!\n";
   }
   echo "---\nend!";
+  /*
+       $need_delete_all_json_files_in_concreate_folder=true;
+    if($need_delete_all_json_files_in_concreate_folder)
+    {
+      echo "<pre>before:";
+      echo implode(glob("vm/backup/*"),"\n");
+      echo "\n\nunlinking...\n";
+      $a=glob("vm/backup/*");
+      foreach($a as $k=>$v)if(strpos($v,'json')!==false)unlink($v);
+      echo "done\nafter:";
+      echo implode(glob("vm/backup/*"),"\n");
+    }
+  */
 ?>
