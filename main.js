@@ -807,8 +807,20 @@ var requestListener=(request,response)=>{
         }
         if("/evals"==uri)
         {
-          var none=()=>{};
-          var f=g_obj.files;
+          var none=()=>{};var f=g_obj.files;
+          if('drop_if_without_code' in qp)
+          {
+            var ins=e=>html_utf8("<pre>"+inspect(e));var jst=jstable;
+            return jst(
+              mapkeys(f).filter(e=>e.includes("eval/")).reverse()
+                .map(e=>({fn:e,log_size:f[e].log.length,code:null,data:JSON.parse(f[e].data)}))
+                .map(e=>mapaddfront({code:e.data.code,data:e.data.data},e))
+                .filter(e=>e.code==null)
+                .map(e=>({cmd:"https://"+master+"/del?fn="+e.fn}))
+                .map(e=>{xhr_get(e.cmd,none,none)+"  "+e.cmd;return e;})//.join("\n")
+                //.map(e=>e.cmd).join("\n")
+            );
+          }
           if('drop_if_over4k' in qp)
           {
             var data_filter=e=>e?e.length>1024*4:e;
