@@ -814,7 +814,7 @@ var requestListener=(request,response)=>{
           );
           qap_foreach_key((g_obj.logs),(m,k,v)=>m[k]=wt(v));
           result.aft_size=json(g_obj).length;
-          return inspect(result);
+          return txt(inspect(result));
         }
         if("/evals"==uri)
         {
