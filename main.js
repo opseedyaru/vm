@@ -805,6 +805,17 @@ var requestListener=(request,response)=>{
           resp_off();
           return;
         }
+        if("/clear_logs"==uri){
+          var result={bef_size:json(g_obj).length};
+          var wt=arr=>arr.filter(e=>
+            e.request_uri.split("/tick?from=").length==1&&
+            e.request_uri.split("/ping?shadow").length==1&&
+            e.request_uri.split("/ping?from=vultr.guest").length==1&&1
+          );
+          qap_foreach_key((g_obj.logs),(m,k,v)=>m[k]=wt(v));
+          result.aft_size=json(g_obj).length;
+          return inspect(result);
+        }
         if("/evals"==uri)
         {
           var none=()=>{};var f=g_obj.files;
