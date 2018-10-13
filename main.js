@@ -68,6 +68,8 @@ var mapclone=obj=>mapaddfront(obj,{});
 var getarr=(m,k)=>{if(!(k in m))m[k]=[];return m[k];};
 var getmap=(m,k)=>{if(!(k in m))m[k]={};return m[k];};
 var getdef=(m,k,def)=>{if(!(k in m))m[k]=def;return m[k];};
+var clone_map_but_add_prefix_to_keys=(m,prefix)=>{var out={};for(var k in m)out[prefix+k]=m[k];return out;}
+var keys_with_prefix=clone_map_but_add_prefix_to_keys;
 
 var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
 
