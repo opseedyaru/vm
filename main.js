@@ -611,6 +611,15 @@ var requestListener=(request,response)=>{
       var html_utf8=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html; charset=UTF-8"});r.end(s);}})(response);
       var html=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/html"});r.end(s);}})(response);
       var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
+      var str2cpp_with_colors=fn=>{
+        var s=fs.readFileSync(fn)+"";
+        s=s.split("<").join("&lt;").split(">").join("&gt;");
+        (
+          'bool,ifdef,endif,int,void,float,real,double,string,char,typedef,template,if,else,'+
+          'for,class,struct,inline,using,define,public,return,include,undef,auto,const,enum'
+        ).split(',').map(e=>s=s.split(e).join("<font color='blue'><b>"+e+"</b></font>"));
+        return html("<pre>"+s);
+      };
       var exec_post_data=()=>{
         var r=response;resp_off();exec_with_stream(POST.data.split("\r").join(""),r);
       }
