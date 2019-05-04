@@ -1,3 +1,16 @@
+if('read' in qp){
+  //exec_post_data();
+  //return jstable+"";
+  var arr=(execSync("echo wmlog_profit/*.txt")+"").slice(0,-1).split(" ");
+  var with_spoiler=s=>{var d="...";var u=e=>d+"spoiler_"+e+"_"+d;return u("beg")+s+u("end");}
+  arr=arr.map(fn=>{
+    var s=fs.readFileSync(fn)+"";
+    if(!s.length)return "not found - "+fn;
+    var p=JSON.parse(s).paths[0][0];
+    return {wmpath:p.path,inp:p.inp,out:p.out,fn:fn,time:""+execSync('date -r '+fn+' "+%Y.%m.%d %H:%M:%S"')/*,p:with_spoiler(inspect(p))*/};
+  });
+  return jstable(arr);
+}
 if(!('sure' in qp))return 'sure in qp required';
 //clear_interval(g_intervals[4]);
 //return inspect(g_intervals);
