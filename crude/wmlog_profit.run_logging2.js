@@ -5,17 +5,17 @@ if(!('sure' in qp))return 'sure in qp required';
 //return ""+g_wmlog_iter;
 g_wmlog_iter=0;
 var doit=()=>{
-g_wmlog_iter++;
-var go=e=>{
-  var p=JSON.parse(e).paths[0][0];
-  qap_log("wmlog_by_timer: "+json({wmpath:p.path,inp:p.inp,out:p.out,iter:g_wmlog_iter}));
-  if(p.inp<p.out){
-    execSync("mkdir -p wmlog_profit");
-    fs.writeFileSync("wmlog_profit/win_"+g_wmlog_iter+".txt",e);
+  g_wmlog_iter++;
+  var go=e=>{
+    var p=JSON.parse(e).paths[0][0];
+    qap_log("wmlog_by_timer: "+json({wmpath:p.path,inp:p.inp,out:p.out,iter:g_wmlog_iter}));
+    if(p.inp<p.out){
+      execSync("mkdir -p wmlog_profit");
+      fs.writeFileSync("wmlog_profit/win_"+g_wmlog_iter+".txt",e);
+    }
+    //txt(inspect(p));
   }
-  //txt(inspect(p));
-}
-xhr_get("http://vm51.herokuapp.com/c/wmlog.js?profit",go,txt);
+  xhr_get("http://vm51.herokuapp.com/c/wmlog.js?profit",go,txt);
 };
 //resp_off();doit();
 set_interval(doit,1000*90);
