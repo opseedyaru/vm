@@ -16,7 +16,7 @@ if(!('sure' in qp))return 'sure in qp required';
 //return inspect(g_intervals);
 //return set_interval+"";
 //return ""+g_wmlog_iter;
-g_wmlog_iter=0;
+g_wmlog_iter=1000;
 var doit=()=>{
   g_wmlog_iter++;
   var go=e=>{
