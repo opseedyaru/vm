@@ -2,6 +2,7 @@
 var r=response;
 resp_off();
 //---
+  var dir2wms_orig=JSON.parse(fs.readFileSync('dir2wms.json')+'');
   var dir2wms=JSON.parse(fs.readFileSync('dir2wms.json')+'');
   var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
 
@@ -23,9 +24,11 @@ resp_off();
     }
     return out;
   };
+  var wms_filter=(e)=>!'WMB,WMV,LTC,VND'.split(',').includes(e);
+  var dir_filter=(e)=>{var t=dir2wms_orig[e];return !t.map(e=>wms_filter(e)?"":"1").length;}
   var gen_paths=(from,to,levels)=>{
     var clone=w=>w.slice();
-    var wm_arr=mapkeys(mid2info).filter(e=>!'WMB,WMV'.split(',').includes(e));
+    var wm_arr=mapkeys(mid2info).filter(wms_filter);
     var out=[];
     var arr=wm_arr.filter(e=>e!=from);
     var way=[from];
@@ -54,6 +57,7 @@ var dir2str=qap_foreach_key(dir2wms,(obj,k,v)=>{obj[k]=v.join('->');});//return 
 var ids=('profit' in qp)?mapkeys(dir2str).join(','):'1,2';
 if('ids' in qp){ids=qp.ids;if(ids==='all')ids=mapkeys(dir2str).join(',');}
 var ids_arr=ids.split(",");
+//ids_arr=ids_arr.filter(dir_filter);
 var type2dir=t=>{return "33,34,37,38".split(",").includes(t)?0:1};
 var fee_koef='fee' in qp?parseFloat(qp.fee):0.0025;
 var pay_fee=x=>x-x*fee_koef;
@@ -64,7 +68,10 @@ var unique_paths=arr=>{
   arr.map(e=>out[e.join("->")]=true);
   return mapkeys(out).map(e=>e.split("->"));
 };
+var ugz=0;
 var check_done=()=>{
+  ugz++;
+  qap_log("ugz = "+ugz);
   if(mapkeys(tables).length!=ids_arr.length)return;
   //return txt(inspect([mapkeys(tables).length,ids_arr.length,ids_arr,tables]));
   var load_time=get_ms()-bef_ms;
@@ -79,7 +86,7 @@ var check_done=()=>{
     for(var k in t){
       if(!t[k].length)bullshits.push(k);
     }
-    if(bullshits.length)txt(inspect(bullshits));
+    //if(bullshits.length)txt(inspect({bullshits:bullshits}));
     var WM='wm' in qp?qp.wm:'100';var WM=pf(WM.split(",").join("."));
     var paths=[];
     if('any' in qp){
@@ -205,35 +212,21 @@ var run=exchtype=>{
     var select=(e,arr)=>{var out={};arr.split(',').map((k,i)=>out[k]=(i==2||i==3)?pretty(d(e[k]).toFixed(2)):e[k]);insert_special_field(out,e);return out;};
     var f=obj=>{
       var wer=obj["wm.exchanger.response"];
-      if(!'WMExchnagerQuerys' in wer){txt(inspect(['error in wm.exchanger.response for ',obj]));}
-      wer_weq=wer.WMExchnagerQuerys;
-      if(!'0' in wer_weq){txt(inspect(['error in wm.exchanger.response.WMExchnagerQuerys for ',obj]));}
-      return wer_weq[0].query.map(e=>e['$']).map(e=>select(e,'id,querydate,amountin,amountout'));
+      if(!('WMExchnagerQuerys' in wer)){return [];txt(inspect(['error in wm.exchanger.response for ',obj]));}
+      var wer_weq=wer.WMExchnagerQuerys;
+      if(!('0' in wer_weq)){txt(inspect(['error in wm.exchanger.response.WMExchnagerQuerys for ',obj]));}
+      var ww0=wer_weq[0];
+      if(!('query' in ww0)){txt(inspect(['error in wm.exchanger.response.WMExchnagerQuerys.0 for ',obj]));}
+      var ww0q=ww0.query;
+      if(ww0q.map(e=>('$' in e?"":"#")).join("").length>0){txt(inspect(['error in wm.exchanger.response.WMExchnagerQuerys.0.$ for ',obj]));}
+      //txt(inspect(wer_weq[0].query));return;
+      return ww0q.map(e=>e['$']).map(e=>select(e,'id,querydate,amountin,amountout'));
     }
     var cb=(err,obj)=>g(f(obj));
     return xml2js.parseString(xml,cb);
   }
   return xhr_get("https:/"+"/wmeng.exchanger.ru/asp/XMLWMList.asp?exchtype="+exchtype,ok,txt);
 }
-ids_arr.map(run);
+if(!ids_arr.length)txt("ids_arr = []");
+ids_arr.map(run);//dir_filter
 return;
-
-if(0)
-{  
-  /*
-
-  t_world{
-    mid;
-    amount;
-    t_move{
-      wmid;
-    }
-    use{
-      var dir=dir_from_to(w.mid,w.mid);
-      w.amount=pay_fee(w.amount)*rate[reverse_dir(dir)];
-      w.mid=dir2wms[dir][1];
-    }
-  }*/
-
-  return txt(inspect(m));
-}
