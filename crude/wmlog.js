@@ -68,10 +68,7 @@ var unique_paths=arr=>{
   arr.map(e=>out[e.join("->")]=true);
   return mapkeys(out).map(e=>e.split("->"));
 };
-var ugz=0;
 var check_done=()=>{
-  ugz++;
-  qap_log("ugz = "+ugz);
   if(mapkeys(tables).length!=ids_arr.length)return;
   //return txt(inspect([mapkeys(tables).length,ids_arr.length,ids_arr,tables]));
   var load_time=get_ms()-bef_ms;
@@ -230,3 +227,22 @@ var run=exchtype=>{
 if(!ids_arr.length)txt("ids_arr = []");
 ids_arr.map(run);//dir_filter
 return;
+
+if(0)
+{  
+  /*
+  t_world{
+    mid;
+    amount;
+    t_move{
+      wmid;
+    }
+    use{
+      var dir=dir_from_to(w.mid,w.mid);
+      w.amount=pay_fee(w.amount)*rate[reverse_dir(dir)];
+      w.mid=dir2wms[dir][1];
+    }
+  }*/
+
+  return txt(inspect(m));
+}
