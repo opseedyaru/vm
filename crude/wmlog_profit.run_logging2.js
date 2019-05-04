@@ -1,5 +1,5 @@
 if('log' in qp){
-  return (fs.readFileSync("mainloop.log")+"").split("\n").map(e=>e.includes("by_timer")).join("\n");
+  return (fs.readFileSync("mainloop.log")+"").split("\n").filter(e=>e.includes("by_timer")).join("\n");
 }
 if('read' in qp){
   //exec_post_data();
