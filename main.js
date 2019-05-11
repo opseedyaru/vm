@@ -1010,7 +1010,7 @@ var requestListener=(request,response)=>{
                 ""
               ];
               if('quit' in qp)raw_quit();
-              return out.join("\n\n");
+              return txt(out.join("\n\n"));
             }
             var fn=('fn' in qp)?qp.fn:"main.js";
             xhr_get(repo+fn+'?t='+rand(),s=>{
