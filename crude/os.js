@@ -11,4 +11,7 @@ var s=f([
   ""
 ].join("\n"))+"\n"+
 f("cat /proc/meminfo").split("\n").filter(mem).join("\n");
-console.log(s);
+
+if(typeof txt!=='undefined'){
+  return txt(s);
+}else console.log(s);
