@@ -19,8 +19,9 @@ if(('test' in qp)){
 }
 if(!('sure' in qp)){
   var arr="menu,test,read,log,sure".split(",");
+  var cfn="./c/"+s.slice("./crude/".length);
   return html(links2table(
-    arr.map(e=>fn+'?&'+e))
+    arr.map(e=>cfn+'?&'+e))
   );
   //return 'sure in qp required';
 }
