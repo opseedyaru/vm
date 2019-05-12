@@ -19,7 +19,7 @@ if(('test' in qp)){
 }
 if(!('sure' in qp)){
   var arr="menu,test,read,log,sure".split(",");
-  var cfn="./c/"+fn.slice("./crude/".length);
+  var cfn="./"+fn.slice("./crude/".length);
   return html(links2table(
     arr.map(e=>cfn+'?&'+e))
   );
