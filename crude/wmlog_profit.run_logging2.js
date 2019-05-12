@@ -14,7 +14,16 @@ if('read' in qp){
   });
   return jstable(arr);
 }
-if(!('sure' in qp))return 'sure in qp required';
+if(('test' in qp)){
+  return txt(fn);
+}
+if(!('sure' in qp)){
+  var arr="menu,test,read,log,sure".split(",");
+  return html(links2table(
+    arr.map(e=>fn+'?&'+e))
+  );
+  //return 'sure in qp required';
+}
 //clear_interval(g_intervals[4]);
 //return inspect(g_intervals);
 //return set_interval+"";
