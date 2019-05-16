@@ -535,7 +535,7 @@ var main=(h2dns)=>{
     xhr_post(host+"/eval?nolog",{code:code},with_link_id,s=>qap_log("xhr_evalno_log fails: "+s));
   }
   if(api=="new_link"){
-    xhr_post(host+"/eval?nolog",{code:"return new_link().id;"},txt,s=>qap_log("xhr_evalno_log fails: "+s));
+    xhr_post(host+"/eval?nolog",{code:"return new_link().id;"},s=>qap_log(s),s=>qap_log("xhr_evalno_log fails: "+s));
   }
   if(api=="duplex"||api=="dup"){
     var with_link_id=link_id=>{
