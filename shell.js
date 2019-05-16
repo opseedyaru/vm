@@ -570,15 +570,12 @@ var hosts_update=hosts=>{
   return hosts;
 };
 
-var hosts_sync=(bef,aft)=>{
-  if((typeof bef)!="function")bef=()=>{};
-  if((typeof aft)!="function")aft=()=>{};
+var hosts_sync=(cb)=>{
+  if((typeof cb)!="function")bef=()=>{};
   xhr_get('https://raw.githubusercontent.com/adler3d/qap_vm/gh-pages/trash/test2017/hosts.json?t='+rand(),
     s=>{
-      bef(s);
       try{hosts=JSON.parse(s);}catch(e){cb(qap_err('hosts_sync.JSON.parse.hosts',e)+'\n\n'+s);return;}
       try{hosts=hosts_update(hosts);}catch(e){cb(qap_err('hosts_sync.hosts_update',e)+'\n\n'+s);return;}
-      aft(s);
     },
     s=>{hosts_err_msg=s;cb(s);}
   );
