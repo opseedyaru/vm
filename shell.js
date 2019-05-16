@@ -496,11 +496,12 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
 var force_http=false;
 var g_conf={};
 var with_protocol=host=>{
+  var a=['http://','https://'];
+  for(var i in a)if(host.startsWith(a[i]))return host;
   assert(!url.parse(host).protocol);
   var c=g_conf;
   if(!(host in c.host2vh))return host;
   var vh=c.host2vh[host];
-  var a=['http://','https://'];
   return a[c.inp.without_https.includes(vh)?0:1]+host;
 };
 
