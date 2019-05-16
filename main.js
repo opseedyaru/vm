@@ -1121,5 +1121,5 @@ var requestListener=(request,response)=>{
     });
   });
 }
-qap_log("Static file server running at http://localhost:"+port);
+qap_log("Static file server running at http://"+ip+":"+port);
 qap_log("CTRL + C to shutdown");
