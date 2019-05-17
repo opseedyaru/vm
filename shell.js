@@ -503,12 +503,14 @@ var xhr_shell_js=(method,URL,ok,err,with_end)=>{
   if(!with_end){
     var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   }
+  if(with_end){
+    req.end("var link=new_link();toR('out')(json(status:ok,link:link.id}));link.resp=response;");
+  }
   var set_raw_mode=s=>{if('setRawMode' in s)s.setRawMode(true);}
   set_raw_mode(process.stdin);
   process.stdin.setEncoding('utf8');
   process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
   process.stdin.resume();
-  if(with_end)req.end();
 }
 
 var force_http=false;
