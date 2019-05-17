@@ -504,7 +504,7 @@ var xhr_shell_js=(method,URL,ok,err,with_end)=>{
     var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   }
   if(with_end){
-    inp("var link=new_link();toR('out')(json({status:ok,link:link.id}));link.resp=response;");
+    inp("var link=new_link();toR('out')(json({status:'ok',link:link.id}));link.resp=response;");
     req.end();
     return;
   }
