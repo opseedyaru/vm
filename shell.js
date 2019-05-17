@@ -493,20 +493,22 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
   return req;
 }
 
-var xhr_shell_js=(method,URL,ok,err)=>{
+var xhr_shell_js=(method,URL,ok,err,with_end)=>{
   var fromR=(z,msg)=>{/*qap_log("\n"+json({z:z,msg:msg}));*/if(z in z2func)z2func[z](msg);};
   var z2func={out:msg=>process.stdout.write(msg),qap_log:msg=>qap_log("from_proxy: "+json(msg)),eval:msg=>eval(msg)};
   var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("xhr_shell_js.qap_http_request_decoder.on_end: // url = "+URL);});
   var toR=z=>stream_write_encoder(req,z);
 
   var inp=toR("eval");
-  var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
+  if(!with_end){
+    var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
+  }
   var set_raw_mode=s=>{if('setRawMode' in s)s.setRawMode(true);}
   set_raw_mode(process.stdin);
   process.stdin.setEncoding('utf8');
   process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
   process.stdin.resume();
-  return req;
+  if(with_end)req.end();
 }
 
 var force_http=false;
@@ -556,8 +558,7 @@ var main=(h2dns)=>{
     xhr_post(host+"/eval?nolog",{code:"return new_link().id;"},s=>qap_log(json(s)),s=>qap_log("xhr_evalno_log fails: "+s));
   }
   if(api=="shell_js"){
-    var req=xhr_shell_js("post",host+"/rt_sh",qap_log,qap_log);
-    if(with_end)req.end();
+    xhr_shell_js("post",host+"/rt_sh",qap_log,qap_log,with_end);
   }
   if(api=="duplex"||api=="dup"){
     var with_link_id=link_id=>{
