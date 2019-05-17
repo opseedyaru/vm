@@ -504,7 +504,7 @@ var xhr_shell_js=(method,URL,ok,err,with_end)=>{
         system_tmp();
         return;
       }catch(err){
-        QapNoWay();
+        //QapNoWay();
         qap_log(qap_err("xhr_shell_js.z2func.eval.msg",err));
         //req.end();on_exit();
         return;
