@@ -495,7 +495,22 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
 
 var xhr_shell_js=(method,URL,ok,err,with_end)=>{
   var fromR=(z,msg)=>{/*qap_log("\n"+json({z:z,msg:msg}));*/if(z in z2func)z2func[z](msg);};
-  var z2func={out:msg=>process.stdout.write(msg),qap_log:msg=>qap_log("from_proxy: "+json(msg)),eval:msg=>eval(msg)};
+  var z2func={
+    out:msg=>process.stdout.write(msg),
+    qap_log:msg=>qap_log("from_proxy: "+json(msg)),
+    eval:msg=>{
+      try{
+        var system_tmp=eval("()=>{"+msg+"\n;return;}");
+        system_tmp();
+        return;
+      }catch(err){
+        QapNoWay();
+        qap_log(qap_err("xhr_shell_js.z2func.eval.msg",err));
+        //req.end();on_exit();
+        return;
+      }
+    }
+  };
   var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("xhr_shell_js.qap_http_request_decoder.on_end: // url = "+URL);});
   var toR=z=>stream_write_encoder(req,z);
 
@@ -504,7 +519,7 @@ var xhr_shell_js=(method,URL,ok,err,with_end)=>{
     var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   }
   if(with_end){
-    inp("var link=new_link();toR('out')(json({status:'ok',link:link.id}));link.resp=response;");
+    inp("var link=new_link();toR('out')(json({status:'ok',link:link.id}));link.resp=response;link.toR=toR;");
     req.end();
     return;
   }
