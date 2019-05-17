@@ -506,6 +506,7 @@ var xhr_shell_js=(method,URL,ok,err)=>{
   process.stdin.setEncoding('utf8');
   process.stdin.on('data',data=>{if(data==='\u0003')process.exit();inp(data);});
   process.stdin.resume();
+  return req;
 }
 
 var force_http=false;
@@ -522,12 +523,13 @@ var with_protocol=host=>{
 
 var main=(h2dns)=>{
   var fn="mask_basepix_log.txt";
-  var api="duplex";var host="";var proxy="";
+  var api="duplex";var host="";var proxy="";var with_end=false;
   
   var f=(key,val)=>{
     if(key==="http"){force_http=true;}
     if(key==="api"){api=val;}
     if(key==="fn"){fn=val;}
+    if(key==="with_end"){with_end=true;}
     if(key==="host"){if(val in h2dns){host=with_protocol(h2dns[val]);}else{host=with_protocol(val);}}
     if(key==="proxy"){if(val in h2dns){proxy=with_protocol(h2dns[val]);}else{proxy=with_protocol(val);}}
   };
@@ -553,8 +555,9 @@ var main=(h2dns)=>{
   if(api=="new_link"){
     xhr_post(host+"/eval?nolog",{code:"return new_link().id;"},s=>qap_log(json(s)),s=>qap_log("xhr_evalno_log fails: "+s));
   }
-  if(api=="xhr_shell_js"){
-    xhr_shell_js("post",host+"/rt_sh",qap_log,qap_log);
+  if(api=="shell_js"){
+    var req=xhr_shell_js("post",host+"/rt_sh",qap_log,qap_log);
+    if(with_end)req.end();
   }
   if(api=="duplex"||api=="dup"){
     var with_link_id=link_id=>{
