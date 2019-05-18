@@ -530,7 +530,7 @@ var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
   }else{
     mem.shared_mem.toR=toR;
     mem.shared_mem.w_req=req;
-    inp("mem.link=g_links["+json(mem_link)+"];");
+    inp("mem.link=g_links["+json(mem.shared_mem.link)+"];qap_log('mem_shared_mem_link passed');");
     inp("mem.link.toR('qap_log')('connected by mem_link='+json(mem.link));");
     return;
   }
