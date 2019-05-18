@@ -521,8 +521,6 @@ var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
   if(!with_end){
     var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   }
-    toR('set_link')(mem.link.id);
-    
   if(with_end){
     mem.r_req=req;
     mem.z2func=z2func;
