@@ -496,7 +496,8 @@ var xhr_shell_reader=(method,URL,ok,err,link_id)=>{
 var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
   qap_log("xhr_shell_js:"+json([with_end,!!shared_mem]));
   var fromR=(z,msg)=>{/*qap_log("\n"+json({z:z,msg:msg}));*/if(z in z2func)z2func[z](msg);};
-  var mem={};mem.shared_mem=shared_mem;
+  var mem={};
+  if(typeof shared_mem==='object')mem.shared_mem=shared_mem;
   var run_writer=()=>xhr_shell_js(method,URL,ok,err,false,mem);
   var z2func={
     out:msg=>process.stdout.write(msg),
@@ -524,7 +525,7 @@ var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
   if(with_end){
     mem.r_req=req;
     mem.z2func=z2func;
-    inp("var L=new_link();mem.link=L;qap_log(json(L.id));toR('out')(json({status:'ok',link:L.id})+'\\n');L.resp=response;L.toR=toR;L.z2func=z2func;");
+    inp("var L=new_link();mem.link=L;qap_log(json(L.id));toR('out')(json({status:'ok',link:L.id})+'\\n');L.wo={resp:response,toR:toR,z2func:z2func};");
     inp("toR('set_link')(mem.link.id);");
     inp("toR('eval')('run_writer();');");
     req.end();
@@ -534,7 +535,9 @@ var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
     mem.shared_mem.w_req=req;
     inp("qap_log('from writer');");
     inp("mem.link=g_links["+json(mem.shared_mem.link)+"];qap_log('mem_shared_mem_link passed');");
-    inp("mem.link.toR('qap_log')('connected by mem_link='+json(mem.link.id));");
+    inp("mem.link.wo.toR('qap_log')('connected by mem_link='+json(mem.link.id));");
+    inp("mem.link.ro={resp:response,toR:toR,z2func:z2func};");
+    inp("var L=mem.link;L.toR=L.wo.toR;L.z2func=L.ro.z2func;");
     return;
   }
   var set_raw_mode=s=>{if('setRawMode' in s)s.setRawMode(true);}
