@@ -513,7 +513,7 @@ var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
         return;
       }
     },
-    set_link:msg=>{mem.link=msg;delete z2func['set_link'];}
+    set_link:msg=>{mem.link=msg;delete z2func['set_link'];qap_log(json({mem_link:mem.link}));}
   };
   var req=qap_http_request_decoder(method,URL,fromR,()=>{qap_log("xhr_shell_js.qap_http_request_decoder.on_end: // url = "+URL);});
   var toR=z=>stream_write_encoder(req,z);
@@ -521,11 +521,14 @@ var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
   if(!with_end){
     var ping=toR("ping");var iter=0;setInterval(()=>ping(""+(iter++)),500);
   }
+    toR('set_link')(mem.link.id);
+    
   if(with_end){
     mem.r_req=req;
     mem.z2func=z2func;
     inp("var L=new_link();mem.link=L;qap_log(json(L.id));toR('out')(json({status:'ok',link:L.id})+'\\n');L.resp=response;L.toR=toR;");
-    inp("toR('set_link')(mem.link.id);toR('eval')('qap_log(json({mem_link:mem.link}))');run_writer();');");
+    inp("toR('set_link')(mem.link.id);");
+    inp("toR('eval')('run_writer();');");
     req.end();
     return;
   }else{
