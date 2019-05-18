@@ -525,7 +525,7 @@ var xhr_shell_js=(method,URL,ok,err,with_end,shared_mem)=>{
     mem.r_req=req;
     mem.z2func=z2func;
     inp("var L=new_link();mem.link=L;qap_log(json(L.id));toR('out')(json({status:'ok',link:L.id})+'\\n');L.resp=response;L.toR=toR;");
-    inp("toR('set_link')(mem.link.id);toR('eval')('qap_log('mem.link = '+json(mem.link));run_writer();');");
+    inp("toR('set_link')(mem.link.id);toR('eval')('qap_log(json({mem_link:mem.link}))');run_writer();');");
     req.end();
     return;
   }else{
