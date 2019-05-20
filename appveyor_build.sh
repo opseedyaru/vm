@@ -6,5 +6,11 @@ wget https://raw.githubusercontent.com/adler3d/simple_cpp11_vm_like_x86/master/c
 g++ -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_per_cmd.out
 
 cp *.out artifacts/
+
+echo nvm install 11.6.0
+
+nvm install 11.6.0
+
 echo os_info
-node crude/os.js>artifacts/os_js.txt
+node crude/os.js|tee artifacts/os_js.txt
+echo ok
