@@ -1,13 +1,21 @@
 version: 1.0.{build}
 image: Ubuntu1604
-stack: node 10
+stack: node 9
+environment:
+  nodejs_version: "9"
+# Install scripts. (runs after repo cloning)
+install:
+  # Get the latest stable version of Node.js or io.js
+  - ps: Install-Product node $env:nodejs_version
+  # install modules
+  - npm install
 build_script:
 - sh: >-
-    echo begin
+    echo begin&& echo nodejs_version = $nodejs_version
 
     chmod +x ./appveyor_build.sh
 
-    mkdir artifacts&& node --version && g++ --version && git --version
+    mkdir artifacts&& echo node&& node --version && g++ --version && git --version
 
     ././appveyor_build.sh|tee artifacts/build.log
 
