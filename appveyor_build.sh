@@ -7,11 +7,9 @@ g++ -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_per_cmd.out
 
 cp *.out artifacts/
 
-echo npm install 11.6.0
-
-npm install
-npm install 11.6.0
-
+echo npm --version
+npm -version
+echo node --bersion
 node --version
 
 echo os_info
