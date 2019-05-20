@@ -1,6 +1,6 @@
 var execSync=require('child_process').execSync;
 var f=cmd=>execSync(cmd)+"";
-var mem=e=>"MemTotal,MemFree,MemAvailable".split(",").includes(e.split(":")[0]);
+var mem=e=>"MemTotal,MemFree,MemAvailable".split(",").indexOf(e.split(":")[0])>0;
 var s=f([
   "cat /proc/cpuinfo|grep 'model name'|awk 'NR==0;END{print}'",
   "cat /proc/cpuinfo|grep 'cache size'|awk 'NR==0;END{print}'",
