@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "...",
   "main": "mainloop.js",
-  "engines" : { "node" : ">=8.9.4 <0.99" },
   "scripts": {
     "start": "node mainloop.js 2>&1 | tee mainloop.log",
     "test": "echo \"Error: no test specified\" && exit 1"
