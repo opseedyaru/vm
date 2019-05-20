@@ -1,0 +1,21 @@
+version: 1.0.{build}
+image: Ubuntu1604
+stack: node 10
+build_script:
+- sh: >-
+    echo begin
+
+    chmod +x ./appveyor_build.sh
+
+    mkdir artifacts&& node --version && g++ --version && git --version
+
+    ././appveyor_build.sh|tee artifacts/build.log
+
+    echo end
+artifacts:
+- path: mem_detect.out
+  name: mem_detect
+- path: bq_perf_test.out
+  name: bq_perf_test
+- path: artifacts
+  name: artifacts
