@@ -7,9 +7,12 @@ g++ -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_per_cmd.out
 
 cp *.out artifacts/
 
-echo nvm install 11.6.0
+echo npm install 11.6.0
 
-nvm install 11.6.0
+npm install
+npm install 11.6.0
+
+node --version
 
 echo os_info
 node crude/os.js|tee artifacts/os_js.txt
