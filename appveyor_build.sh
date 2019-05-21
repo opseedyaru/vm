@@ -20,16 +20,16 @@ appveyor_serv_info() {
 
   echo "os_info"
   node crude/os.js|tee artifacts/os_js.txt
-  echo "more_lulz:{ssd:\n"
+  echo "more_lulz:{ssd:"
   ./cpu_cycles_per_cmd_ssd.out
-  echo ",\n"
-  echo "mem:\n"
+  echo ","
+  echo "mem:"
   ./cpu_cycles_per_cmd_mem.out
-  echo ",\n"
-  echo "bq_perf_test_all:\n"
+  echo ","
+  echo "bq_perf_test_all:"
   ./bq_perf_test.out
-  echo ",\n"
-  echo "bq_perf_test_one:\n"
+  echo ","
+  echo "bq_perf_test_one:"
   taskset -c 0 ./bq_perf_test.out
   echo "}:more_lulz"
 }
