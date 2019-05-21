@@ -8,19 +8,32 @@ g++ -DUSE_DEF_MEM -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_p
 
 cp *.out artifacts/
 
-echo npm --version
-npm -version
-echo node --bersion
-node --version
+appveyor_serv_info() {
+  echo "npm --version"
+  npm -version
+  echo "node --version"
+  node --version
+  echo "g++ --version"
+  g++ --version
+  echo "clang++ --version"
+  clang++ --version
 
-echo os_info
-node crude/os.js|tee artifacts/os_js.txt
+  echo "os_info"
+  node crude/os.js|tee artifacts/os_js.txt
+  echo "more_lulz:{ssd:\n"
+  ./cpu_cycles_per_cmd_ssd.out
+  echo ",\n"
+  echo "mem:\n"
+  ./cpu_cycles_per_cmd_mem.out
+  echo ",\n"
+  echo "bq_perf_test_all:\n"
+  ./bq_perf_test.out
+  echo ",\n"
+  echo "bq_perf_test_one:\n"
+  taskset -c 0 ./bq_perf_test.out
+  echo "}:more_lulz"
+}
 
-echo more lulz
-./cpu_cycles_per_cmd_ssd.out>>artifacts/os_js.txt
-./cpu_cycles_per_cmd_mem.out>>artifacts/os_js.txt
-./bq_perf_test.out>>artifacts/os_js.txt
-
-cat artifacts/os_js.txt
+appveyor_serv_info|tee artifacts/appveyor_serv_info.txt
 
 echo ok
