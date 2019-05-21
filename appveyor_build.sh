@@ -15,4 +15,12 @@ node --version
 
 echo os_info
 node crude/os.js|tee artifacts/os_js.txt
+
+echo more lulz
+./cpu_cycles_per_cmd_ssd.out>>artifacts/os_js.txt
+./cpu_cycles_per_cmd_mem.out>>artifacts/os_js.txt
+./bq_perf_test.out>>artifacts/os_js.txt
+
+cat artifacts/os_js.txt
+
 echo ok
