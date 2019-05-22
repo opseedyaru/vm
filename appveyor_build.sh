@@ -33,7 +33,10 @@ appveyor_serv_info() {
   taskset -c 0 ./bq_perf_test.out
   echo "}:more_lulz"
 }
+appveyor_serv_info>artifacts/appveyor_serv_info.txt
+cat artifacts/appveyor_serv_info.txt
 
-appveyor_serv_info|tee artifacts/appveyor_serv_info.txt
+npm install systeminformation
+echo "require('systeminformation').getAllData(data=>console.log(JSON.stringify(data)));"|node|tee artifacts/is.json
 
 echo ok
