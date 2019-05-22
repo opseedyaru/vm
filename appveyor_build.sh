@@ -7,7 +7,9 @@ g++ -DUSE_SSD_MEM -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_p
 g++ -DUSE_DEF_MEM -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_per_cmd_mem.out
 
 cp *.out artifacts/
-
+echo nope>artifacts/os_js.txt
+echo nope>artifacts/appveyor_serv_info.txt
+echo nope>artifacts/si.json
 appveyor_serv_info() {
   echo "npm --version"
   npm -version
@@ -37,6 +39,6 @@ appveyor_serv_info>artifacts/appveyor_serv_info.txt
 cat artifacts/appveyor_serv_info.txt
 
 npm install systeminformation
-echo "require('systeminformation').getAllData(data=>console.log(JSON.stringify(data)));"|node|tee artifacts/is.json
+echo "require('systeminformation').getAllData(data=>console.log(JSON.stringify(data)));"|node|tee artifacts/si.json
 
 echo ok
