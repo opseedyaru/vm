@@ -33,13 +33,14 @@ struct bq
 #include <unistd.h>
 #include <stdarg.h>
 double sec(){struct timeval tv;gettimeofday(&tv,NULL);return tv.tv_sec+tv.tv_usec*1e-6;}
-int main(){
-  bq<string> q0,q1;int n=2*1000*1000;
+template<class TYPE>
+void foo(string name,TYPE test_val){
+  bq<TYPE> q0,q1;int n=2*1000*1000;
   auto bef=sec();
   thread t0([&](){
     for(int i=0;i<n;i++){
-      q1.push("test");
-      assert(q0.pop()=="test");
+      q1.push(test_val);
+      assert(q0.pop()==test_val);
     }
   });
   thread t1([&](){
@@ -51,6 +52,12 @@ int main(){
   t0.join();t1.join();
   auto t=(sec()-bef);
   auto perf=double(n)/t;
-  cout<<"{sec:"<<t<<","<<"perf:"<<perf<<"}"<<endl;
+  cout<<name<<":{sec:"<<t<<","<<"perf:"<<perf<<"},"<<endl;
+}
+int main(){
+  cout<<"{"<<endl;;
+  foo<string>("string","test");
+  foo<int>("int",9000);
+  cout<<"}"<<endl;;
   return 0;
 }
