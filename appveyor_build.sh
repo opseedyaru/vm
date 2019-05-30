@@ -3,7 +3,7 @@ if [[ "$1" ==  "run" ]];then
   wget https://ci.appveyor.com/api/buildjobs/bfltbqn9rxfin3tl/artifacts/artifacts.zip
   unzip artifacts.zip
   cp artifacts/*.out ./
-  export folder="local_artifact"
+  export folder="local_artifacts"
   mkdir -p $folder
 else
 echo required os = ubuntu 1604
