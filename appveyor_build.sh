@@ -1,3 +1,11 @@
+if [ "$1" -eq  "run" ];then
+  echo "runned without g++"
+  wget https://ci.appveyor.com/api/buildjobs/bfltbqn9rxfin3tl/artifacts/artifacts.zip
+  unzip artifacts.zip
+  cp artifacts/*.out ./
+  export folder="local_artifact"
+  mkdir -p $folder
+else
 echo required os = ubuntu 1604
 g++ -std=c++14 -O2 proc_mem_limit_detector.cpp -o mem_detect.out
 g++ -std=c++14 -O2 -pthread bq_perf_test.cpp -o bq_perf_test.out
@@ -6,11 +14,15 @@ wget https://raw.githubusercontent.com/adler3d/simple_cpp11_vm_like_x86/master/c
 g++ -DUSE_SSD_MEM -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_per_cmd_ssd.out
 g++ -DUSE_DEF_MEM -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_per_cmd_mem.out
 
-cp *.out artifacts/
-echo nope>artifacts/os_js.txt
-echo nope>artifacts/appveyor_serv_info.txt
-echo nope>artifacts/si.json
-appveyor_serv_info() {
+export folder="artifacts"
+
+cp *.out $folder/
+echo nope>$folder/os_js.txt
+echo nope>$folder/appveyor_serv_info.txt
+echo nope>$folder/si.json
+fi
+
+serv_info() {
   echo "npm --version"
   npm -version
   echo "node --version"
@@ -21,7 +33,7 @@ appveyor_serv_info() {
   clang++ --version
 
   echo "os_info"
-  node crude/os.js|tee artifacts/os_js.txt
+  node crude/os.js|tee $folder/os_js.txt
   echo "more_lulz:{ssd:"
   ./cpu_cycles_per_cmd_ssd.out
   echo ","
@@ -35,10 +47,11 @@ appveyor_serv_info() {
   taskset -c 0 ./bq_perf_test.out
   echo "}:more_lulz"
 }
-appveyor_serv_info>artifacts/appveyor_serv_info.txt
-cat artifacts/appveyor_serv_info.txt
+serv_info>$folder/appveyor_serv_info.txt
+cat $folder/appveyor_serv_info.txt
 
 npm install systeminformation
-echo "require('systeminformation').getAllData(data=>console.log(JSON.stringify(data)));"|node|tee artifacts/si.json
+echo "require('systeminformation').getAllData(data=>console.log(JSON.stringify(data)));"|node|tee $folder/si.json
+
 
 echo ok
