@@ -15,7 +15,7 @@ g++ -DUSE_SSD_MEM -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_p
 g++ -DUSE_DEF_MEM -std=c++14 -O2 -pthread cpu_cycles_per_cmd.cpp -o cpu_cycles_per_cmd_mem.out
 
 export folder="artifacts"
-
+mkdir -p $folder
 cp *.out $folder/
 echo nope>$folder/os_js.txt
 echo nope>$folder/appveyor_serv_info.txt
