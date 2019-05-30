@@ -1,4 +1,4 @@
-if [ "$1" -eq  "run" ];then
+if [[ "$1" ==  "run" ]];then
   echo "runned without g++"
   wget https://ci.appveyor.com/api/buildjobs/bfltbqn9rxfin3tl/artifacts/artifacts.zip
   unzip artifacts.zip
