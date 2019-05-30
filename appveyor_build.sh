@@ -1,7 +1,8 @@
 if [[ "$1" ==  "run" ]];then
   echo "runned without g++"
   curl -L https://ci.appveyor.com/api/projects/adler3d/vm/artifacts/artifacts.zip>artifacts.zip
-  unzip artifacts.zip
+  unzip artifacts.zip -d artifacts
+  chmod +rwx artifacts/*.out
   cp artifacts/*.out ./
   export folder="local_artifacts"
   mkdir -p $folder
