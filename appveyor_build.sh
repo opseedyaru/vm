@@ -1,6 +1,6 @@
 if [[ "$1" ==  "run" ]];then
   echo "runned without g++"
-  wget https://ci.appveyor.com/api/projects/adler3d/vm/artifacts/artifacts.zip
+  curl -L https://ci.appveyor.com/api/projects/adler3d/vm/artifacts/artifacts.zip>artifacts.zip
   unzip artifacts.zip
   cp artifacts/*.out ./
   export folder="local_artifacts"
