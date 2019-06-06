@@ -598,7 +598,7 @@ var requestListener=(request,response)=>{
   if("multipart/form-data"===request.headers["content-type"])if("/upload"==uri)if("POST"===request.method){
     var form=new require('multiparty').Form();
     var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
-    form.parse(req,(err,fields,files)=>{
+    form.parse(request,(err,fields,files)=>{
       g_mp_upload_cb(err,fields,files,request,response,txt);
       //txt(inspect({fields:fields,files:files,err:err}));
     });
