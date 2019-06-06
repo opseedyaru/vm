@@ -598,8 +598,11 @@ var requestListener=(request,response)=>{
   var check_upload=()=>{
     var ct="content-type";
     if(!ct in request.headers)return false;
-    qap_log(request.headers["content-type"].toLowerCase());
-    if("/upload"===uri)if("POST"===request.method.toUpperCase())return true;
+    var ctv=request.headers[ct];
+    qap_log(ctv);
+    if("multipart/form-data"!==ctv.toLowerCase())return false;
+    if("/upload"!==uri)return false;
+    if("POST"!==request.method.toUpperCase())return false;
     return false;
   }
   if(check_upload())
