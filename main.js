@@ -607,6 +607,7 @@ var requestListener=(request,response)=>{
   }
   if(check_upload())
   {
+    // upload script: curl -F "field=value" -F "file=@file_name.mp4" http://localhost:8080/upload
     var multiparty=require('multiparty');
     var uploadDir="dir" in qp?qp.dir:"./";
     var form=new multiparty.Form({uploadDir:uploadDir});
