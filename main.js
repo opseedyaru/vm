@@ -500,6 +500,7 @@ http_server.on('clientError',(err,socket)=>{
   g_err_socks_func(err,socket);
 });
 
+var g_mp_upload_cb=(err,fields,files,request,response,txt)=>{txt(inspect({fields:fields,files:files,err:err}));}
 var g_links={};
 var gen_link_id=()=>{return rand()+" "+getDateTime();}
 var new_link=()=>{var out={id:gen_link_id()};g_links[out.id]=out;return out;}
@@ -594,6 +595,15 @@ var requestListener=(request,response)=>{
     };
     var arr=getarr(getmap(g_obj,'logs'),os.hostname()).push(f(request));
   };
+  if("multipart/form-data"===request.headers["content-type"])if("/upload"==uri)if("POST"===request.method){
+    var form=new require('multiparty').Form();
+    var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
+    form.parse(req,(err,fields,files)=>{
+      g_mp_upload_cb(err,fields,files,request,response,txt);
+      //txt(inspect({fields:fields,files:files,err:err}));
+    });
+    return;
+  }
   on_request_end((POST_BODY)=>{
     g_conf_info.last_request_host=request.headers.host;
     var POST=POST_BODY.length?qs.parse(POST_BODY):{};
