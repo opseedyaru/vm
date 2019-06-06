@@ -607,7 +607,8 @@ var requestListener=(request,response)=>{
   }
   if(check_upload())
   {
-    var form=new require('multiparty').Form();
+    var multiparty=require('multiparty');
+    var form=new multiparty.Form();
     var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
     form.parse(request,(err,fields,files)=>{
       g_mp_upload_cb(err,fields,files,request,response,txt);
