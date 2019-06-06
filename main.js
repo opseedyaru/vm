@@ -595,9 +595,14 @@ var requestListener=(request,response)=>{
     };
     var arr=getarr(getmap(g_obj,'logs'),os.hostname()).push(f(request));
   };
-  qap_log(request.headers["content-type"].toLowerCase());
-  if("multipart/form-data"===request.headers["content-type"].toLowerCase())
-  if("/upload"===uri)if("POST"===request.method.toUpperCase())
+  var check_upload=()=>{
+    var ct="content-type";
+    if(!ct in request.headers)return false;
+    qap_log(request.headers["content-type"].toLowerCase());
+    if("/upload"===uri)if("POST"===request.method.toUpperCase())return true;
+    return false;
+  }
+  if(check_upload())
   {
     var form=new require('multiparty').Form();
     var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
