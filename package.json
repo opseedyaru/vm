@@ -13,5 +13,7 @@
   },
   "author": "gitseo@ya.ru",
   "dependencies": {
+    "multiparty": "^4.2.1",
+    "pidusage": "^2.0.17"
   }
 }
