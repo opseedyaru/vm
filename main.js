@@ -599,7 +599,7 @@ var requestListener=(request,response)=>{
     var ct="content-type";
     if(!(ct in request.headers))return false;
     var ctv=request.headers[ct];
-    qap_log(inspect({ctv:ctv,uri:uri,method:request.method}));
+    //qap_log(inspect({ctv:ctv,uri:uri,method:request.method}));
     if(!ctv.toLowerCase().startsWith("multipart/form-data;"))return false;
     if("/upload"!==uri)return false;
     if("POST"!==request.method.toUpperCase())return false;
@@ -608,11 +608,11 @@ var requestListener=(request,response)=>{
   if(check_upload())
   {
     var multiparty=require('multiparty');
-    var form=new multiparty.Form();
+    var uploadDir="dir" in qp?qp.dir:"./";
+    var form=new multiparty.Form({uploadDir:uploadDir});
     var txt=((res)=>{var r=res;return s=>{r.writeHead(200,{"Content-Type":"text/plain"});r.end(s);}})(response);
     form.parse(request,(err,fields,files)=>{
       g_mp_upload_cb(err,fields,files,request,response,txt);
-      //txt(inspect({fields:fields,files:files,err:err}));
     });
     return;
   }
