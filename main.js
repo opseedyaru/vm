@@ -149,7 +149,6 @@ var maps2table=(table,dc)=>{
   var s=gen_maps2table_style("div."+dc);
   return s+'<center><pre><div class="'+dc+'">'+maps2table_impl(table)+'</div></pre></center>';
 };
-//return html_utf8('<html><title>maps2table</title><body>'+maps2table(JSON.parse(POST.data)));
 
 var getDateTime=t=>{
   var now     = typeof t==='number'?new Date(t):new Date();
@@ -765,6 +764,13 @@ var requestListener=(request,response)=>{
           return;
         };
         var jstable_right=(arr,title)=>jstable(arr,"CR",title);
+        var qap_page_v0=(title,api)=>{
+          var tag=(t,s)=>'<'+t+'>'+s+'</'+t+'>';
+          var body=api(tag);
+          return html_utf8(tag('html',tag('title',title||"")+tag('body',body)));
+          //var a=JSON.parse(POST.data);
+          //return qap_page_v0("nope",(tag)=>maps2table(a));
+        }
         var yt_title=s=>{
           response.off();
           var safe_json=obj=>json(obj).split("/").join("\\/");
