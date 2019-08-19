@@ -765,11 +765,26 @@ var requestListener=(request,response)=>{
         };
         var jstable_right=(arr,title)=>jstable(arr,"CR",title);
         var qap_page_v0=(title,api)=>{
-          var tag=(t,s)=>'<'+t+'>'+s+'</'+t+'>';
+          var tag=(t,s)=>'<'+t+'>'+s+'</'+t.split(" ")[0]+'>';
           var body=api(tag);
           return html_utf8(tag('html',tag('title',title||"")+tag('body',body)));
           //var a=JSON.parse(POST.data);
           //return qap_page_v0("nope",(tag)=>maps2table(a));
+        }
+        var qap_page_v1=(title,api)=>{
+          var tag=(t,s)=>'<'+t+'>'+s+'</'+t.split(" ")[0]+'>';
+          var gen_msg_header=name=>{
+            var arrow='<h1><font size="+20">&uarr;</font></h1>';
+            var header='<h2><small>.</small>.<b>.</b>---=( '+name+' )=---<b>.</b>.<small>.</small></h2>';
+            return arrow+header;
+          };
+          var add=(name,html)=>content.push(gen_msg_header(name)+'<pre>'+html+'</pre>');
+          var add_tab=(name,table)=>add(name,maps2table(table));
+          var add_txt=(name,s)=>add(name,"<table><tr><td><pre>"+s+"</pre></td></tr></table>");
+          var add_obj=(name,obj)=>add_table_v2(name,inspect(obj));
+          var content=[];
+          var body=api(tag,{tag,add,add_tab,add_txt,add_obj,content});
+          return html_utf8(tag('html',tag('title',title||"")+tag('body',body)));
         }
         var yt_title=s=>{
           response.off();
