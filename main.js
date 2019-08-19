@@ -91,18 +91,11 @@ var json_once=(obj,replacer,indent,limit)=>{
 var json_once_v2=(e,v,lim)=>json_once(e,v,2,lim);
 var inspect=json_once_v2;
 
-var escapeHtml=(text)=>
-{
-  if("string"!==(typeof text)){return text;}
-  return text
-      .replace(/&/g,"&amp;")
-      .replace(/</g,"&lt;")
-      .replace(/>/g,"&gt;")
-      .replace(/"/g,"&quot;")
-      .replace(/'/g,"&#039;");
+var escapeHtml=(s)=>{
+  if("string"!==(typeof text)){return s;}
+  return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 }
-var maps2table_impl=(table)=>
-{
+var maps2table_impl=(table)=>{
   function skip_field(field){
     var ignore=[];//["user_agent","request_uri","referrer"];
     for(var key in ignore)if(ignore[key]==field){return true;}
@@ -983,7 +976,7 @@ var requestListener=(request,response)=>{
           return head+as_table(arr);
         }
         if("/sitemap"==uri){
-          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",");
+          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",").concat("/g,");
           var preproc=s=>s.split('+"/').join("*cut*");
           return html(links2table(
             qap_unique(
