@@ -757,16 +757,14 @@ var requestListener=(request,response)=>{
           if("string"!==typeof conf)title=g_conf_info.vhost;
           resp_off();
           var right=s=>!flags.right?s:s.split('<tbody>').join('<tbody align="right">');
-          var center=s=>!flags.center?s:s.split('<body>').join('<center><body>');
+          var center=s=>!flags.center?s:s.split('<body>').join('<body><center>');
           var f=s=>center(right(s));
           var safe_json=obj=>json(obj).split("/").join("\\/");
           var cb=data=>html(f(data).split("</body>").join("<script>document.title+='("+title+")';draw("+safe_json(arr)+");</script></body>"));
           fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
         };
-        var jstable_right=arr=>{
-          return jstable(arr,"CR");
-        };
+        var jstable_right=(arr,title)=>jstable(arr,"CR",title);
         var yt_title=s=>{
           response.off();
           var safe_json=obj=>json(obj).split("/").join("\\/");
