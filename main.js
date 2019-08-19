@@ -73,6 +73,10 @@ var keys_with_prefix=clone_map_but_add_prefix_to_keys;
 
 var qap_foreach_key=(obj,cb)=>{for(var k in obj)cb(obj,k,obj[k]);return obj;}
 
+var arrmapdrop=(arr,keys)=>arr.map(e=>mapdrop(e,keys));
+var mapgetdef=(m,k,def)=>((k in m)?m[k]:def);
+var qapclone=obj=>JSON.parse(JSON.stringify(obj));
+
 var json_once=(obj,replacer,indent,limit)=>{
   var objs=[];var keys=[];if(typeof(limit)=='undefined')limit=2048;
   return json(obj,(key,v)=>{
