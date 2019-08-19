@@ -91,6 +91,66 @@ var json_once=(obj,replacer,indent,limit)=>{
 var json_once_v2=(e,v,lim)=>json_once(e,v,2,lim);
 var inspect=json_once_v2;
 
+var escapeHtml=(text)=>
+{
+  if("string"!==(typeof text)){return text;}
+  return text
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#039;");
+}
+var maps2table_impl=(table)=>
+{
+  function skip_field(field){
+    var ignore=[];//["user_agent","request_uri","referrer"];
+    for(var key in ignore)if(ignore[key]==field){return true;}
+    return false;
+  };
+  //var def_table=[{'id':1,'nick':'Owen'},{'id':2,'nick':'Kyle'}];
+  if(!table.length){return 'table is empty';}
+  if(!Object.keys(table[0]).length){return 'table is empty';}
+  var km={};for(var i=0;i<table.length;i++){var ex=table[i];for(var k in ex){inc(km,k);}}
+  var arr=Object.keys(km);
+  var out="";var head="";
+  for(var i in arr)
+  {
+    if(skip_field(arr[i]))continue;
+    out+='<td>'+escapeHtml(arr[i])+'</td>';
+  }
+  var head='<thead><tr>'+out+'</tr></thead>';
+  out="";
+  for(var i=0;i<table.length;i++)
+  {
+    var tmp="";
+    //var tmp_arr=table[table.length-i-1];
+    var tmp_arr=table[i];
+    for(var j=0;j<arr.length;j++){
+      //if(skip_field(key))continue;
+      var k=arr[j];var v="<b>0</b>";var bg="";
+      if(k in tmp_arr){v=escapeHtml(tmp_arr[k]);}else{/*bg='class="bgw"';*/}
+      tmp+='<td>'+v+'</td>';
+    }
+    out+='<tr>'+tmp+'</tr>';
+  }
+  out='<table>'+head+'<tbody>'+out+'</tbody></table>';
+  return out;
+}
+var gen_maps2table_style=dtm=>`<style>
+  @dtm tr:nth-child(2n){background:#FEFEFE;}
+  @dtm table{border-collapse:collapse;font-size:10pt;text-align:right}
+  @dtm thead{background:#ccc;text-align:center;font-weight:bold;}
+  @dtm td,thead{border:1px solid #800;padding:4px;}
+</style>`.split("@dtm").join('undefined'===typeof dtm?"div.table_main":dtm);
+
+var maps2table=(table,dc)=>{
+  dc='undefined'===typeof dc?'table_main':dc;
+  var s=gen_maps2table_style("div."+dc);
+  return s+'<center><pre><div class="'+dc+'">'+maps2table_impl(table)+'</div></pre></center>';
+};
+//return html_utf8('<html><title>maps2table</title><body>'+maps2table(JSON.parse(POST.data)));
+
 var getDateTime=t=>{
   var now     = typeof t==='number'?new Date(t):new Date();
   var year    = now.getFullYear();
@@ -691,22 +751,22 @@ var requestListener=(request,response)=>{
         response.off=()=>response={writeHead:()=>{},end:()=>{},off:()=>{}};
         var safe_promise_all_to=(err_cb,arr)=>Promise.all(arr).catch(err=>err_cb(qap_err('safe_promise_all',err)));
         var safe_promise_all=arr=>safe_promise_all_to(txt,arr);
-        var jstable=arr=>{
+        var jstable=(arr,conf,title)=>{
+          var flags={center:true,right:false};
+          if("string"===typeof conf)mapkeys(flags).map(k=>flags[k]=conf.toLowerCase().includes(k[0]));
+          if("string"!==typeof conf)title=g_conf_info.vhost;
           resp_off();
-          //  safe_json=obj=>json(obj).split("</script>").join("<\\/script>");
+          var right=s=>!flags.right?s:s.split('<tbody>').join('<tbody align="right">');
+          var center=s=>!flags.center?s:s.split('<body>').join('<center><body>');
+          var f=s=>center(right(s));
           var safe_json=obj=>json(obj).split("/").join("\\/");
-          var cb=data=>html(data.split("</body>").join("<script>document.title+='("+g_conf_info.vhost+")';draw("+safe_json(arr)+");</script></body>"));
+          var cb=data=>html(f(data).split("</body>").join("<script>document.title+='("+title+")';draw("+safe_json(arr)+");</script></body>"));
           fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
           return;
         };
         var jstable_right=arr=>{
-          resp_off();
-          var right=s=>s.split('<tbody>').join('<tbody align="right">');
-          var safe_json=obj=>json(obj).split("/").join("\\/");
-          var cb=data=>html(right(data).split("</body>").join("<script>document.title+='("+g_conf_info.vhost+")';draw("+safe_json(arr)+");</script></body>"));
-          fs.readFile("json2table_fish.html",(err,data)=>{if(err)throw err;cb(""+data);})
-          return;
-        }
+          return jstable(arr,"CR");
+        };
         var yt_title=s=>{
           response.off();
           var safe_json=obj=>json(obj).split("/").join("\\/");
