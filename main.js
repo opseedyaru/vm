@@ -976,7 +976,7 @@ var requestListener=(request,response)=>{
           return head+as_table(arr);
         }
         if("/sitemap"==uri){
-          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",").concat("/g,");
+          var hide="close,exit,inc,dec,del,put,get,internal,eval,tick,ping".split(",").concat("g,");
           var preproc=s=>s.split('+"/').join("*cut*");
           return html(links2table(
             qap_unique(
