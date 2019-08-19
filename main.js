@@ -147,6 +147,9 @@ var maps2table=(table,dc)=>{
   return s+'<center><pre><div class="'+dc+'">'+maps2table_impl(table)+'</div></pre></center>';
 };
 
+var parse_csv=(s,sep)=>{var t=s.split("\r").join("").split("\n").map(e=>e.split('undefined'===typeof sep?",":sep));return t;}
+var parse_csv_with_head=(s,sep)=>{var t=parse_csv(s,sep);return {head:t[0],arr:t.slice(1)};}
+
 var getDateTime=t=>{
   var now     = typeof t==='number'?new Date(t):new Date();
   var year    = now.getFullYear();
