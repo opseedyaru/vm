@@ -781,7 +781,7 @@ var requestListener=(request,response)=>{
           var add=(name,html)=>content.push(gen_msg_header(name)+'<pre>'+html+'</pre>');
           var add_tab=(name,table)=>add(name,maps2table(table));
           var add_txt=(name,s)=>add(name,"<table><tr><td><pre>"+s+"</pre></td></tr></table>");
-          var add_obj=(name,obj)=>add_table_v2(name,inspect(obj));
+          var add_obj=(name,obj)=>add_txt(name,inspect(obj));
           var content=[];
           var body=api(tag,{tag,add,add_tab,add_txt,add_obj,content});
           return html_utf8(tag('html',tag('title',title||"")+tag('body',body)));
