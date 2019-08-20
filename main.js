@@ -107,9 +107,9 @@ var maps2table_impl=(table)=>{
   };
   //var def_table=[{'id':1,'nick':'Owen'},{'id':2,'nick':'Kyle'}];
   if(!table.length){return 'table is empty';}
-  //if(!Object.keys(table[0]).length){return 'table is empty';}
   var km={};for(var i=0;i<table.length;i++){var ex=table[i];for(var k in ex){inc(km,k);}}
   var arr=Object.keys(km);
+  if(!arr.length){return 'table look like empty: '+json({"table.keys.length":arr.length,"table.length":table.length});}
   var out="";var head="";
   for(var i in arr)
   {
