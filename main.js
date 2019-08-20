@@ -107,7 +107,7 @@ var maps2table_impl=(table)=>{
   };
   //var def_table=[{'id':1,'nick':'Owen'},{'id':2,'nick':'Kyle'}];
   if(!table.length){return 'table is empty';}
-  if(!Object.keys(table[0]).length){return 'table is empty';}
+  //if(!Object.keys(table[0]).length){return 'table is empty';}
   var km={};for(var i=0;i<table.length;i++){var ex=table[i];for(var k in ex){inc(km,k);}}
   var arr=Object.keys(km);
   var out="";var head="";
