@@ -167,9 +167,10 @@ var pcsv2table_impl=(pcsv,cb)=>{
   return '<table>'+head+'<tbody>'+out+'</tbody></table>';
 }
 
-var csv2table=(str,sep)=>{
+var csv2table=(str,sep,cb)=>{
+  //var cb=(str,pos)=>{if(0)escapeHtml(str);return "<b>"+json(pos)+"</b>";};
   var pcsv=parse_csv_with_head(str,sep);
-  return with_style_for_center_pre_div_table(pcsv2table_impl(pcsv));
+  return with_style_for_center_pre_div_table(pcsv2table_impl(pcsv,cb));
 }
 
 var getDateTime=t=>{
