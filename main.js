@@ -141,15 +141,36 @@ var gen_maps2table_style=dtm=>`<style>
   @dtm td,thead{border:1px solid #800;padding:4px;}
 </style>`.split("@dtm").join('undefined'===typeof dtm?"div.table_main":dtm);
 
-var maps2table=(table,dc)=>{
+var with_style_for_center_pre_div_table=(str,dc)=>{
   dc='undefined'===typeof dc?'table_main':dc;
   var s=gen_maps2table_style("div."+dc);
-  return s+'<center><pre><div class="'+dc+'">'+maps2table_impl(table)+'</div></pre></center>';
+  return s+'<center><pre><div class="'+dc+'">'+str+'</div></pre></center>';
+}
+
+var maps2table=(table,dc)=>{
+  return with_style_for_center_pre_div_table(maps2table_impl(table),dc);
 };
 
 var parse_csv=(s,sep)=>{var t=s.split("\r").join("").split("\n").map(e=>e.split('undefined'===typeof sep?",":sep));return t;}
 var parse_csv_with_head=(s,sep)=>{var t=parse_csv(s,sep);return {head:t[0],arr:t.slice(1)};}
 var parsed_csv2maps=csv=>csv.arr.map(e=>{var out={};csv.head.map((k,id)=>out[k]=e[id]);return out;});
+
+var pcsv2table_impl=(pcsv,cb)=>{
+  cb="undefined"!==typeof cb?cb:(str,pos)=>escapeHtml(str);
+  var h=pcsv.head;
+  var out=h.map((e,id)=>"<td>"+cb(e,{t:'h',y:0,x:id})+"</td>").join("");
+  var head='<thead><tr>'+out+'</tr></thead>';
+  out=pcsv.arr.map((arr,y)=>{
+    return h.map((key,id)=>id<arr.length?cb(arr[id],{t:'b',y:y,x:id,key:key}):"<b>0</b>").map(e=>"<td>"+e+"</td>").join("");
+  });
+  out=out.map(e=>"<tr>"+e+"</tr>").join("");
+  return '<table>'+head+'<tbody>'+out+'</tbody></table>';
+}
+
+var csv2table=(str,sep)=>{
+  var pcsv=parse_csv_with_head(str,sep);
+  return with_style_for_center_pre_div_table(pcsv2table_impl(pcsv));
+}
 
 var getDateTime=t=>{
   var now     = typeof t==='number'?new Date(t):new Date();
