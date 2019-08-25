@@ -156,19 +156,19 @@ var parse_csv_with_head=(s,sep)=>{var t=parse_csv(s,sep);return {head:t[0],arr:t
 var parsed_csv2maps=csv=>csv.arr.map(e=>{var out={};csv.head.map((k,id)=>out[k]=e[id]);return out;});
 
 var pcsv2table_impl=(pcsv,cb)=>{
-  cb="undefined"!==typeof cb?cb:(str,pos)=>escapeHtml(str);
+  cb="undefined"!==typeof cb?cb:(str,pos,pcsv,arr)=>escapeHtml(str);
   var h=pcsv.head;
-  var out=h.map((e,id)=>"<td>"+cb(e,{t:'h',y:0,x:id})+"</td>").join("");
+  var out=h.map((e,id)=>"<td>"+cb(e,{t:'h',y:0,x:id},pcsv,h)+"</td>").join("");
   var head='<thead><tr>'+out+'</tr></thead>';
   out=pcsv.arr.map((arr,y)=>{
-    return h.map((key,id)=>id<arr.length?cb(arr[id],{t:'b',y:y,x:id,key:key}):"<b>0</b>").map(e=>"<td>"+e+"</td>").join("");
+    return h.map((key,id)=>id<arr.length?cb(arr[id],{t:'b',y:y,x:id,key:key},pcsv,arr):"<b>0</b>").map(e=>"<td>"+e+"</td>").join("");
   });
   out=out.map(e=>"<tr>"+e+"</tr>").join("");
   return '<table>'+head+'<tbody>'+out+'</tbody></table>';
 }
 
 var csv2table=(str,sep,cb)=>{
-  //var cb=(str,pos)=>{if(0)escapeHtml(str);return "<b>"+json(pos)+"</b>";};
+  //var cb=(str,pos,pcsv,arr)=>{if(0)escapeHtml(str);return "<b>"+json(pos)+"</b>";};
   var pcsv=parse_csv_with_head(str,sep);
   return with_style_for_center_pre_div_table(pcsv2table_impl(pcsv,cb));
 }
