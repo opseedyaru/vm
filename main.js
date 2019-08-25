@@ -138,7 +138,7 @@ var gen_maps2table_style=dtm=>`<style>
   @dtm tr:nth-child(2n){background:#FEFEFE;}
   @dtm table{border-collapse:collapse;font-size:10pt;text-align:right}
   @dtm thead{background:#ccc;text-align:center;font-weight:bold;}
-  @dtm td,thead{border:1px solid #800;padding:4px;}
+  @dtm td,thead{border:1px solid #bbb;padding:4px;}
 </style>`.split("@dtm").join('undefined'===typeof dtm?"div.table_main":dtm);
 
 var with_style_for_center_pre_div_table=(str,dc)=>{
