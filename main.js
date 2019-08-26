@@ -147,12 +147,10 @@ var with_style_for_center_pre_div_table=(str,dc)=>{
   return s+'<center><pre><div class="'+dc+'">'+str+'</div></pre></center>';
 }
 
-var maps2table=(table,dc)=>{
-  return with_style_for_center_pre_div_table(maps2table_impl(table),dc);
-};
-
+var maps2table=(table,dc)=>{return with_style_for_center_pre_div_table(maps2table_impl(table),dc);};
+var maps2csv=arr=>{var h=mapkeys(arr[0]);return h.join(",")+"\n"+arr.map(e=>h.map(k=>e[k]).join(",")).join("\n");}
 var parse_csv=(s,sep)=>{var t=s.split("\r").join("").split("\n").map(e=>e.split('undefined'===typeof sep?",":sep));return t;}
-var parse_csv_with_head=(s,sep)=>{var t=parse_csv(s,sep);return {head:t[0],arr:t.slice(1)};}
+var parse_csv_with_head=(s,sep)=>{var t=parse_csv(s,sep);var pcsv={head:t[0],arr:t.slice(1)};pcsv.get=(y,key)=>pcsv.arr[y][pcsv.head.indexOf(key)];return pcsv;};}
 var parsed_csv2maps=csv=>csv.arr.map(e=>{var out={};csv.head.map((k,id)=>out[k]=e[id]);return out;});
 
 var pcsv2table_impl=(pcsv,cb)=>{
@@ -166,7 +164,7 @@ var pcsv2table_impl=(pcsv,cb)=>{
   out=out.map(e=>"<tr>"+e+"</tr>").join("");
   return '<table>'+head+'<tbody>'+out+'</tbody></table>';
 }
-
+ 
 var csv2table=(str,sep,cb)=>{
   //var cb=(str,pos,pcsv,arr)=>{if(0)escapeHtml(str);return "<b>"+json(pos)+"</b>";};
   var pcsv=parse_csv_with_head(str,sep);
