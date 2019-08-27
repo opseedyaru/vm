@@ -137,7 +137,7 @@ var maps2table_impl=(table)=>{
 var gen_maps2table_style=dtm=>`<style>
   @dtm tr:nth-child(2n){background:#FEFEFE;}
   @dtm table{border-collapse:collapse;font-size:10pt;text-align:right}
-  @dtm thead{background:#ccc;text-align:center;font-weight:bold;}
+  @dtm th,thead{background:#ccc;text-align:center;font-weight:bold;}
   @dtm td,thead{border:1px solid #bbb;padding:4px;}
 </style>`.split("@dtm").join('undefined'===typeof dtm?"div.table_main":dtm);
 
