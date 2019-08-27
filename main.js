@@ -157,7 +157,6 @@ var parse_csv_with_head=(s,sep)=>{
   return pcsv;
 }
 var parsed_csv2maps=csv=>csv.arr.map(e=>{var out={};csv.head.map((k,id)=>out[k]=e[id]);return out;});
-
 var pcsv2table_impl=(pcsv,cb)=>{
   cb="undefined"!==typeof cb?cb:(str,pos,pcsv,arr)=>escapeHtml(str);
   var h=pcsv.head;
@@ -169,11 +168,14 @@ var pcsv2table_impl=(pcsv,cb)=>{
   out=out.map(e=>"<tr>"+e+"</tr>").join("");
   return '<table>'+head+'<tbody>'+out+'</tbody></table>';
 }
- 
-var csv2table=(str,sep,cb)=>{
-  //var cb=(str,pos,pcsv,arr)=>{if(0)escapeHtml(str);return "<b>"+json(pos)+"</b>";};
-  var pcsv=parse_csv_with_head(str,sep);
+var pcsv2table=(pcsv,cb)=>{
+  //var cb=(str,pos,pcsv,arr)=>{if(0)escapeHtml(str);return "<b>"+escapeHtml(json(pos))+"</b>";};
   return with_style_for_center_pre_div_table(pcsv2table_impl(pcsv,cb));
+}
+var csv2table=(str,sep,cb)=>{
+  //var cb=(str,pos,pcsv,arr)=>{if(0)escapeHtml(str);return "<b>"+escapeHtml(json(pos))+"</b>";};
+  var pcsv=parse_csv_with_head(str,sep);
+  return pcsv2table(pcsv,cb);
 }
 
 var getDateTime=t=>{
