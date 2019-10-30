@@ -23,29 +23,6 @@ g_58601=set_interval(()=>{for(;;){t++;if(t>1130)return txt("done");var ok=load_p
 
 return;
 
-var request = require('request');
-var iconv = require('iconv-lite');
-
-request({url: 'https://gamedev.ru/code/forum/?id=199132&from=zqn0&page=1',encoding:'binary'}, (err,res,body) => {
-    if (err) throw txt("no way");
-fs.writeFileSync("gd1.html",res.body,"binary");
-    var decoded = iconv.decode(res.body, 'win1251');
-
-    html_utf8(decoded);
-});
-
-
-
-return;
-
 var iconv =require('iconv-lite');
 resp_off();
 return html_utf8(iconv.decode(qsqs,'win1251'));
-
-
-return json(qsqs.split("https://www.khronos.org/asset")[0].split("HolyDel")[1]+"");
-/*
-
-//return html_utf8+"";
-resp_off();xhr_get("https://gamedev.ru/code/forum/?id=199132&from=zqn0&page=1",html_1251,html_1251);
-*/
