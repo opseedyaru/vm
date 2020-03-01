@@ -221,7 +221,7 @@ var parse_datetime=s=>{
   var t=s.split(' ');var ymd=t[0].split('.');var hms=t[1].split(':');
   return new Date(ymd[0],ymd[1],ymd[2],hms[0],hms[1],hms[2]);
 }
-//parse_wmdatetime("20.03.01 13:08:20");
+//parse_datetime("20.03.01 13:08:20");
 
 var parse_wmdatetime=s=>{
   var t=s.split(' ');var ymd=t[0].split('.').reverse();var hms=t[1].split(':');
