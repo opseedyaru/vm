@@ -218,7 +218,7 @@ var toHHHMMSS=s=>[s/3600,s/60,s].map(x=>x|0).map((x,i)=>i?x%60:x).map(v=>v<10?"0
 var func_to_var_decl=func=>"var "+func+"="+eval("("+func+").toString()")+";\n";
 
 var parse_wmdatetime=s=>{
-  var t=s.split(' ');var ymd=t[0].split('.').reverse();var hms=t[1].split(':');
+  var t=s.split(' ');var ymd=t[0].split('.');var hms=t[1].split(':');
   return new Date(ymd[0],ymd[1],ymd[2],hms[0],hms[1],hms[2]);
 }
 //parse_wmdatetime("28.02.2018 18:42:43");
