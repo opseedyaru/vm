@@ -1,0 +1,9 @@
+<body>
+<style type="text/css">pre{width:99%;font-family:consolas;height:35pc;overflow-y:scroll;}</style>
+<script>
+var f=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+var go=()=>document.getElementById('pre').innerHTML=f(document.body.outerHTML)
+</script>
+<font size=5>
+<button onclick="go();">GO</button>
+<br><pre id="pre" spellcheck=false contenteditable=true>text</pre></font>
