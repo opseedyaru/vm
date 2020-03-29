@@ -13,7 +13,7 @@ set_interval(()=>get_hosts_by_type('backup').map(
   e=>xhr_get('http://'+e+'/vm/ping?from='+os.hostname(),nope,nope)
 ),60*1000);
 get_hosts_by_type('backup').map(e=>xhr_get('http://'+e+'/vm/on_start?from='+os.hostname(),nope,nope));
-xhr_get('http://adler.hol.es/vm/on_start?from='+os.hostname(),nope,nope);
+//xhr_get('http://adler.hol.es/vm/on_start?from='+os.hostname(),nope,nope);
 
 var fetch_other_file=(files)=>files.map(fn=>xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/'+fn+'?t='+rand(),
   data=>{
@@ -31,7 +31,7 @@ xhr_get('https://raw.githubusercontent.com/gitseo/vm/master/main.js?t='+rand(),
       qap_log("on_restart.js :: main.js is up-to-date");
       fs.mkdir("crude",err=>{
         var crude=["wmlog.js","run_logging.js","yazl_test.js","like_ping.js","axhr_get.js","ll_all.js","show_tmptxt.js","wm_best_rates.js","os.js"].map(fn=>"crude/"+fn);
-        fetch_other_file(["shell.js","eval.html","proc_mem_limit_detector.cpp","dir2wms.json"].concat(crude));
+        fetch_other_file(["editable_pre.html","shell.js","eval.html","proc_mem_limit_detector.cpp","dir2wms.json"].concat(crude));
       });
       return;
     }
