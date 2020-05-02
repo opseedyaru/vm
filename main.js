@@ -683,7 +683,7 @@ var requestListener=(request,response)=>{
     '.mem':  "application/octet-stream",
     '.bin':  "application/octet-stream",
     '.png':  "image/png",
-    '.svg':  "image/svg",
+    '.svg':  "image/svg+xml",
     '.ico':  "image/x-icon",
     '.zip':  "application/zip",
     '.tar':  "application/x-tar",
