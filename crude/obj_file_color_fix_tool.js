@@ -1,7 +1,13 @@
+var mk_html=s=>`
+<html><body><center>
+<form method="post"><p>content of *.obj file with colors:</p><textarea name="title"></textarea></form>
+</center></body></html>
+`;
 var obj_str=POST.data;//return "ok";
-if('code' in qp)return txt(POST.code);
+if('show_code' in qp)return txt(POST.code);
+if('main' in qp)if(!('data' in qp))return html(mk_html());
 if(!('data' in qp)){
-  var arr="menu,code".split(",");
+  var arr="menu,show_code,main".split(",");
   var cfn="./"+fn.slice("./crude/".length);
   return html(links2table(
     arr.map(e=>cfn+'?&'+e))
