@@ -3,7 +3,7 @@ var mk_html=s=>`
 <body><center>
 <form id="postform" method="post">
   <p>content of *.obj file(with colored vertices):</p>
-  <textarea spellcheck=false rows="20" name="title" onkeypress="if(event.keyCode==10||(event.ctrlKey&&event.keyCode==13))document.getElementById('postform').submit();"></textarea>
+  <textarea spellcheck=false rows="20" name="data" id="data" onkeypress="if(event.keyCode==10||(event.ctrlKey&&event.keyCode==13))document.getElementById('postform').submit();"></textarea>
   <p><input type="submit" value="send"></p>
 </form>
 </center></body></html>
