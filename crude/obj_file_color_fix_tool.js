@@ -1,6 +1,8 @@
 var mk_html=s=>`
-<html><body><center>
-<form method="post"><p>content of *.obj file with colors:</p><textarea name="title"></textarea></form>
+<html><style type="text/css">textarea{width:99%;font-family:consolas;}</style>
+<body><center>
+<form method="post"><p>content of *.obj file with colors:</p>
+<textarea spellcheck=false rows="20" name="title"></textarea></form>
 </center></body></html>
 `;
 var obj_str=POST.data;//return "ok";
