@@ -1,8 +1,11 @@
 var mk_html=s=>`
 <html><style type="text/css">textarea{width:99%;font-family:consolas;}</style>
 <body><center>
-<form method="post"><p>content of *.obj file with colors:</p>
-<textarea spellcheck=false rows="20" name="title"></textarea></form>
+<form id="postform" method="post">
+  <p>content of *.obj file(with colored vertices):</p>
+  <textarea spellcheck=false rows="20" name="title" onkeypress="if(event.keyCode==10||(event.ctrlKey&&event.keyCode==13))document.getElementById('postform').submit();"></textarea>
+  <p><input type="submit" value="send"></p>
+</form>
 </center></body></html>
 `;
 var obj_str=POST.data;//return "ok";
