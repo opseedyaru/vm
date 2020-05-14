@@ -1,5 +1,5 @@
 // "new version(with ffmpeg)" can be found at "https://gitlab.com/opseed_yaru/ff_bin.git"
-if('show_code' in qp)return txt(POST.data);
+if('show_code' in qp)return txt(POST.code);
 if(!('run' in qp)){
   var arr="menu,run,show_code".split(",");
   var cfn="./"+fn.slice("./crude/".length);
