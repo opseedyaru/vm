@@ -9,11 +9,11 @@ for(var k in arr){
   out[e]=1;
 }
 var foo=e=>{return (
-'<br/><br/><div class="youtube_container">'+
-'<div class="youtube" id="yt_id_'+e+'" data-value="'+e+'">'+
-'<a href="https://www.youtube.com/watch?v='+e+'">'+
-'<img data-value="'+e+'" src="https://img.youtube.com/vi/'+e+'/maxresdefault.jpg" onload="yt_img_onload(event)">'+
-'</a></div></div>'
+  '<br/><br/><div class="youtube_container">'+
+  '<div class="youtube" id="yt_id_'+e+'" data-value="'+e+'">'+
+  '<a href="https://www.youtube.com/watch?v='+e+'">'+
+  '<img data-value="'+e+'" src="https://img.youtube.com/vi/'+e+'/maxresdefault.jpg" onload="yt_img_onload(event)">'+
+  '</a></div></div>'
 );}
 var bar=e=>"[youtube="+e+"]";
 return html(mapkeys(out).map(foo).join("\n"));
