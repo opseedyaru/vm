@@ -17,7 +17,19 @@ var cb=(err,image)=>{
     return Jimp.rgbaToInt(r,g,b,a);
   };
   for(var x=0;x<dx;x++)for(var y=0;y<dy;y++){
-    pix.map((v,i)=>image.setPixelColor(argb2rgba(v),x+i*dx,y+0));
+    var h=dx/2;var sqr=x=>x*x;
+    var qq=Math.sqrt(sqr(x-h)+sqr(y-h))/h; qq=1.0-(qq>1?1:qq); qq=Math.cos((1.0-qq)*Math.PI/2);
+    var q=(qq*255)|0;
+    var c=Jimp.rgbaToInt(q,q,q,255);
+    pix.map((v,i)=>image.setPixelColor(c,x+i*dx,y+0));
+  }
+  for(var x=0;x<dx;x++)for(var y=0;y<dy;y++){
+    var h=dx/2;var sqr=x=>x*x;
+    var qq=Math.sqrt(sqr(x-h)+sqr(y-h))/h; var fail=qq>1; qq=1.0-(qq>1?1:qq); qq=Math.cos((1.0-qq)*Math.PI/2);
+    var q=(qq*255)|0;
+    var c=Jimp.rgbaToInt(q,q,q,255);
+    pix.map((v,i)=>image.setPixelColor(c,x+i*dx,y+0));
+    if(fail)pix.map((v,i)=>image.setPixelColor(argb2rgba(v),x+i*dx,y+0));
   }
   var fn="foo.png";
   image.write(fn);
