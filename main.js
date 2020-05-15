@@ -1237,11 +1237,12 @@ var requestListener=(request,response)=>{
           if(error){throw error;}
           var arr=contentTypesByExtension;
           var ext=path.extname(filename);
-          var ct=ext in arr?arr[ext]:'application/octet-stream';
+          var ok=ext in arr;var hardcase=ext.includes(".");
+          var ct=ok?arr[ext]:(hardcase?ext.split(".").pop():'application/octet-stream');
           response.writeHead(200,{
             'Content-Type':ct,
             'Content-Length':stat.size
-          })
+          });
           fs.createReadStream(filename).pipe(response).on('end',()=>{response.destroy();request.destroy()});
         });
       };
