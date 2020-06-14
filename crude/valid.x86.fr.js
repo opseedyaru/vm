@@ -19,7 +19,7 @@ var arr0=mk_arr('"http://','http://',b);
 var arr1=mk_arr('<img src="/','/',b);
 var arr=[...arr0,...arr1];
 //return
-//mapkeys(m).map(e=>"curl "+site+m[e].raw+">./"+folder+"/"+m[e].local).map(e=>execSync(e)).join("\n");
+mapkeys(m).map(e=>"curl "+site+m[e].raw+">./"+folder+"/"+m[e].local).map(e=>execSync(e)).join("\n");
 //return [json(m),out].join("\n");//inspect(out);
 var h=s;mapkeys(m).map(e=>h=h.split(m[e].a+m[e].in_src).join(m[e].b+m[e].local));
 //return txt(inspect(m)+h);
