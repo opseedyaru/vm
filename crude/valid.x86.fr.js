@@ -1,4 +1,4 @@
-var href="https://habr.com/ru/top/";if('href' in qp)href=qp.href;if('url' in qp)href=qp.url;
+var href="http://valid.x86.fr/rzyidw";if('href' in qp)href=qp.href;if('url' in qp)href=qp.url;
 var hp=url.parse(href);
 if(!hp.protocol||!hp.protocol.includes("http"))return "protocol - required in:"+inspect(hp);
 var hpp=hp.protocol+'//';
