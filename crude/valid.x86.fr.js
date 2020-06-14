@@ -1,7 +1,7 @@
 var site='http://valid.x86.fr/';
-//execSync("curl http://valid.x86.fr/rzyidw>a.html");
+execSync("curl http://valid.x86.fr/rzyidw>valid.x86.fr.html");
 var off='style="display:none"';
-var s=(fs.readFileSync("a.html")+"").split("<script").join('<nahuy '+off).split("</script>").join("</nahuy>");
+var s=(fs.readFileSync("valid.x86.fr.html")+"").split("<script").join('<nahuy '+off).split("</script>").join("</nahuy>");
 s=s.split('<section id="main__header" role="banner">').join('<section '+off+'>');
 var m={};
 var is_normext=e=>"css,jpg,gif,svg,png".split(",").map(k=>e.includes("."+k)?"1":"").join("").length;
