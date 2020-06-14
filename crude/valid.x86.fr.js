@@ -1,4 +1,4 @@
-var site='http://valid.x86.fr/';var folder="valid.x86.fr";
+var site='http://valid.x86.fr/';var folder="valid.x86.fr";var host=request.headers.host;
 execSync("mkdir -p valid.x86.fr");
 execSync("curl http://valid.x86.fr/rzyidw>"+folder+"/index.html");
 var off='style="display:none"';
@@ -14,8 +14,9 @@ var arr2out=(prefix,a,b,arr)=>arr.filter(is_normext).map(e=>{m[e]={
   prefix,a,b
 };return e;}).join('\n');
 var mk_arr=(prefix,a,b)=>arr2out(prefix,a,b,s.split(prefix).slice(1).map(e=>e.split('"')[0]));
-var arr0=mk_arr('"http://','http://','http://vm51.herokuapp.com/'+folder+'/');
-var arr1=mk_arr('<img src="/','/','http://vm51.herokuapp.com/'+folder+'/');
+var b='http://'+host+'/'+folder+'/';
+var arr0=mk_arr('"http://','http://',b);
+var arr1=mk_arr('<img src="/','/',b);
 var arr=[...arr0,...arr1];
 //return
 //mapkeys(m).map(e=>"curl "+site+m[e].raw+">./"+folder+"/"+m[e].local).map(e=>execSync(e)).join("\n");
