@@ -8,6 +8,7 @@ execSync("curl "+href+">"+folder+"/index.html");
 var off='style="display:none"';
 var s=(fs.readFileSync(folder+"/index.html")+"").split("<script").join('<nahuy '+off).split("</script>").join("</nahuy>");
 s=s.split('<section id="main__header" role="banner">').join('<section '+off+'>');
+s=s.split('data-hide="false"').join('data-hide="true"');
 var m={};
 var is_normext=e=>"css,jpg,gif,svg,png".split(",").map(k=>e.includes("."+k)?"1":"").join("").length;
 var arr2out=(prefix,a,b,arr)=>arr.filter(is_normext).map(e=>{m[e]={
