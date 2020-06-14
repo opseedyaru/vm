@@ -1,5 +1,8 @@
-var site='http://valid.x86.fr/';var folder="valid.x86.fr";var host=request.headers.host;
-execSync("mkdir -p valid.x86.fr");
+var href="http://valid.x86.fr";if('href' in qp)href=qp.href;if('url' in qp)href=qp.url;
+var hp=url.parse(href);
+if(!hp.protocol||!hp.protocol.includes("http"))return "protocol - required in:"+inspect(hp);
+var site=hp.protocol+"//"+url.parse(href).host+'/';var folder=hp.host;var host=request.headers.host;
+execSync("mkdir -p "+folder);
 execSync("curl http://valid.x86.fr/rzyidw>"+folder+"/index.html");
 var off='style="display:none"';
 var s=(fs.readFileSync(folder+"/index.html")+"").split("<script").join('<nahuy '+off).split("</script>").join("</nahuy>");
