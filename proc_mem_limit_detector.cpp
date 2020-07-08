@@ -75,12 +75,15 @@ void text_like(vector<string>&out,CSR n,CSR v,CSR u){
   auto q=[](CSR s){return s;};
   out.push_back(q(n)+"="+q(v+u));
 }
-const auto default_params=split("./app 50 mset all dual json no_detect_swap no_show_header print_units 900 nope");
+const auto default_params=split("./app 50 mset all dual json no_detect_swap no_show_header print_units 900 nope"," ");
+const auto v0=split("./app 128 mset dots no_dual np_json detect_swap print_units 10485760"," ");
 int main(int argc,char**argv)
 {
-  if(argc==1){
+  auto arr=default_params;
+  if(argc==2&&string(argv[1])=="v0")arr=v0;
+  if(bool use_pDP=true){
     static vector<char*> ptrs;
-    static auto arr=default_params;arr[0]=argv[0];
+    arr[0]=argv[0];
     auto cn=arr.size();auto N=std::max<size_t>(cn,argc);
     arr.resize(N);ptrs.resize(N);
     for(size_t i=0;i<N;i++){ptrs[i]=i<argc?argv[i]:(i<cn?&arr[i]:argv[i]);}
@@ -134,6 +137,7 @@ int main(int argc,char**argv)
     cout<<"usage: a.out [buff_size/*in MiB*/] [mset/*memset*/ or loop/*for(...)*/] [dots|all|no] [dual] [json] [detect_swap] [show_header] [print_units] [max_mb]\n";
     cout<<"sizeof(void*) = "<<sizeof(void*)<<endl;
     cout<<"default_params: "<<join(default_params," ")<<endl;
+    cout<<"v0: "<<join(v0," ")<<endl;
   }
   //cout<<argc;return 0;
   vector<size_t*> ptrs;ptrs.reserve(1024);
