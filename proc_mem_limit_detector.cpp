@@ -109,16 +109,16 @@ int main(int argc, char **argv)
     max_mb=std::stol(argv[9]);
   }
   if(show_header){
-    cout<<"usage: a.out [buff_size/*in MiB*/] [mset/*memset*/ or loop/*for(...)*/] [dots|all|no] [dual] [json] [detect_swap] [show_header] [print_units]\n";
+    cout<<"usage: a.out [buff_size/*in MiB*/] [mset/*memset*/ or loop/*for(...)*/] [dots|all|no] [dual] [json] [detect_swap] [show_header] [print_units] [max_mb]\n";
     cout<<"sizeof(void*) = "<< sizeof(void*)<<endl;
   }
   //cout<<argc;return 0;
   vector<size_t*> ptrs;ptrs.reserve(1024);
   bool done=false;
   for(size_t i=0;i<1000*64;i++){
-    #ifdef _MSC_VER
+    //#ifdef _MSC_VER
     if((i+1)*mb>max_mb)return 0;
-    #endif
+    //#endif
     int n=1024*1024*mb;
     auto nocare=(size_t*)malloc(n);
     if(!nocare){cout<<"mem =  "<<i<<" MB"<<endl<<std::flush;return 0;}
