@@ -11,7 +11,7 @@
 unsigned long long get_tot_sysmem(){return sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGE_SIZE);}
 #else
 #include <windows.h>
-unsigned long long get_tot_sysmem(){MEMORYSTATUSEX t;t.dwLength=sizeof(t);GlobalMemoryStatusEx(&t);return status.ullTotalPhys;}
+unsigned long long get_tot_sysmem(){MEMORYSTATUSEX t;t.dwLength=sizeof(t);GlobalMemoryStatusEx(&t);return t.ullTotalPhys;}
 #endif
 using namespace std;
 static vector<string> split(const string&s,const string&needle)
