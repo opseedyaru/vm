@@ -76,13 +76,13 @@ void text_like(vector<string>&out,CSR n,CSR v,CSR u){
   out.push_back(q(n)+"="+q(v+u));
 }
 const auto default_params=split("./app 50 mset all dual json no_detect_swap no_show_header print_units 900 nope"," ");
-const auto v0=split("./app 128 mset dots no_dual np_json detect_swap print_units 10485760"," ");
-int main(int argc,char**argv)
+const auto v0=split("./app 128 mset all dual no_json no_detect_swap show_header print_units 10485760"," ");
+int main(int argc,const char**argv)
 {
   auto arr=default_params;
   if(argc==2&&string(argv[1])=="v0")arr=v0;
   if(bool use_pDP=true){
-    static vector<char*> ptrs;
+    static vector<const char*> ptrs;
     arr[0]=argv[0];
     auto cn=arr.size();auto N=std::max<size_t>(cn,argc);
     arr.resize(N);ptrs.resize(N);
