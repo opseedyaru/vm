@@ -34,7 +34,7 @@ struct bq
 #include <stdarg.h>
 double sec(){struct timeval tv;gettimeofday(&tv,NULL);return tv.tv_sec+tv.tv_usec*1e-6;}
 template<class TYPE>
-void foo(string name,TYPE test_val){
+void pingpong_T2(string name,TYPE test_val){
   bq<TYPE> q0,q1;int n=2*1000*10;
   auto bef=sec();
   thread t0([&](){
@@ -56,7 +56,7 @@ void foo(string name,TYPE test_val){
   cout<<q+name+q<<":{\"sec\":"<<t<<","<<"\"perf\":"<<perf<<"},"<<endl;
 }
 template<class TYPE>
-void raw(string name,TYPE test_val){
+void pingpong_T1(string name,TYPE test_val){
   std::deque<TYPE> q0;auto&q1=q0;int n=20*1000*1000;
   auto bef=sec();
   {
@@ -75,11 +75,12 @@ void raw(string name,TYPE test_val){
   cout<<q+name+q<<":{\"sec\":"<<t<<","<<"\"perf\":"<<int64(perf)<<"},"<<endl;
 }
 int main(){
-  cout<<"{"<<endl;;
-  foo<string>("string","test");
-  foo<int>("int",9000);
-  raw<string>("raw_string","test");
-  raw<int>("raw_int",9000);
-  cout<<"}"<<endl;;
+  typedef string str;
+  cout<<"{\"pingpong\":{"<<endl;
+  pingpong_T2<str>("str_T2","test");
+  pingpong_T2<int>("int_T2",9000);
+  pingpong_T1<str>("str_T1","test");
+  pingpong_T1<int>("int_T1",9000);
+  cout<<"\"end\":true}}"<<endl;;
   return 0;
 }
