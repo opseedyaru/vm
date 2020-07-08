@@ -8,8 +8,10 @@
 #ifndef _MSC_VER
 #include <unistd.h>
 #include <sys/time.h>
+unsigned long long get_tot_sysmem(){return sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGE_SIZE);}
 #else
 #include <windows.h>
+unsigned long long get_tot_sysmem(){MEMORYSTATUSEX t;t.dwLength=sizeof(t);GlobalMemoryStatusEx(&t);return status.ullTotalPhys;}
 #endif
 using namespace std;
 static string join(const vector<string>&arr,const string&glue)
@@ -102,6 +104,10 @@ int main(int argc, char **argv)
   if(argc>8){
     print_units=string(argv[8])=="print_units";
   }
+  size_t max_mb=10*1024*1024;
+  if(argc>9){
+    max_mb=std::stol(argv[9]);
+  }
   if(show_header){
     cout<<"usage: a.out [buff_size/*in MiB*/] [mset/*memset*/ or loop/*for(...)*/] [dots|all|no] [dual] [json] [detect_swap] [show_header] [print_units]\n";
     cout<<"sizeof(void*) = "<< sizeof(void*)<<endl;
@@ -109,7 +115,10 @@ int main(int argc, char **argv)
   //cout<<argc;return 0;
   vector<size_t*> ptrs;ptrs.reserve(1024);
   bool done=false;
-  for(int i=0;i<1000*64;i++){
+  for(size_t i=0;i<1000*64;i++){
+    #ifdef _MSC_VER
+    if((i+1)*mb>max_mb)return 0;
+    #endif
     int n=1024*1024*mb;
     auto nocare=(size_t*)malloc(n);
     if(!nocare){cout<<"mem =  "<<i<<" MB"<<endl<<std::flush;return 0;}
@@ -143,9 +152,6 @@ int main(int argc, char **argv)
     cout<<s<<"\n"<<std::flush;
     if(detect_swap)if(t>max_t){cerr<<"swap detected. // mem init"<<endl;done=true;}
     if(done)break;
-    #ifdef _MSC_VER
-    if((i+1)*mb>700)return 0;
-    #endif
     //usleep(1000*16);
   }
   return 0;
