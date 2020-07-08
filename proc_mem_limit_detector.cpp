@@ -14,6 +14,19 @@ unsigned long long get_tot_sysmem(){return sysconf(_SC_PHYS_PAGES)*sysconf(_SC_P
 unsigned long long get_tot_sysmem(){MEMORYSTATUSEX t;t.dwLength=sizeof(t);GlobalMemoryStatusEx(&t);return status.ullTotalPhys;}
 #endif
 using namespace std;
+static vector<string> split(const string&s,const string&needle)
+{
+  vector<string> arr;
+  if(s.empty())return arr;
+  size_t p=0;
+  for(;;){
+    auto pos=s.find(needle,p);
+    if(pos==std::string::npos){arr.push_back(s.substr(p));return arr;}
+    arr.push_back(s.substr(p,pos-p));
+    p=pos+needle.size();
+  }
+  return arr;
+}
 static string join(const vector<string>&arr,const string&glue)
 {
   string out;
@@ -62,9 +75,18 @@ void text_like(vector<string>&out,CSR n,CSR v,CSR u){
   auto q=[](CSR s){return s;};
   out.push_back(q(n)+"="+q(v+u));
 }
-
-int main(int argc, char **argv)
+const auto default_params=split("./app 50 mset all dual json no_detect_swap no_show_header print_units 900 nope");
+int main(int argc,char**argv)
 {
+  if(argc==1){
+    static vector<char*> ptrs;
+    static auto arr=default_params;arr[0]=argv[0];
+    auto cn=arr.size();auto N=std::max<size_t>(cn,argc);
+    arr.resize(N);ptrs.resize(N);
+    for(size_t i=0;i<N;i++){ptrs[i]=i<argc?argv[i]:(i<cn?&arr[i]:argv[i]);}
+    argv=&ptrs[0];
+    argc=arr.size();
+  }
   int mb=128;
   if(argc>1){
     mb=std::stol(argv[1]);
@@ -110,7 +132,8 @@ int main(int argc, char **argv)
   }
   if(show_header){
     cout<<"usage: a.out [buff_size/*in MiB*/] [mset/*memset*/ or loop/*for(...)*/] [dots|all|no] [dual] [json] [detect_swap] [show_header] [print_units] [max_mb]\n";
-    cout<<"sizeof(void*) = "<< sizeof(void*)<<endl;
+    cout<<"sizeof(void*) = "<<sizeof(void*)<<endl;
+    cout<<"default_params: "<<join(default_params," ")<<endl;
   }
   //cout<<argc;return 0;
   vector<size_t*> ptrs;ptrs.reserve(1024);
