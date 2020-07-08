@@ -44,12 +44,13 @@ serv_info() {
   ./bq_perf_test.out
   echo $',\n\"bq_perf_test_one\":'
   taskset -c 0 ./bq_perf_test.out
-  echo $',\n\"mem_detect\":'
+  echo $',\n\"mem_detect\":['
   ./mem_detect.out
-  echo "}:more_lulz"
+  echo $'0]}:more_lulz'
 }
 serv_info>$folder/appveyor_serv_info.txt
 cat $folder/appveyor_serv_info.txt
+node xhr_post.js $folder/appveyor_serv_info.txt
 
 npm install systeminformation
 echo "require('systeminformation').getAllData(data=>console.log(JSON.stringify(data)));"|node|tee $folder/si.json
