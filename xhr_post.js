@@ -76,7 +76,7 @@ var rand_full=()=>{var rnd=rand()+"";return "00000".substr(rnd.length)+rnd;}
 
 var say=msg=>(s)=>{qap_log(msg+"::"+s);};
 var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
-if(process.argv.length==2){
+if(process.argv.length==3){
   var fn="vm/Z"+rand_full()+"_"+rand_full()+".txt";
   var data=""+fs.readFileSync(process.argv[2]);
   xhr_post('http://qap.atwebpages.com/deploy.php',{fn,data},say("xhr_post_done"),say("xhr_post_fail"));
