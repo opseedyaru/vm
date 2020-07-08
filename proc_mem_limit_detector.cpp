@@ -5,11 +5,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
+#include <algorithm>
 #ifndef _MSC_VER
 #include <unistd.h>
 #include <sys/time.h>
 unsigned long long get_tot_sysmem(){return sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PAGE_SIZE);}
 #else
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 unsigned long long get_tot_sysmem(){MEMORYSTATUSEX t;t.dwLength=sizeof(t);GlobalMemoryStatusEx(&t);return t.ullTotalPhys;}
 #endif
