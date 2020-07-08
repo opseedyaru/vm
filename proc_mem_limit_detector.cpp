@@ -86,7 +86,7 @@ int main(int argc,char**argv)
     arr[0]=argv[0];
     auto cn=arr.size();auto N=std::max<size_t>(cn,argc);
     arr.resize(N);ptrs.resize(N);
-    for(size_t i=0;i<N;i++){ptrs[i]=i<argc?argv[i]:(i<cn?&arr[i]:argv[i]);}
+    for(size_t i=0;i<N;i++){ptrs[i]=i<argc?argv[i]:(i<cn?arr[i].c_str():argv[i]);}
     argv=&ptrs[0];
     argc=arr.size();
   }
