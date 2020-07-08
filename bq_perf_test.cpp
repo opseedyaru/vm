@@ -52,7 +52,8 @@ void foo(string name,TYPE test_val){
   t0.join();t1.join();
   auto t=(sec()-bef);
   auto perf=double(n)/t;
-  cout<<name<<":{sec:"<<t<<","<<"perf:"<<perf<<"},"<<endl;
+  string q="\"";
+  cout<<q+name+q<<":{\"sec\":"<<t<<","<<"\"perf\":"<<perf<<"},"<<endl;
 }
 template<class TYPE>
 void raw(string name,TYPE test_val){
@@ -70,7 +71,8 @@ void raw(string name,TYPE test_val){
   }
   auto t=(sec()-bef);
   auto perf=double(n)/t;
-  cout<<name<<":{sec:"<<t<<","<<"perf:"<<int(perf)<<"},"<<endl;
+  string q="\"";typedef long long int int64;
+  cout<<q+name+q<<":{\"sec\":"<<t<<","<<"\"perf\":"<<int64(perf)<<"},"<<endl;
 }
 int main(){
   cout<<"{"<<endl;;
