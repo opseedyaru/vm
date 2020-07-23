@@ -80,7 +80,7 @@ var xhr_post=(url,obj,ok,err)=>xhr('post',url,qs.stringify(obj),ok,err);
 var argc=process.argv.length;
 if([3,4].includes(argc)){
   var fn=argc==4?"vm/"+process.argv[3]:"vm/Z"+rand_full()+"_"+rand_full()+".txt";
-  var data=""+fs.readFileSync(process.argv[2]);
+  var data=""+fs.readFileSync(process.argv[2],"binary");
   xhr_post('http://qap.atwebpages.com/deploy.php',{fn,data},say("xhr_post_done"),say("xhr_post_fail"));
   qap_log("xhr_post: runned with "+json({fn}));
 }else{
