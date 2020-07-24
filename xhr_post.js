@@ -81,7 +81,7 @@ var argc=process.argv.length;
 if([3,4].includes(argc)){
   var fn=argc==4?"vm/"+process.argv[3]:"vm/Z"+rand_full()+"_"+rand_full()+".txt";
   var data=""+fs.readFileSync(process.argv[2],"binary");
-  xhr_post('http://qap.atwebpages.com/deploy.php',{fn,data},say("xhr_post_done"),say("xhr_post_fail"));
+  xhr_post('http://qap.atwebpages.com/deploy.php',{fn,data,from_js:'querystring<utf8>(data)'},say("xhr_post_done"),say("xhr_post_fail"));
   qap_log("xhr_post: runned with "+json({fn}));
 }else{
   qap_log("xhr_post: error 'process.argv.length!=2' - need local filename");
