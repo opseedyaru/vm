@@ -303,6 +303,8 @@ var send_backup=(force)=>{
   );
 }
 
+var chmodx=fn=>{var fd=fs.openSync(fn,"r");fs.fchmodSync(fd,33216);fs.close(fd);};
+
 var g_intervals=[];
 
 var set_interval=(func,ms)=>{
